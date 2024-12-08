@@ -1,12 +1,10 @@
-using System.Reflection.Emit;
 using IdGen;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Serilog; 
-using XExplorer.DataModels;
+using Serilog;
+using XExplorer.Core.Modes;
 
-namespace XExplorer.DataAccess;
+namespace XExplorer.Core.Context;
 
 /// <summary>
 /// 代表应用程序的数据库上下文，用于与SQLite数据库交互。
@@ -39,7 +37,7 @@ public class SQLiteContext : DbContext
     /// <summary>
     /// 获取或设置存储在数据库中的密码集合。
     /// </summary>
-    public DbSet<Passwords> Passwords { get; set; }
+    public DbSet<Password> Passwords { get; set; }
     
     #endregion
 

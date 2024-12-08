@@ -3,13 +3,13 @@ using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
 using Serilog;
 
-namespace XExplorer.Utils;
+namespace XExplorer.Core.Utils;
 
 public class ZipUtils
 {
     public static string[] Passwords = new[] { "1024" };
-    
-	 /// <summary>
+
+    /// <summary>
     /// Extracts a zip archive to a specified output path, trying passwords from the provided array if the archive is encrypted.
     /// </summary>
     /// <param name="archivePath">The path to the zip archive.</param>
@@ -34,11 +34,11 @@ public class ZipUtils
             {
                 // No encryption, extract directly
                 zipFile.Password = null; // No password
-                ExtractEntries(zipFile, outputPath); 
+                ExtractEntries(zipFile, outputPath);
                 return string.Empty;
             }
         }
- 
+
         // Encrypted archive, try passwords
         foreach (string password in passwords)
         {
@@ -52,7 +52,7 @@ public class ZipUtils
                     zipFile.TestArchive(true);
 
                     // If no exception, password is correct
-                    ExtractEntries(zipFile, outputPath);  
+                    ExtractEntries(zipFile, outputPath);
                     Log.Information("Extraction succeeded with password: " + password);
                     return string.Empty;
                 }
@@ -60,10 +60,10 @@ public class ZipUtils
             catch (Exception ex)
             {
                 // Password incorrect or other error
-                Log.Error($"Password '{password}' failed: {ex.Message}"); 
+                Log.Error($"Password '{password}' failed: {ex.Message}");
             }
         }
- 
+
         // If we get here, none of the passwords worked
         Log.Error("Failed to extract archive. None of the passwords worked.");
         return $"{archivePath} Failed to extract archive. None of the passwords worked.";

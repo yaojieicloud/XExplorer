@@ -1,23 +1,13 @@
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
-namespace XExplorer.DataModels;
-
-/// <summary>
-/// s实体基类
-/// </summary>
-public abstract class ModelBase
-{
-    [Key]
-    public long Id { get; set; }
-}
+namespace XExplorer.Core.Modes;
 
 /// <summary>
 /// 表示一个视频实体，用于数据库操作。
 /// </summary>
 [Table("Videos")]
-public class Video : ModelBase
+public class Video : ModeBase
 {
     /// <summary>
     /// 获取或设置视频的标题。
@@ -78,22 +68,4 @@ public class Video : ModelBase
     /// 快照列表.
     /// </summary>
     public List<Snapshot> Snapshots { get; set; } = [];
-}
-
-/// <summary>
-/// 表示视频快照的实体类。
-/// </summary>
-[Table("Snapshots")]
-public class Snapshot : ModelBase
-{
-    /// <summary>
-    /// 获取或设置与此快照关联的视频的标识符。
-    /// </summary>
-    [ForeignKey("Video")]
-    public long VideoId { get; set; }
-
-    /// <summary>
-    /// 获取或设置快照的文件路径。
-    /// </summary>
-    public string Path { get; set; }
 }

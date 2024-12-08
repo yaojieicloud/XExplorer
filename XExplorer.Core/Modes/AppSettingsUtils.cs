@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace XExplorer.Models;
+namespace XExplorer.Core.Modes;
 
 using System.IO;
 

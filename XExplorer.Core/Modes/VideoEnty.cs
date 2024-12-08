@@ -1,11 +1,9 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
-using XExplorer.DataModels;
 
-namespace XExplorer.Models;
+namespace XExplorer.Core.Modes;
 
 /// <summary>
 /// 表示视频条目，包含诸如长度、播放次数、修改时间和快照等属性。
