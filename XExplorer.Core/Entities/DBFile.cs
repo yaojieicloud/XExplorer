@@ -20,6 +20,6 @@ public class DBFile
 
     /// <summary>
     /// Gets or sets the full name of the database file, including its directory path.
-    /// </summary>
+    /// </summary> 
     public string FullName { get; set; }
 }

@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
 using XExplorer.Core.Context;
@@ -58,7 +59,7 @@ partial class DataService
         /// 此方法批量将视频对象添加到数据上下文中，并保存更改到数据库。
         /// 请确保传入的视频列表不为空，以避免不必要的数据库操作。
         /// </remarks>
-        private async Task AddAsync(List<Video> videos)
+        public async Task AddAsync(List<Video> videos)
         {
             var newVideos = videos.Where(v => !this.dataContext.Videos.Any(m => m.Id == v.Id)).ToList();
             if (newVideos?.Any() ?? false)
@@ -117,7 +118,7 @@ partial class DataService
         /// 此方法用于更新数据上下文中的视频对象，并保存更改到数据库。
         /// 在调用此方法之前，请确保视频对象的 ID 对应于数据库中已存在的记录，并且所有需要更新的属性都已正确设置。
         /// </remarks>
-        private async Task UpdateOnlyAsync(Video video)
+        public async Task UpdateOnlyAsync(Video video)
         {
             var existingVideo = this.dataContext.Videos
                 .Include(v => v.Snapshots)
@@ -139,7 +140,7 @@ partial class DataService
         /// 在调用此方法之前，请确保视频对象已经存在于数据上下文中。
         /// 需要注意的是，如果视频对象在数据库中有关联的数据（如快照），则可能需要先删除或处理这些关联数据。
         /// </remarks>
-        private async Task DeleteAsync(Video video) => await this.DeleteAsync(video.Id);
+        public async Task DeleteAsync(Video video) => await this.DeleteAsync(video.Id);
 
         /// <summary>
         /// 异步删除指定 ID 的实体。
@@ -150,7 +151,7 @@ partial class DataService
         /// 如果找不到指定的实体，此方法可能会抛出异常或执行特定的错误处理逻辑，
         /// 具体取决于实现的细节。
         /// </remarks>
-        private async Task DeleteAsync(long id)
+        public async Task DeleteAsync(long id)
         {
             var video = this.dataContext.Videos.FirstOrDefault(v => v.Id == id);
             var delSnapshots = this.dataContext.Snapshots.Where(s => s.VideoId == video.Id).ToList();
@@ -172,7 +173,7 @@ partial class DataService
         /// 请确保传入的视频列表中的每个视频对象都已经存在于数据上下文中。
         /// 如果列表中的某些视频对象在数据库中有关联的数据（如快照），则可能需要先处理这些关联数据。
         /// </remarks>
-        private async Task DeleteVideosAsync(List<Video> videos)
+        public async Task DeleteVideosAsync(List<Video> videos)
         {
             this.dataContext.Videos.RemoveRange(videos);
             await this.dataContext.SaveChangesAsync();
@@ -187,7 +188,7 @@ partial class DataService
         /// 它使用异步操作来确保数据库操作的效率。
         /// 在调用此方法之前，请确保提供的目录是有效的，并且考虑到删除操作是不可逆的。
         /// </remarks>
-        private async Task DeleteDirAsync(string dir)
+        public async Task DeleteDirAsync(string dir)
         {
             var delVideos = this.dataContext.Videos.Where(v => v.VideoDir == dir).ToList();
             var delSnapshots = this.dataContext.Snapshots.Where(s => delVideos.Any(v => v.Id == s.VideoId)).ToList();
@@ -214,7 +215,7 @@ partial class DataService
         /// <remarks>
         /// 此方法允许通过目录、标题关键字和评价分数进行筛选，并支持分页和排序。
         /// </remarks>
-        private async Task<List<Video>> QueryAsync(string? dir = null, string? caption = null, int? evaluate = null,
+        public async Task<List<Video>> QueryAsync(string? dir = null, string? caption = null, int? evaluate = null,
             bool isDesc = true, int skip = 0, int take = int.MaxValue, decimal status = 1)
         {
             var query = this.dataContext.Videos
@@ -236,6 +237,32 @@ partial class DataService
                 : (IQueryable<Video>)query.OrderByDescending(m => m.Evaluate).ThenBy(v => v.ModifyTime).ThenBy(m => m.Dir);
 
             return await query.Skip(skip).Take(take).ToListAsync();
+        }
+
+        /// <summary>
+        /// 异步查询视频的方法，根据指定的谓词条件从数据库中检索视频列表。
+        /// </summary>
+        /// <param name="predicate">用于筛选视频的谓词表达式。</param>
+        /// <returns>满足条件的视频列表。</returns>
+        public async Task<List<Video>> QueryAsync(Expression<Func<Video, bool>> predicate)
+        {
+            var query = this.dataContext.Videos
+                .Include(v => v.Snapshots).AsQueryable();
+
+            return await query.Where(predicate).ToListAsync();
+        }
+        
+        /// <summary>
+        /// 异步查询视频的方法，根据指定的谓词条件从数据库中检索视频列表。
+        /// </summary>
+        /// <param name="predicate">用于筛选视频的谓词表达式。</param>
+        /// <returns>满足条件的视频列表。</returns>
+        public async Task<Video> FirstAsync(Expression<Func<Video, bool>> predicate)
+        {
+            var query = this.dataContext.Videos
+                .Include(v => v.Snapshots).AsQueryable();
+
+            return await query.Where(predicate).FirstOrDefaultAsync();
         }
     }
 }

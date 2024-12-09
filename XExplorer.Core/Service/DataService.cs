@@ -49,8 +49,9 @@ public partial class DataService
     private DBFile GetSqlitePath()
     {
         var dbfile = new DBFile(); 
-        dbfile.Name = $"data.db";
-        dbfile.FullName = Path.Combine(AppSettingsUtils.Default.DBDir, dbfile.Name);
+        dbfile.Name = Path.GetFileName(AppSettingsUtils.Default.Current.DBPath);
+        dbfile.FullName = AppSettingsUtils.Default.Current.DBPath;
+        dbfile.Dir = Path.GetDirectoryName(AppSettingsUtils.Default.Current.DBPath);
         return dbfile;
     }
 }
