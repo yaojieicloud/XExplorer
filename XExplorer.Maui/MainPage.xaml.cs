@@ -2,22 +2,28 @@
 
 public partial class MainPage : ContentPage
 {
-    int count = 0;
-
     public MainPage()
     {
         InitializeComponent();
     }
-
-    private void OnCounterClicked(object sender, EventArgs e)
+    
+    // File 菜单的二级菜单
+    private async void OnFileMenuClicked(object sender, EventArgs e)
     {
-        count++;
+        string action = await DisplayActionSheet("File Menu", "Cancel", null, "New File", "Open File", "Save File");
+        if (action != "Cancel")
+        {
+            await DisplayAlert("You Selected", action, "OK");
+        }
+    }
 
-        if (count == 1)
-            CounterBtn.Text = $"Clicked {count} time";
-        else
-            CounterBtn.Text = $"Clicked {count} times";
-
-        SemanticScreenReader.Announce(CounterBtn.Text);
+    // Edit 菜单的二级菜单
+    private async void OnEditMenuClicked(object sender, EventArgs e)
+    {
+        string action = await DisplayActionSheet("Edit Menu", "Cancel", null, "Copy", "Paste", "Undo");
+        if (action != "Cancel")
+        {
+            await DisplayAlert("You Selected", action, "OK");
+        }
     }
 }
