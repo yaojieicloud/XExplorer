@@ -1,10 +1,13 @@
-﻿namespace XExplorer.Maui;
+﻿using XExplorer.Core.ViewModel;
+
+namespace XExplorer.Maui;
 
 public partial class MainPage : ContentPage
 {
     public MainPage()
     {
-        InitializeComponent();
+        this.InitializeComponent();
+        this.BindingContext = new MainViewModel();
     }
     
     // File 菜单的二级菜单
