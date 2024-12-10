@@ -50,12 +50,28 @@ public class AppSettings
 public class Conf
 {
     /// <summary>
-    ///     DBPath
+    /// 获取或设置数据存储目录路径，以便应用程序存放其相关的文件或数据。
+    /// 根据当前操作系统的配置（Windows 或 MacCatalyst）可以有不同的路径设定。
+    /// </summary>
+    public string DataDir { get; set; }
+
+    /// <summary>
+    /// 获取或设置数据库文件的路径。
+    /// DBPath 属性用于指定应用程序使用的数据库文件的存储位置，
+    /// 以确保数据存储和访问的便捷性。
     /// </summary>
     public string DBPath { get; set; } = "";
 
     /// <summary>
-    ///     VLCPath
+    /// 获取或设置VLC播放器的路径。
+    /// 默认值为 "/Applications/VLC.app/Contents/MacOS/VLC"。
+    /// 该属性用于指定VLC播放器的可执行文件路径，以便在系统上运行或与其他应用程序进行交互。
     /// </summary>
     public string VLCPath { get; set; } = "/Applications/VLC.app/Contents/MacOS/VLC";
+
+    /// <summary>
+    /// 获取或设置应用程序的根目录路径。
+    /// 根目录是配置文件、数据库及其他应用程序资源的基础位置，通常根据操作系统的不同而有所变化。
+    /// </summary>
+    public string RootDir { get; set; }
 }

@@ -45,8 +45,23 @@ public partial class MainViewModel : CommunityToolkit.Mvvm.ComponentModel.Observ
     [ObservableProperty]
     private ObservableCollection<VideoMode> videos = new();
 
+    /// <summary>
+    /// 一个私有变量，代表用户当前选择的目录路径。用于
+    /// 记录和管理用户导航的文件夹，支持界面中目录
+    /// 相关操作的实现。当目录加载时，
+    /// 此变量会更新以反映用户的新选择。
+    /// </summary>
     [ObservableProperty]
     private string selectedDir;
+
+    /// <summary>
+    /// 一个私有变量，用于存储目录路径的集合。该集合是
+    /// <see cref="ObservableCollection{T}"/> 类型，支持在 UI 中动态更新和绑定。
+    /// <see cref="dirs"/> 变量由 <see cref="MainViewModel"/> 管理，负责跟踪应用程序
+    /// 中需要显示的所有目录路径。
+    /// </summary>
+    [ObservableProperty]
+    private ObservableCollection<string> dirs = new();
     #endregion
 
     #region Command
@@ -86,6 +101,9 @@ public partial class MainViewModel : CommunityToolkit.Mvvm.ComponentModel.Observ
     /// </summary>
     public MainViewModel()
     {
+        var allDirs = Directory.GetDirectories(@"\\192.168.10.2\99_资源收藏\01_成人资源");
+        var videoDirs = Directory.GetDirectories(AppSettingsUtils.Default.Current.RootDir)?.ToList();
         this.dataService = new DataService();
+        this.Dirs = new(videoDirs);
     }
 }

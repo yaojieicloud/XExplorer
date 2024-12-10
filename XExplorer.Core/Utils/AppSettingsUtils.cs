@@ -25,6 +25,9 @@ public static class AppSettingsUtils
     /// <param name="jsonPath">包含应用程序设置的 JSON 文件的路径。</param>
     public static void LoadJson(string jsonPath)
     {
+        if (!File.Exists(jsonPath))
+            throw new FileNotFoundException(jsonPath);
+        
         var jsonTxt = File.ReadAllText(jsonPath);
         Default = JsonConvert.DeserializeObject<AppSettings>(jsonTxt);
     }

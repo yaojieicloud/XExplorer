@@ -6,102 +6,102 @@
     <ContentPage.BindingContext>
         <vm:MainViewModel/>
     </ContentPage.BindingContext>
-    <Grid Margin="10" x:Name="MainGrid">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="10"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <HorizontalStackLayout Grid.Row="0">
-            <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center"  Text="目录："/>
-            <Picker SelectedItem="{Binding SelectedDir}" 
-                    ItemsSource="{Binding DirPaths}" 
-                    HorizontalTextAlignment="Start" 
-                    HorizontalOptions="StartAndExpand"
-                    MinimumWidthRequest="300"/>
-            <Button Text="加载" ToolTipProperties.Text="懒加载" Command="{Binding LoadDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button>
-            <Button Text="全载" ToolTipProperties.Text="全部加载" Command="{Binding LoadAllDirsCommand}" MinimumWidthRequest="50" Margin="10,0"></Button>
-            <Button Text="处理" ToolTipProperties.Text="视频处理" Command="{Binding ProcessVideosCommand}" MinimumWidthRequest="50" Margin="10,0"></Button>
-            <Button Text="清源" ToolTipProperties.Text="清理原始目录" Command="{Binding DeleteOriginalCommand}" MinimumWidthRequest="50" Margin="10,0"></Button>
-            <Button Text="日志" ToolTipProperties.Text="打开日志目录" Command="{Binding OpenLogDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button>
-            <Button Text="数据" ToolTipProperties.Text="打开数据目录" Command="{Binding OpenDataDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button>
-            <Button Text="清垃圾" ToolTipProperties.Text="清理数据目录不再使用的图片资源" Command="{Binding ClearInvalidDataDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button>
-            <Button Text="删数据" ToolTipProperties.Text="删除选中目录的数据目录" Command="{Binding ClearDataCommand}" MinimumWidthRequest="50" Margin="10,0"></Button>
-        </HorizontalStackLayout>
-        <BoxView Grid.Row="1" HeightRequest="1" BackgroundColor="Black" HorizontalOptions="FillAndExpand" />
-        <VerticalStackLayout Grid.Row="2" x:Name="ManLayout">
-            <ScrollView VerticalScrollBarVisibility="Always" x:Name="MainScroll"
-                        HorizontalScrollBarVisibility="Always"
-                        HorizontalOptions="StartAndExpand">
-                <CollectionView ItemsSource="{Binding Videos}" x:Name="MainCView">
-                    <CollectionView.ItemsLayout>
-                        <GridItemsLayout Orientation="Vertical"/>
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Border HeightRequest="400" HorizontalOptions="Start">
-                                <VerticalStackLayout>
-                                    <HorizontalStackLayout HeightRequest="30">
-                                        <Label Text="{Binding Dir}" />
-                                    </HorizontalStackLayout>
-                                    <BoxView HeightRequest="1" BackgroundColor="Black" HorizontalOptions="FillAndExpand" />
-                                    <HorizontalStackLayout HeightRequest="30">
-                                        <Label Text="{Binding Caption}" />
-                                        <Label Text="===" />
-                                        <Label Text="{Binding Length}" />
-                                        <Label Text="MB" />
-                                        <Label Text="===" />
-                                        <Label Text="{Binding PlayCount}" />
-                                        <Label Text="===" />
-                                        <Label Text="{Binding MidifyTime}" />
-                                        <Label Text="===" />
-                                    </HorizontalStackLayout>
-                                    <BoxView HeightRequest="1" BackgroundColor="Black" HorizontalOptions="FillAndExpand" />
-                                    <HorizontalStackLayout>
-                                        <CollectionView ItemsSource="{Binding Snapshots}" 
-                                                        HorizontalScrollBarVisibility="Always"                                                        >
-                                            <CollectionView.ItemsLayout>
-                                                <LinearItemsLayout Orientation="Horizontal"/>
-                                            </CollectionView.ItemsLayout>
-                                            <CollectionView.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Image Source="{Binding}"
-                                                           HeightRequest="300" 
-                                                           WidthRequest="400" >
-                                                    </Image>
-                                                </DataTemplate>
-                                            </CollectionView.ItemTemplate>
-                                        </CollectionView>
-                                    </HorizontalStackLayout>
-
-                                    <HorizontalStackLayout HeightRequest="35" 
-                                                           HorizontalOptions="StartAndExpand" 
-                                                           VerticalOptions="CenterAndExpand">
-                                        <Button MinimumWidthRequest="150" Text="Play" 
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ViewModels:MainViewModel}}, Path=PlayCommand}" 
-                                                CommandParameter="{Binding VideoPath}" />
-                                        <Button MinimumWidthRequest="150" Text="Folder" 
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ViewModels:MainViewModel}}, Path=FolderCommand}"
-                                                CommandParameter="{Binding VideoPath}" />
-                                        <Button MinimumWidthRequest="150" Text="Del" 
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ViewModels:MainViewModel}}, Path=DeleteCommand}"
-                                                CommandParameter="{Binding}" />
-                                        <Button MinimumWidthRequest="150" Text="Del folder" 
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ViewModels:MainViewModel}}, Path=DeleteFolderCommand}"
-                                                CommandParameter="{Binding}" />
-                                        <Button MinimumWidthRequest="150" Text="Reset" 
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ViewModels:MainViewModel}}, Path=ResetVideoCommand}"
-                                                CommandParameter="{Binding}" />
-                                    </HorizontalStackLayout>
-                                </VerticalStackLayout>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </ScrollView>
-        </VerticalStackLayout>
-    </Grid>
+    <!-- <Grid Margin="10" x:Name="MainGrid"> -->
+    <!--     <Grid.RowDefinitions> -->
+    <!--         <RowDefinition Height="40"/> -->
+    <!--         <RowDefinition Height="10"/> -->
+    <!--         <RowDefinition Height="*"/> -->
+    <!--     </Grid.RowDefinitions> -->
+    <!--     <Grid.ColumnDefinitions> -->
+    <!--         <ColumnDefinition Width="*"/> -->
+    <!--     </Grid.ColumnDefinitions> -->
+    <!--     <HorizontalStackLayout Grid.Row="0"> -->
+    <!--         <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center"  Text="目录："/> -->
+    <!--         <Picker SelectedItem="{Binding SelectedDir}"  -->
+    <!--                 ItemsSource="{Binding Dirs}"  -->
+    <!--                 HorizontalTextAlignment="Start"  -->
+    <!--                 HorizontalOptions="StartAndExpand" -->
+    <!--                 MinimumWidthRequest="300"/> -->
+    <!--         <Button Text="加载" ToolTipProperties.Text="懒加载" Command="{Binding LoadDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
+    <!--         ~1~ <Button Text="全载" ToolTipProperties.Text="全部加载" Command="{Binding LoadAllDirsCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> @1@ -->
+    <!--         ~1~ <Button Text="处理" ToolTipProperties.Text="视频处理" Command="{Binding ProcessVideosCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> @1@ -->
+    <!--         ~1~ <Button Text="清源" ToolTipProperties.Text="清理原始目录" Command="{Binding DeleteOriginalCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> @1@ -->
+    <!--         ~1~ <Button Text="日志" ToolTipProperties.Text="打开日志目录" Command="{Binding OpenLogDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> @1@ -->
+    <!--         ~1~ <Button Text="数据" ToolTipProperties.Text="打开数据目录" Command="{Binding OpenDataDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> @1@ -->
+    <!--         ~1~ <Button Text="清垃圾" ToolTipProperties.Text="清理数据目录不再使用的图片资源" Command="{Binding ClearInvalidDataDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> @1@ -->
+    <!--         ~1~ <Button Text="删数据" ToolTipProperties.Text="删除选中目录的数据目录" Command="{Binding ClearDataCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> @1@ -->
+    <!--     </HorizontalStackLayout> -->
+    <!--     <BoxView Grid.Row="1" HeightRequest="1" BackgroundColor="Black" HorizontalOptions="FillAndExpand" /> -->
+    <!--     <VerticalStackLayout Grid.Row="2" x:Name="ManLayout"> -->
+    <!--         <ScrollView VerticalScrollBarVisibility="Always" x:Name="MainScroll" -->
+    <!--                     HorizontalScrollBarVisibility="Always" -->
+    <!--                     HorizontalOptions="StartAndExpand"> -->
+    <!--             <CollectionView ItemsSource="{Binding Videos}" x:Name="MainView"> -->
+    <!--                 <CollectionView.ItemsLayout> -->
+    <!--                     <GridItemsLayout Orientation="Vertical"/> -->
+    <!--                 </CollectionView.ItemsLayout> -->
+    <!--                 <CollectionView.ItemTemplate> -->
+    <!--                     <DataTemplate> -->
+    <!--                         <Border HeightRequest="400" HorizontalOptions="Start"> -->
+    <!--                             <VerticalStackLayout> -->
+    <!--                                 <HorizontalStackLayout HeightRequest="30"> -->
+    <!--                                     <Label Text="{Binding Dir}" /> -->
+    <!--                                 </HorizontalStackLayout> -->
+    <!--                                 <BoxView HeightRequest="1" BackgroundColor="Black" HorizontalOptions="FillAndExpand" /> -->
+    <!--                                 <HorizontalStackLayout HeightRequest="30"> -->
+    <!--                                     <Label Text="{Binding Caption}" /> -->
+    <!--                                     <Label Text="===" /> -->
+    <!--                                     <Label Text="{Binding Length}" /> -->
+    <!--                                     <Label Text="MB" /> -->
+    <!--                                     <Label Text="===" /> -->
+    <!--                                     <Label Text="{Binding PlayCount}" /> -->
+    <!--                                     <Label Text="===" /> -->
+    <!--                                     <Label Text="{Binding ModifyTime}" /> -->
+    <!--                                     <Label Text="===" /> -->
+    <!--                                 </HorizontalStackLayout> -->
+    <!--                                 <BoxView HeightRequest="1" BackgroundColor="Black" HorizontalOptions="FillAndExpand" /> -->
+    <!--                                 <HorizontalStackLayout> -->
+    <!--                                     <CollectionView ItemsSource="{Binding Snapshots}"  -->
+    <!--                                                     HorizontalScrollBarVisibility="Always"                                                        > -->
+    <!--                                         <CollectionView.ItemsLayout> -->
+    <!--                                             <LinearItemsLayout Orientation="Horizontal"/> -->
+    <!--                                         </CollectionView.ItemsLayout> -->
+    <!--                                         <CollectionView.ItemTemplate> -->
+    <!--                                             <DataTemplate> -->
+    <!--                                                 <Image Source="{Binding}" -->
+    <!--                                                        HeightRequest="300"  -->
+    <!--                                                        WidthRequest="400" > -->
+    <!--                                                 </Image> -->
+    <!--                                             </DataTemplate> -->
+    <!--                                         </CollectionView.ItemTemplate> -->
+    <!--                                     </CollectionView> -->
+    <!--                                 </HorizontalStackLayout> -->
+    <!-- -->
+    <!--                                 <HorizontalStackLayout HeightRequest="35"  -->
+    <!--                                                        HorizontalOptions="StartAndExpand"  -->
+    <!--                                                        VerticalOptions="CenterAndExpand"> -->
+    <!--                                     ~1~ <Button MinimumWidthRequest="150" Text="Play"  @1@ -->
+    <!--                                     ~1~         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=PlayCommand}"  @1@ -->
+    <!--                                     ~1~         CommandParameter="{Binding VideoPath}" /> @1@ -->
+    <!--                                     ~1~ <Button MinimumWidthRequest="150" Text="Folder"  @1@ -->
+    <!--                                     ~1~         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=FolderCommand}" @1@ -->
+    <!--                                     ~1~         CommandParameter="{Binding VideoPath}" /> @1@ -->
+    <!--                                     ~1~ <Button MinimumWidthRequest="150" Text="Del"  @1@ -->
+    <!--                                     ~1~         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteCommand}" @1@ -->
+    <!--                                     ~1~         CommandParameter="{Binding}" /> @1@ -->
+    <!--                                     ~1~ <Button MinimumWidthRequest="150" Text="Del folder"  @1@ -->
+    <!--                                     ~1~         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteFolderCommand}" @1@ -->
+    <!--                                     ~1~         CommandParameter="{Binding}" /> @1@ -->
+    <!--                                     ~1~ <Button MinimumWidthRequest="150" Text="Reset"  @1@ -->
+    <!--                                     ~1~         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=ResetVideoCommand}" @1@ -->
+    <!--                                     ~1~         CommandParameter="{Binding}" /> @1@ -->
+    <!--                                 </HorizontalStackLayout> -->
+    <!--                             </VerticalStackLayout> -->
+    <!--                         </Border> -->
+    <!--                     </DataTemplate> -->
+    <!--                 </CollectionView.ItemTemplate> -->
+    <!--             </CollectionView> -->
+    <!--         </ScrollView> -->
+    <!--     </VerticalStackLayout> -->
+    <!-- </Grid> -->
 </ContentPage>
