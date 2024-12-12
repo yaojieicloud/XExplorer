@@ -3,6 +3,7 @@ using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
+using XExplorer.Core.Dictionaries;
 using XExplorer.Core.Modes;
 using XExplorer.Core.Service;
 using XExplorer.Core.Utils;
@@ -54,5 +55,23 @@ partial class MainViewModel
         } 
         
         this.Dirs = new ObservableCollection<DirInfo>(videoDirs);
+    }
+
+    private string AdjustPath(string path)
+    {
+        if (AppSettingsUtils.Default.OS == OS.MacCatalyst)
+        {
+            // 将 Windows 路径转换成 Mac 的路径
+            path = path.Replace(AppSettingsUtils.Default.Windows.Volume, AppSettingsUtils.Default.Mac.Volume); 
+            path = path.Replace('\\', '/');
+        }
+        else
+        {
+            // 将 Mac 路径转换成 Windows 的路径
+            path = path.Replace(AppSettingsUtils.Default.Mac.Volume, AppSettingsUtils.Default.Windows.Volume); 
+            path = path.Replace('/', '\\');
+        }
+        
+        return path;
     }
 }

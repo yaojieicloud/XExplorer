@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
+using XExplorer.Core.Dictionaries;
 using XExplorer.Core.Modes;
 
 namespace XExplorer.Core.ViewModel;
@@ -30,12 +31,20 @@ partial class MainViewModel
         try
         {
             string path = param as string;
-            if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+            if (!string.IsNullOrWhiteSpace(path))
             {
-                Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"--no-one-instance \"{path}\"");
+                var currPath = this.AdjustPath(path);
+                if (AppSettingsUtils.Default.OS == OS.Windows)
+                    Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"--no-one-instance \"{currPath}\"");
+                else
+                    Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"\"{currPath}\"");
+                
                 var entry = await this.dataService.VideosService.FirstAsync(m => m.VideoPath == path);
-                entry.PlayCount++;
-                await this.dataService.VideosService.UpdateOnlyAsync(entry);
+                if (entry != null)
+                {
+                    entry.PlayCount++;
+                    await this.dataService.VideosService.UpdateOnlyAsync(entry);
+                }
             }
         }
         catch (Exception ex)

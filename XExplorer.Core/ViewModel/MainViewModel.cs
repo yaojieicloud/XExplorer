@@ -3,6 +3,7 @@ using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
+using XExplorer.Core.Dictionaries;
 using XExplorer.Core.Modes;
 using XExplorer.Core.Service;
 using XExplorer.Core.Utils;
@@ -44,6 +45,16 @@ public partial class MainViewModel : ObservableObject
             Processing = true;
             Videos.Clear();
             var enties = await dataService.VideosService.QueryAsync(this.SelectedDir.ValidName);
+
+            Parallel.ForEach(enties, m =>
+            {
+                m.Snapshots.ForEach(s =>
+                {
+                    s.Path = Path.Combine(AppSettingsUtils.Default.Current.DataDir, s.Path);
+                    s.Path = AppSettingsUtils.Default.OS == OS.MacCatalyst ? s.Path.Replace('\\', '/') : s.Path.Replace('/', '\\');
+                });
+            });
+            
             var modes = enties.ToModes();
             Videos = new ObservableCollection<VideoMode>(modes);
         }
