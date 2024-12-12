@@ -224,7 +224,7 @@ partial class DataService
             query = query.Where(m => m.Status == status);
 
             if (!string.IsNullOrWhiteSpace(dir))
-                query = query.Where(m => m.VideoDir == dir);
+                query = query.Where(m => m.VideoDir.Replace(@"\","/").EndsWith(dir.Replace(@"\","/")));
 
             if (!string.IsNullOrWhiteSpace(caption))
                 query = query.Where(m => m.Caption.Contains(caption));
@@ -236,6 +236,8 @@ partial class DataService
                 ? query.OrderByDescending(m => m.Evaluate).ThenByDescending(v => v.ModifyTime).ThenBy(m => m.Dir)
                 : (IQueryable<Video>)query.OrderByDescending(m => m.Evaluate).ThenBy(v => v.ModifyTime).ThenBy(m => m.Dir);
 
+            var sql = query.ToQueryString();
+            
             return await query.Skip(skip).Take(take).ToListAsync();
         }
 

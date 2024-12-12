@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using IdGen;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -57,6 +58,7 @@ public class SQLiteContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlite($"Data Source={DBFile}").LogTo(Log.Information, LogLevel.Information);
+        optionsBuilder.LogTo(WriteDebugLog, LogLevel.Information);
 
         // Enable sensitive data logging if needed
         optionsBuilder.EnableSensitiveDataLogging();
@@ -137,4 +139,6 @@ public class SQLiteContext : DbContext
 
         return snapshot;
     } 
+    
+    private void WriteDebugLog(string message) => Debug.WriteLine(message);
 } 

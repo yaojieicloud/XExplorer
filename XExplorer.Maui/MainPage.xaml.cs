@@ -1,4 +1,5 @@
-﻿using XExplorer.Core.ViewModel;
+﻿using CommunityToolkit.Maui.Views;
+using XExplorer.Core.ViewModel;
 
 namespace XExplorer.Maui;
 
@@ -7,7 +8,6 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         this.InitializeComponent();
-        this.BindingContext = new MainViewModel();
     }
     
     // File 菜单的二级菜单
@@ -28,5 +28,10 @@ public partial class MainPage : ContentPage
         {
             await DisplayAlert("You Selected", action, "OK");
         }
+    }
+
+    private void Button_OnClicked(object? sender, EventArgs e)
+    {
+        //this.ShowPopup(DirPopup);
     }
 }

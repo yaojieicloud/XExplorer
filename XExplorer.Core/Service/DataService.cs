@@ -40,15 +40,17 @@ public partial class DataService
     {
         var dbfile = this.GetSqlitePath();
         this.dataContext = new SQLiteContext(dbfile.FullName);
+        this.VideosService = new(this.dataContext);
+        this.PwdService = new(this.dataContext); 
     }
-    
+
     /// <summary>
     /// 获取数据目录路径
     /// </summary>
     /// <returns>包含目录路径、文件路径和名称的元组</returns>
     private DBFile GetSqlitePath()
     {
-        var dbfile = new DBFile(); 
+        var dbfile = new DBFile();
         dbfile.Name = Path.GetFileName(AppSettingsUtils.Default.Current.DBPath);
         dbfile.FullName = AppSettingsUtils.Default.Current.DBPath;
         dbfile.Dir = Path.GetDirectoryName(AppSettingsUtils.Default.Current.DBPath);

@@ -50,6 +50,13 @@ public class AppSettings
 public class Conf
 {
     /// <summary>
+    /// 获取或设置音量存储路径配置。
+    /// 此属性指定了存储数据的卷路径，
+    /// 它通常与相应的操作系统配置文件关联，例如 Windows 或 Mac 的存储卷路径。
+    /// </summary>
+    public string Volume { get; set; }
+    
+    /// <summary>
     /// 获取或设置数据存储目录路径，以便应用程序存放其相关的文件或数据。
     /// 根据当前操作系统的配置（Windows 或 MacCatalyst）可以有不同的路径设定。
     /// </summary>
