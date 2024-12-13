@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -57,10 +58,12 @@ public partial class MainViewModel : ObservableObject
             
             var modes = enties.ToModes();
             Videos = new ObservableCollection<VideoMode>(modes);
+            this.Notification($"数据加载完成！");
         }
         catch (Exception ex)
         {
             Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+            this.Notification($"{ex}");
         }
         finally
         {
@@ -68,5 +71,58 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// 打开包含指定文件的文件夹。
+    /// </summary>
+    /// <param name="param">表示文件路径的对象。</param>
+    /// <remarks>
+    /// 此方法首先将传入的参数转换为字符串，然后获取该路径的目录名。最后，如果路径不为空，它会使用Windows资源管理器打开该目录。
+    /// </remarks>
+    [RelayCommand]
+    public async Task FolderAsync(object param)
+    {
+        try
+        {
+            string path = param as string;
+            var dirPath = Path.GetDirectoryName(path);
+
+            // Running on Windows
+            Process.Start("explorer.exe", dirPath);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+            this.Notification($"{ex}");
+        }
+    }
+
+    /// <summary>
+    /// 通知方法，用于在应用程序中显示消息通知。
+    /// 根据输入参数设置消息内容，并控制消息显示状态。
+    /// </summary>
+    /// <param name="param">
+    /// 消息内容的参数。如果参数为字符串类型，则其内容将被设置为通知消息。
+    /// </param>
+    [RelayCommand]
+    public void Notification(object param)
+    {
+        if (param is string msg)
+        {
+            this.Message = msg;
+            this.IsShow = true;
+        }
+    }
+
+    /// <summary>
+    /// CloseNotification 是一个用于关闭通知的方法。
+    /// 此方法通过将 Message 属性设置为 null 和 IsShow 属性设置为 false，
+    /// 清除当前通知信息并隐藏通知界面。
+    /// </summary>
+    [RelayCommand]
+    public void CloseNotification()
+    {
+        this.Message = null;
+        this.IsShow = false;
+    }
     #endregion
 }

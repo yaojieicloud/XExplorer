@@ -63,5 +63,21 @@ partial class MainViewModel
     [ObservableProperty]
     private ObservableCollection<DirInfo> dirs = new();
 
+    /// <summary>
+    /// 一个私有字段，用于存储与应用程序状态或用户界面相关的消息内容。
+    /// 该字段通过实现数据绑定的机制，被 UI 动态显示或更新，以实现对
+    /// 消息通知、信息提示或用户交互内容的支持。
+    /// </summary>
+    [ObservableProperty]
+    private string message;
+
+    /// <summary>
+    /// 一个私有布尔变量，表示当前界面元素的显示状态。通常与
+    /// 界面的可见性或动画效果相关联，支持对 UI 层的动态更新。
+    /// 此变量对 UI 状态的变化响应至关重要，绑定到对应的视图属性以确保
+    /// 状态同步。
+    /// </summary>
+    [ObservableProperty]
+    private bool isShow;
     #endregion
 }
