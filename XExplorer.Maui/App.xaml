@@ -13,6 +13,18 @@
                 <ResourceDictionary x:Name="appStyles" Source="Resources/Styles/Styles.xaml" />
                 <material:StyleResource ColorsOverride="{x:Reference appColors}" BasedOn="{x:Reference appStyles}" />
             </ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary>
+                <!-- 定义字体大小为 18 的样式 -->
+                <Style TargetType="Label" x:Key="FontSize18Style">
+                    <Setter Property="FontSize" Value="18" />
+                </Style>
+                <Style TargetType="Button" x:Key="ButtonFontSize18Style">
+                    <Setter Property="FontSize" Value="18" />
+                </Style>
+                <Style TargetType="Entry" x:Key="EntryFontSize18Style">
+                    <Setter Property="FontSize" Value="18" />
+                </Style>
+            </ResourceDictionary>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

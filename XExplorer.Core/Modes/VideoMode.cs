@@ -9,6 +9,12 @@ namespace XExplorer.Core.Modes;
 public partial class VideoMode : ObservableObject
 {
     /// <summary>
+    /// 获取或设置视频的唯一标识符。
+    /// </summary>
+    [ObservableProperty]
+    private long id;
+    
+    /// <summary>
     /// 获取或设置视频的标题。
     /// </summary>
     [ObservableProperty]

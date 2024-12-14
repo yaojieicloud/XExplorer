@@ -1,4 +1,5 @@
 using System.Xml.Linq;
+using IdGen;
 using Microsoft.EntityFrameworkCore;
 using XExplorer.Core.Context;
 using XExplorer.Core.Modes;
@@ -33,6 +34,28 @@ partial class DataService
             this.dataContext = context;
         }
 
+        /// <summary>
+        /// 根据提供的快照路径创建一个新的快照实体。
+        /// </summary>
+        /// <param name="snapshotPath">快照文件的完整路径。</param>
+        /// <param name="videoId">视频ID。</param>
+        /// <returns>新创建的快照实体。</returns>
+        /// <remarks>
+        /// 此方法会生成一个新的快照实体，并为其分配一个唯一的标识符。
+        /// 调用此方法时，请确保提供的快照路径是有效的。
+        /// </remarks>
+        public Snapshot Create(string snapshotPath, long videoId)
+        {
+            var snapshot = new Snapshot
+            {
+                Path = snapshotPath,
+                Id = this.dataContext.IdGenerator.CreateId(),
+                VideoId = videoId,
+            };
+
+            return snapshot;
+        } 
+        
         /// <summary>
         /// 从数据库中批量删除视频快照列表。
         /// </summary>

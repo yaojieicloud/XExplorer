@@ -4,22 +4,31 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:XExplorer.Core.ViewModel;assembly=XExplorer.Core"
              xmlns:fa="clr-namespace:UraniumUI.Icons.MaterialIcons;assembly=UraniumUI.Icons.MaterialIcons"
+             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              x:Class="XExplorer.Maui.MainPage">
+    <ContentPage.Resources>
+        <Style x:Key="DefaultButtonView" TargetType="material:ButtonView" />
+    </ContentPage.Resources>
     <ContentPage.BindingContext>
         <vm:MainViewModel />
     </ContentPage.BindingContext>
+    <ContentPage.Style>
+    </ContentPage.Style>
     <VerticalStackLayout Margin="10" x:Name="MainGrid">
         <!-- 遮罩层 -->
-        <Grid IsVisible="{Binding IsShow}" BackgroundColor="#80000000">
+        <Grid IsVisible="{Binding IsShow}" BackgroundColor="#80000000"
+              WidthRequest="{Binding Source={x:Reference MainGrid}, Path=WidthRequest}">
             <!-- 弹窗 -->
             <Frame BackgroundColor="Moccasin"
                    Padding="20"
-                   CornerRadius="10"
                    VerticalOptions="Center"
-                   HorizontalOptions="Center"
-                   WidthRequest="300">
-                <VerticalStackLayout>
+                   CornerRadius="5"
+                   HorizontalOptions="Center">
+                <VerticalStackLayout Padding="10">
                     <Label Text="{Binding Message}" TextColor="Black" HorizontalOptions="Center" />
+                    <BoxView StyleClass="Divider"
+                             WidthRequest="{Binding Source={x:Reference MainGrid}, Path=WidthRequest}" />
                     <Button Text="关闭" Command="{Binding CloseNotificationCommand}" StyleClass="ElevatedButton" />
                 </VerticalStackLayout>
             </Frame>
@@ -32,13 +41,22 @@
                     HorizontalTextAlignment="Start"
                     HorizontalOptions="StartAndExpand"
                     MinimumWidthRequest="400" />
+            <!-- <uranium:Dropdown WidthRequest="300" ItemDisplayBinding="{Binding Name}"  -->
+            <!--                   ItemsSource="{Binding Dirs}"  -->
+            <!--                   SelectedItem="{Binding SelectedDir}" Placeholder="Choose" /> -->
 
-            <Button Text="加载" ToolTipProperties.Text="懒加载" Command="{Binding LoadDirCommand}" StyleClass="ElevatedButton" />
-            <Image>
-                <Image.Source>
-                    <FontImageSource FontFamily="FASolid" Glyph="{x:Static fa:MaterialSharp.Supervised_user_circle}" Color="Orange" />
-                </Image.Source>
-            </Image>
+            <material:ButtonView ToolTipProperties.Text="加载选中文件目录的视频"
+                                 PressedCommand="{Binding LoadDirCommand}">
+                <Label Text="加载" Padding="5,0,5,0" />
+            </material:ButtonView>
+            <material:ButtonView ToolTipProperties.Text="打开日志目录"
+                                 PressedCommand="{Binding OpenLogDirCommand}">
+                <Label Text="日志" Padding="5,0,5,0" />
+            </material:ButtonView>
+            <material:ButtonView ToolTipProperties.Text="处理视频"
+                                 PressedCommand="{Binding ProcessVideosCommand}">
+                <Label Text="处理" Padding="5,0,5,0" />
+            </material:ButtonView>
             <!-- <Button Text="全载" ToolTipProperties.Text="全部加载" Command="{Binding LoadAllDirsCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
             <!-- <Button Text="处理" ToolTipProperties.Text="视频处理" Command="{Binding ProcessVideosCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
             <!-- <Button Text="清源" ToolTipProperties.Text="清理原始目录" Command="{Binding DeleteOriginalCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
@@ -58,19 +76,19 @@
                     <Border HeightRequest="450" HorizontalOptions="Start">
                         <VerticalStackLayout>
                             <HorizontalStackLayout HeightRequest="30">
-                                <Label Text="{Binding Dir}" />
+                                <Label Text="{Binding Dir}" FontSize="18" />
                             </HorizontalStackLayout>
                             <BoxView StyleClass="Divider" />
                             <HorizontalStackLayout HeightRequest="30">
-                                <Label Text="{Binding Caption}" />
-                                <Label Text="===" />
-                                <Label Text="{Binding Length}" />
-                                <Label Text="MB" />
-                                <Label Text="===" />
-                                <Label Text="{Binding PlayCount}" />
-                                <Label Text="===" />
+                                <Label Text="{Binding Caption}" FontSize="18" />
+                                <Label Text="===" FontSize="18" />
+                                <Label Text="{Binding Length}" FontSize="18" />
+                                <Label Text="MB" FontSize="18" />
+                                <Label Text="===" FontSize="18" />
+                                <Label Text="{Binding PlayCount}" FontSize="18" />
+                                <Label Text="===" FontSize="18" />
                                 <Label Text="{Binding ModifyTime}" />
-                                <Label Text="===" />
+                                <Label Text="===" FontSize="18" />
                             </HorizontalStackLayout>
                             <BoxView StyleClass="Divider" />
                             <CollectionView ItemsSource="{Binding Snapshots}" HeightRequest="310"
@@ -80,20 +98,19 @@
                                 </CollectionView.ItemsLayout>
                                 <CollectionView.ItemTemplate>
                                     <DataTemplate>
-                                        <!-- <Image Source="{Binding Path}" -->
-                                        <!--        HeightRequest="300" -->
-                                        <!--        WidthRequest="400"> -->
-                                        <!-- </Image> -->
+                                        <Image Source="{Binding Path}"
+                                               HeightRequest="300"
+                                               WidthRequest="400">
+                                        </Image>
                                     </DataTemplate>
                                 </CollectionView.ItemTemplate>
                             </CollectionView>
-                            <HorizontalStackLayout HeightRequest="35"
-                                                   HorizontalOptions="StartAndExpand"
+                            <HorizontalStackLayout HorizontalOptions="StartAndExpand"
                                                    VerticalOptions="CenterAndExpand">
-                                <Button MinimumWidthRequest="150" Text="Play"
+                                <Button Text="Play" StyleClass="ElevatedButton"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=PlayCommand}"
                                         CommandParameter="{Binding VideoPath}" />
-                                <Button MinimumWidthRequest="150" Text="Folder"
+                                <Button Text="Folder" StyleClass="ElevatedButton"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=FolderCommand}"
                                         CommandParameter="{Binding VideoPath}" />
                                 <!-- <Button MinimumWidthRequest="150" Text="Del"  -->
@@ -102,9 +119,9 @@
                                 <!-- <Button MinimumWidthRequest="150" Text="Del folder"  -->
                                 <!--         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteFolderCommand}" -->
                                 <!--         CommandParameter="{Binding}" /> -->
-                                <!-- <Button MinimumWidthRequest="150" Text="Reset"  -->
-                                <!--         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=ResetVideoCommand}" -->
-                                <!--         CommandParameter="{Binding}" /> -->
+                                <Button Text="Reset" StyleClass="ElevatedButton"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=ResetVideoCommand}"
+                                        CommandParameter="{Binding}" />
                             </HorizontalStackLayout>
                         </VerticalStackLayout>
                     </Border>

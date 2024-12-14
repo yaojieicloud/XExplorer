@@ -53,5 +53,33 @@ partial class MainViewModel
         }
     }
 
+    /// <summary>
+    /// 异步处理单个视频文件。
+    /// </summary>
+    /// <param name="param">表示视频实体的对象。</param>
+    /// <returns>
+    /// 表示异步操作的任务。
+    /// </returns>
+    /// <remarks>
+    /// 此方法首先检查传入的参数是否为`VideoEntry`类型，如果是，它就会调用`ProcessVideoAsync`方法来处理这个视频实体。
+    /// </remarks>
+    [RelayCommand]
+    public async Task ResetVideoAsync(object param)
+    {
+        try
+        {
+            if (param is VideoMode enty)
+            {
+                var video = await this.dataService.VideosService.FirstAsync(m=>m.Id == enty.Id);
+                await this.ProcessVideoAsync(video, default);
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+            this.Notification($"{ex}");
+        }
+    }
+    
     #endregion
 }

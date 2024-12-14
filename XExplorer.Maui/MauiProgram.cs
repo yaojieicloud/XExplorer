@@ -25,7 +25,7 @@ public static class MauiProgram
         #region 初始化
 
         Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().Enrich.WithThreadId().WriteTo.File(
-                "logs\\XExplorer.txt", rollingInterval: RollingInterval.Day,
+                "logs/XExplorer.txt", rollingInterval: RollingInterval.Day,
                 outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3} {ThreadId}] {Message:lj}{NewLine}{Exception}")
             .CreateLogger();
         AppSettingsUtils.LoadJson(GetAppSettingsPath());

@@ -16,6 +16,7 @@ public static class DataUtils
     {
         return new Video
         {
+            Id = mode.Id,
             Caption = mode.Caption,
             Dir = mode.Dir,
             VideoDir = mode.VideoDir,
@@ -47,6 +48,7 @@ public static class DataUtils
     {
         return new VideoMode
         {
+            Id = video.Id,
             Caption = video.Caption,
             Dir = video.Dir,
             VideoDir = video.VideoDir,

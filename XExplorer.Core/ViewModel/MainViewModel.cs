@@ -27,7 +27,7 @@ public partial class MainViewModel : ObservableObject
     ///     促进了视图层和模型层之间的数据绑定。
     /// </summary>
     public MainViewModel()
-    { 
+    {
         this.dataService = new DataService();
         this.InitDirs();
     }
@@ -52,10 +52,12 @@ public partial class MainViewModel : ObservableObject
                 m.Snapshots.ForEach(s =>
                 {
                     s.Path = Path.Combine(AppSettingsUtils.Default.Current.DataDir, s.Path);
-                    s.Path = AppSettingsUtils.Default.OS == OS.MacCatalyst ? s.Path.Replace('\\', '/') : s.Path.Replace('/', '\\');
+                    s.Path = AppSettingsUtils.Default.OS == OS.MacCatalyst
+                        ? s.Path.Replace('\\', '/')
+                        : s.Path.Replace('/', '\\');
                 });
             });
-            
+
             var modes = enties.ToModes();
             Videos = new ObservableCollection<VideoMode>(modes);
             this.Notification($"数据加载完成！");
@@ -81,19 +83,41 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     public async Task FolderAsync(object param)
     {
+        this.OpenFolder($"{param}");
+    }
+
+    /// <summary>
+    /// 打开日志目录。
+    /// </summary>
+    /// <remarks>
+    /// 此方法首先获取当前应用程序域的基目录，然后构造日志目录的路径。最后，它使用Windows资源管理器打开日志目录。
+    /// </remarks>
+    [RelayCommand]
+    public async Task OpenLogDirAsync()
+    {
         try
         {
-            string path = param as string;
-            var dirPath = Path.GetDirectoryName(path);
-
-            // Running on Windows
-            Process.Start("explorer.exe", dirPath);
+            string baseDirectory = AppContext.BaseDirectory;
+            if (AppSettingsUtils.Default.OS == OS.MacCatalyst)
+            {
+                // Adjust the path for macOS to get the app bundle root directory
+                var path = Path.GetFullPath(Path.Combine(baseDirectory, "..", ".."));
+                path = Path.Combine(path, "logs");
+                this.OpenFolder(path);
+            }
+            else
+            {
+                var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
+                this.OpenFolder(path);
+            }
         }
         catch (Exception ex)
         {
             Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
             this.Notification($"{ex}");
         }
+
+        await Task.CompletedTask;
     }
 
     /// <summary>
@@ -124,5 +148,6 @@ public partial class MainViewModel : ObservableObject
         this.Message = null;
         this.IsShow = false;
     }
+
     #endregion
 }
