@@ -1,7 +1,6 @@
 ﻿using Foundation;
-using Microsoft.Maui;
 
-namespace XExplorer.Maui;
+namespace XExplorer.MauiApp;
 
 [Register("AppDelegate")]
 public class AppDelegate : MauiUIApplicationDelegate
