@@ -71,7 +71,9 @@ partial class MainViewModel
             if (param is VideoMode enty)
             {
                 var video = await dataService.VideosService.FirstAsync(m => m.Id == enty.Id);
-                await ProcessVideoAsync(video, default);
+                var path = this.AdjustPath(video.VideoPath);
+                var length = await this.GetVideoLength(path);
+                this.Notification($"视频 [{path}] 时长 [{length}] m");
             }
         }
         catch (Exception ex)

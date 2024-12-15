@@ -4,6 +4,8 @@ using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
+using Xabe.FFmpeg;
+using Xabe.FFmpeg.Downloader;
 using XExplorer.Core.Dictionaries;
 using XExplorer.Core.Modes;
 using XExplorer.Core.Service;
@@ -118,6 +120,26 @@ public partial class MainViewModel : ObservableObject
         }
 
         await Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// 异步方法 DownloadRuntimeAsync 用于下载和配置 FFmpeg 的运行时文件。
+    /// 此方法将 FFmpeg 的运行时文件下载到指定的路径，并设置可执行文件路径，
+    /// 确保在应用程序中可以正确使用 FFmpeg 功能。
+    /// </summary>
+    /// <returns>表示异步操作的 Task。</returns>
+    [RelayCommand]
+    public async Task DownloadRuntimeAsync()
+    {
+        var ffmpegDir = Path.Combine(AppContext.BaseDirectory, "ffmpeg", AppSettingsUtils.Default.OS);
+
+        if (!Directory.Exists(ffmpegDir))
+            Directory.CreateDirectory(ffmpegDir);
+
+        await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Shared, ffmpegDir);
+        FFmpeg.SetExecutablesPath(ffmpegDir);
+        Log.Information($"已经将 FFmpeg 运行时下载到 [{ffmpegDir}]");
+        this.Notification($"已经将 FFmpeg 运行时下载到 [{ffmpegDir}]");
     }
 
     /// <summary>

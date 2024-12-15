@@ -2,15 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- The Mac App Store requires you specify if the app uses encryption. -->
-    <!-- Please consult https://developer.apple.com/documentation/bundleresources/information_property_list/itsappusesnonexemptencryption -->
-    <!-- <key>ITSAppUsesNonExemptEncryption</key> -->
-    <!-- Please indicate <true/> or <false/> here. -->
-
-    <!-- Specify the category for your app here. -->
-    <!-- Please consult https://developer.apple.com/documentation/bundleresources/information_property_list/lsapplicationcategorytype -->
-    <!-- <key>LSApplicationCategoryType</key> -->
-    <!-- <string>public.app-category.YOUR-CATEGORY-HERE</string> -->
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>2</integer>
@@ -34,5 +25,22 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>NSFileProviderPresenceUsageDescription</key>
+	<string>此应用需要访问文件提供者，以便读取或保存文件。</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>此应用需要访问桌面文件夹</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>此应用需要访问文档文件夹</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>此应用需要访问下载文件夹</string>
+	<key>NSNetworkVolumesUsageDescription</key>
+	<string>此应用需要访问网络驱动器</string>
+	<key>NSFileProviderDomainUsageDescription</key>
+	<string>此应用需要访问文件提供者域，以便同步和管理您的文件。</string>
 </dict>
 </plist>
