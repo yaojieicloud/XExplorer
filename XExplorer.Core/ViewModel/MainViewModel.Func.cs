@@ -8,6 +8,7 @@ using Emgu.CV.Structure;
 using Serilog;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.PixelFormats;
 using Xabe.FFmpeg;
 using XExplorer.Core.Dictionaries;
 using XExplorer.Core.Modes;
@@ -173,6 +174,39 @@ partial class MainViewModel
     #region 视频处理
 
     /// <summary>
+    /// 异步处理视频的方法。
+    /// 此方法根据传入的视频路径生成一个 <see cref="Video" /> 对象，并返回该对象。
+    /// </summary>
+    /// <param name="path">
+    /// 视频文件的路径，用于创建对应的 <see cref="Video" /> 对象。
+    /// </param>
+    /// <returns>
+    /// 一个任务，表示异步操作的结果。任务完成时返回一个 <see cref="Video" /> 对象，
+    /// 其中包含生成的视频信息（如标题、路径等）。
+    /// </returns>
+    /// <remarks>
+    /// 具体流程如下：
+    /// 1. 调用 <see cref="DataService.VideoService.Create(string)" /> 方法，根据提供的路径创建一个 <see cref="Video" /> 对象。
+    /// 2. 通过 <c>await</c> 保证异步任务的执行流程。
+    /// 3. 返回该 <see cref="Video" /> 对象作为结果。
+    /// </remarks>
+    /// <example>
+    /// 假设输入路径为 "C:\Videos\Sample.mp4"，调用此方法后将生成一个具有以下信息的 <see cref="Video" /> 对象：
+    /// <list type="bullet">
+    /// <item>Caption：自动生成的标题（可能基于文件名）。</item>
+    /// <item>Dir：文件所在的主目录。</item>
+    /// <item>VideoDir：文件的完整路径。</item>
+    /// </list>
+    /// </example>
+    private async Task<Video> ProcessVideoAsync(string path)
+    {
+        var video = this.dataService.VideosService.Create(path);
+
+        await Task.CompletedTask;
+        return video;
+    }
+    
+    /// <summary>
     ///     从指定的视频文件中提取多个时间点的截图，并将其保存到指定的输出文件夹中。
     ///     此方法通过 <see cref="Xabe.FFmpeg" /> 库实现视频文件的处理和截图功能。
     /// </summary>
@@ -201,10 +235,14 @@ partial class MainViewModel
     ///     </list>
     /// </example>
     /// <returns>异步任务 (<see cref="Task" />)，用于表示截取过程的完成状态。</returns>
-    private async Task GetVideoImages(string videoPath, string outputFolderPath, List<TimeSpan> timestamps)
+    private async Task<List<string>> GetVideoImages(string videoPath, string outputFolderPath,
+        List<TimeSpan> timestamps)
     {
+        var images = new List<string>();
+
         // 确保输出文件夹存在
-        Directory.CreateDirectory(outputFolderPath);
+        if (!Directory.Exists(outputFolderPath))
+            Directory.CreateDirectory(outputFolderPath);
 
         // 创建一个 FFmpeg 转换实例
         var conversion = FFmpeg.Conversions.New();
@@ -212,7 +250,8 @@ partial class MainViewModel
         // 遍历时间点并添加截图参数
         foreach (var timestamp in timestamps)
         {
-            var outputPath = Path.Combine(outputFolderPath, $"frame_{timestamp.TotalSeconds}.jpg");
+            var img = $"{Guid.NewGuid():N}.jpg";
+            var outputPath = Path.Combine(outputFolderPath, img);
             conversion.AddParameter($"-ss {timestamp} -i \"{videoPath}\" -frames:v 1 \"{outputPath}\"");
         }
 
@@ -220,6 +259,7 @@ partial class MainViewModel
         await conversion.Start();
 
         Log.Information($"视频 「{videoPath}」截图已保存到: [{outputFolderPath}] ");
+        return images;
     }
 
     /// <summary>

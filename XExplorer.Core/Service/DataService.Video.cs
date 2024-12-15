@@ -35,6 +35,13 @@ partial class DataService
         }
 
         /// <summary>
+        /// 创建一个新的 <see cref="Video"/> 实例。
+        /// </summary>
+        /// <param name="path">视频文件的路径。</param>
+        /// <returns>包含指定路径的 <see cref="Video"/> 对象。</returns>
+        public Video Create(string path) => this.dataContext.CreateVideo(path);
+
+        /// <summary>
         /// 将单个视频对象添加到数据库中。
         /// </summary>
         /// <param name="video">要添加到数据库的视频对象。</param>
@@ -68,7 +75,7 @@ partial class DataService
                 await this.dataContext.SaveChangesAsync();
             }
         }
-        
+
         /// <summary>
         /// 更新数据库中的视频对象。
         /// </summary>
@@ -109,7 +116,7 @@ partial class DataService
                 await this.dataContext.SaveChangesAsync();
             }
         }
-        
+
         /// <summary>
         /// 更新数据库中的视频对象。
         /// </summary>
@@ -163,7 +170,7 @@ partial class DataService
 
             await this.dataContext.SaveChangesAsync();
         }
-        
+
         /// <summary>
         /// 从数据库中批量删除视频对象列表。
         /// </summary>
@@ -178,7 +185,7 @@ partial class DataService
             this.dataContext.Videos.RemoveRange(videos);
             await this.dataContext.SaveChangesAsync();
         }
-        
+
         /// <summary>
         /// 异步删除指定目录下的所有视频记录。
         /// </summary>
@@ -201,7 +208,7 @@ partial class DataService
 
             await this.dataContext.SaveChangesAsync();
         }
-        
+
         /// <summary>
         /// 根据指定条件查询视频列表。
         /// </summary>
@@ -224,7 +231,7 @@ partial class DataService
             query = query.Where(m => m.Status == status);
 
             if (!string.IsNullOrWhiteSpace(dir))
-                query = query.Where(m => m.VideoDir.Replace(@"\","/").EndsWith(dir.Replace(@"\","/")));
+                query = query.Where(m => m.VideoDir.Replace(@"\", "/").EndsWith(dir.Replace(@"\", "/")));
 
             if (!string.IsNullOrWhiteSpace(caption))
                 query = query.Where(m => m.Caption.Contains(caption));
@@ -234,10 +241,11 @@ partial class DataService
 
             query = isDesc
                 ? query.OrderByDescending(m => m.Evaluate).ThenByDescending(v => v.ModifyTime).ThenBy(m => m.Dir)
-                : (IQueryable<Video>)query.OrderByDescending(m => m.Evaluate).ThenBy(v => v.ModifyTime).ThenBy(m => m.Dir);
+                : (IQueryable<Video>)query.OrderByDescending(m => m.Evaluate).ThenBy(v => v.ModifyTime)
+                    .ThenBy(m => m.Dir);
 
             var sql = query.ToQueryString();
-            
+
             return await query.Skip(skip).Take(take).ToListAsync();
         }
 
@@ -253,7 +261,7 @@ partial class DataService
 
             return await query.Where(predicate).ToListAsync();
         }
-        
+
         /// <summary>
         /// 异步查询视频的方法，根据指定的谓词条件从数据库中检索视频列表。
         /// </summary>
