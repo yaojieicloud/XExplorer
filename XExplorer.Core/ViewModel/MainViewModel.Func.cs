@@ -198,13 +198,13 @@ partial class MainViewModel
     /// <item>VideoDir：文件的完整路径。</item>
     /// </list>
     /// </example>
-    private async Task<Video> ProcessVideoAsync(string path)
+    private async Task<Video> ProcessVideoAsync(string videoPath)
     {
         var st = Stopwatch.StartNew();
 
         try
         {
-            path = AdjustPath(path);
+            var path = AdjustPath(videoPath);
             if (!path.StartsWith(AppSettingsUtils.Default.Current.Volume))
                 path = Path.Combine(AppSettingsUtils.Default.Current.Volume, path);
 
@@ -214,7 +214,7 @@ partial class MainViewModel
             var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(path);
             var file = new FileInfo(path);
             var dataDir = Path.Combine(AppSettingsUtils.Default.Current.DataDir, this.GetRelativeDir(path));
-            var video = await this.dataService.VideosService.FirstAsync(m => m.VideoPath == path);
+            var video = await this.dataService.VideosService.FirstAsync(m => m.VideoPath == videoPath);
             var times = await this.GetVideoTimes(path);
             var md5Task = this.GetMd5CodeAsync(path);
             var timestamps = this.GetTimestamps(times);
@@ -238,7 +238,7 @@ partial class MainViewModel
         finally
         {
             st.Stop();
-            Log.Information($"视频 [{path}] 处理完成，耗时 [{st.Elapsed.TotalSeconds}] 秒");
+            Log.Information($"视频 [{videoPath}] 处理完成，耗时 [{st.Elapsed.TotalSeconds}] 秒");
         }
     }
 
@@ -276,12 +276,11 @@ partial class MainViewModel
             var img = $"{Guid.NewGuid():N}.jpg";
             var outputPath = Path.Combine(outputFolderPath, img);
             conversion.AddParameter($"-ss {timestamp} -i \"{videoPath}\" -frames:v 1 \"{outputPath}\"");
-            this.CompressAsPng(outputPath);
+            images.Add(outputPath);
         }
 
         // 执行转换任务
         await conversion.Start();
-
         Log.Information($"视频 「{videoPath}」截图已保存到: [{outputFolderPath}] ");
         return images;
     }

@@ -61,12 +61,10 @@ partial class DataService
         /// </summary>
         /// <param name="snapshots">要从数据库中删除的视频快照对象列表。</param> 
         public async Task DelAsync(List<Snapshot> snapshots)
-        {
-            var delSnaps = await this.dataContext.Snapshots.Where(s => snapshots.Any(s1 => s1.Id == s.Id)).ToListAsync();
-
-            if (delSnaps?.Any() ?? false)
+        { 
+            if (snapshots?.Any() ?? false)
             {
-                this.dataContext.Snapshots.RemoveRange(delSnaps);
+                this.dataContext.Snapshots.RemoveRange(snapshots);
                 await this.dataContext.SaveChangesAsync();
             }
         }

@@ -4,8 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XExplorer.Maui", "XExplorer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XExplorer.Core", "XExplorer.Core\XExplorer.Core.csproj", "{5B24664B-B4E8-4A63-99CB-049D59839FBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XExplorer.MauiApp", "XExplorer.MauiApp\XExplorer.MauiApp.csproj", "{71B6A162-62E2-47CF-9178-DB782C30C84E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,9 +18,5 @@ Global
 		{5B24664B-B4E8-4A63-99CB-049D59839FBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B24664B-B4E8-4A63-99CB-049D59839FBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B24664B-B4E8-4A63-99CB-049D59839FBB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{71B6A162-62E2-47CF-9178-DB782C30C84E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{71B6A162-62E2-47CF-9178-DB782C30C84E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{71B6A162-62E2-47CF-9178-DB782C30C84E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{71B6A162-62E2-47CF-9178-DB782C30C84E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

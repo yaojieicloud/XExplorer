@@ -72,11 +72,11 @@ partial class MainViewModel
             if (param is VideoMode enty)
             {
                 var st = Stopwatch.StartNew();
-                var video = await this.ProcessVideoAsync(enty.VideoPath);
-                await this.dataService.VideosService.UpdateAsync(video);
+                var video = await ProcessVideoAsync(enty.VideoPath);
+                await dataService.VideosService.UpdateAsync(video);
                 video.ToMode(enty);
                 st.Stop();
-                this.Notification($"视频重置完成，耗时 {st.Elapsed.TotalSeconds} 秒");
+                Notification($"视频重置完成，耗时 {st.Elapsed.TotalSeconds} 秒");
             }
         }
         catch (Exception ex)
