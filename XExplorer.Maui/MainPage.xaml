@@ -98,10 +98,10 @@
                                 </CollectionView.ItemsLayout>
                                 <CollectionView.ItemTemplate>
                                     <DataTemplate>
-                                        <Image Source="{Binding Path}"
-                                               HeightRequest="300"
-                                               WidthRequest="400">
-                                        </Image>
+                                        <!-- <Image Source="{Binding Path}" -->
+                                        <!--        HeightRequest="300" -->
+                                        <!--        WidthRequest="400"> -->
+                                        <!-- </Image> -->
                                     </DataTemplate>
                                 </CollectionView.ItemTemplate>
                             </CollectionView>

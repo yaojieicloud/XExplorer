@@ -58,6 +58,11 @@ public class Video : ModeBase
     /// MD5
     /// </summary>
     public string? MD5 { get; set; }
+
+    /// <summary>
+    /// 获取或设置视频的时长（单位：秒）。
+    /// </summary>
+    public long? Times { get; set; }
     
     /// <summary>
     /// Status

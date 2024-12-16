@@ -27,6 +27,7 @@ public static class DataUtils
             ModifyTime = mode.ModifyTime,
             Evaluate = mode.Evaluate,
             MD5 = mode.Md5,
+            Times = mode.Times,
             Status = mode.Status,
             Snapshots = new List<Snapshot>(mode.Snapshots)
         };
@@ -59,6 +60,7 @@ public static class DataUtils
             ModifyTime = video.ModifyTime,
             Evaluate = video.Evaluate,
             Md5 = video.MD5,
+            Times = video.Times,
             Status = video.Status,
             Snapshots = new ObservableCollection<Snapshot>(video.Snapshots)
         };

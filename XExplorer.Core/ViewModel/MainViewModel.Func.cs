@@ -200,12 +200,37 @@ partial class MainViewModel
     /// </example>
     private async Task<Video> ProcessVideoAsync(string path)
     {
-        var video = this.dataService.VideosService.Create(path);
+        path = AdjustPath(path);
 
-        await Task.CompletedTask;
+        if (!File.Exists(path))
+            return null;
+
+        var fileName = Path.GetFileName(path);
+        var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(path);
+        var file = new FileInfo(path);
+        var dataDir = Path.Combine(AppSettingsUtils.Default.Current.DataDir, this.GetRelativeDir(path));
+        var video = await this.dataService.VideosService.FirstAsync(m => m.VideoPath == path);
+        var times = await this.GetVideoTimes(path);
+        var md5Task = this.GetMd5CodeAsync(path);
+        var timestamps = this.GetTimestamps(times);
+        var images = await this.GetVideoImages(path, dataDir, timestamps);
+
+        video ??= this.dataService.VideosService.Create(path);
+        video.Status = 1;
+        await this.DelOriginalImagesAsync(video);
+        video.VideoDir = this.GetRelativeDir(path);
+        video.VideoPath = this.GetRelativeDir(path);
+        video.Dir = Path.GetDirectoryName(path)?.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty);
+        video.Caption = fileNameWithoutExtension;
+        video.Times = times;
+        video.Length = file.Length / 1024 / 1024;
+        video.DataDir = video.VideoPath;
+        video.Snapshots = images.Select(m => this.dataService.SnapshotsService.Create(m, video.Id)).ToList();
+        video.MD5 = await md5Task;
+        video.ModifyTime = DateTime.Now;
         return video;
     }
-    
+
     /// <summary>
     ///     从指定的视频文件中提取多个时间点的截图，并将其保存到指定的输出文件夹中。
     ///     此方法通过 <see cref="Xabe.FFmpeg" /> 库实现视频文件的处理和截图功能。
@@ -221,19 +246,6 @@ partial class MainViewModel
     ///     4. 调用 <c>conversion.Start()</c> 执行转换任务，生成截图文件。
     ///     5. 通过 <see cref="Serilog.Log.Information(string)" /> 记录操作日志以标识任务完成。
     /// </remarks>
-    /// <example>
-    ///     假设输入参数如下：
-    ///     <list type="bullet">
-    ///         <item><c>videoPath</c>: "C:\Videos\MyVideo.mp4"</item>
-    ///         <item><c>outputFolderPath</c>: "C:\Screenshots"</item>
-    ///         <item><c>timestamps</c>: { TimeSpan.FromSeconds(5), TimeSpan.FromMinutes(1) }</item>
-    ///     </list>
-    ///     调用本方法后，以下截图文件将保存在 "C:\Screenshots" 文件夹中：
-    ///     <list type="bullet">
-    ///         <item>frame_5.jpg</item>
-    ///         <item>frame_60.jpg</item>
-    ///     </list>
-    /// </example>
     /// <returns>异步任务 (<see cref="Task" />)，用于表示截取过程的完成状态。</returns>
     private async Task<List<string>> GetVideoImages(string videoPath, string outputFolderPath,
         List<TimeSpan> timestamps)
@@ -253,6 +265,7 @@ partial class MainViewModel
             var img = $"{Guid.NewGuid():N}.jpg";
             var outputPath = Path.Combine(outputFolderPath, img);
             conversion.AddParameter($"-ss {timestamp} -i \"{videoPath}\" -frames:v 1 \"{outputPath}\"");
+            this.CompressAsPng(outputPath);
         }
 
         // 执行转换任务
@@ -260,6 +273,53 @@ partial class MainViewModel
 
         Log.Information($"视频 「{videoPath}」截图已保存到: [{outputFolderPath}] ");
         return images;
+    }
+
+    /// <summary>
+    /// 根据总时长（单位为秒）计算出若干个关键时间点的时间戳。
+    /// 本方法会将输入的时长分为 10 个时间段，提取中间 8 个时间点的时间戳（剔除第一个和最后一个时间点）。
+    /// </summary>
+    /// <param name="times">
+    /// 视频的总时长（单位为秒）。该值必须大于 1，否则返回空集合。
+    /// </param>
+    /// <returns>
+    /// 一个包含 8 个时间戳 (<see cref="TimeSpan" />) 的集合列表。这些时间戳为中间的
+    /// 分段点时间值，依次从第 2 段到第 9 段的计算结果。
+    /// 如果输入的时长不足以分为 10 个时间点，返回空集合。
+    /// </returns>
+    /// <remarks>
+    /// 具体实现过程为：
+    /// 1. 首先检查输入的时长。如果时长小于或等于 1，直接返回空集合。
+    /// 2. 计算时间间隔，即将总时长除以 10，作为每段的距离。
+    /// 3. 遍历第 2 到第 9 段，生成对应的时间戳；若因误差导致时间点超出总时长，则取总时长作为限制。
+    /// 4. 将剔除的第一个和最后一个段时间点外的时间戳加入集合后返回。
+    /// </remarks>
+    private List<TimeSpan> GetTimestamps(long times)
+    {
+        // 创建一个列表来存储时间戳
+        var timestamps = new List<TimeSpan>();
+        if (times <= 1)
+            return timestamps;
+
+        // 计算时间间隔，确保分为10段
+        double interval = (double)times / 10;
+        for (int i = 1; i <= 10; i++)
+        {
+            double timeInSeconds = i == 10 ? times : i * interval;
+            TimeSpan timeStamp = TimeSpan.FromSeconds(timeInSeconds);
+            if (!timestamps.Contains(timeStamp))
+                timestamps.Add(timeStamp);
+        }
+
+        // 删除第一个时间点
+        if (timestamps.Count > 1)
+            timestamps.RemoveAt(0);
+
+        // 删除最后一个时间点
+        if (timestamps.Count > 1)
+            timestamps.RemoveAt(timestamps.Count - 1);
+
+        return timestamps;
     }
 
     /// <summary>
@@ -278,7 +338,7 @@ partial class MainViewModel
     ///     假设提供的视频文件路径为 <c>C:\Videos\Sample.mp4</c> 且文件有效：
     ///     <code>
     /// double length = await GetVideoLength(@"C:\Videos\Sample.mp4");
-    /// Console.WriteLine($"视频时长: {length} 分钟");
+    /// Console.WriteLine($"视频时长: {length} 秒");
     /// </code>
     ///     如果文件不存在：
     ///     <code>
@@ -286,7 +346,7 @@ partial class MainViewModel
     /// Console.WriteLine($"返回值为 {length}，表示文件无效");
     /// </code>
     /// </example>
-    private async Task<double> GetVideoLength(string videoPath)
+    private async Task<long> GetVideoTimes(string videoPath)
     {
         if (File.Exists(videoPath))
         {
@@ -294,11 +354,11 @@ partial class MainViewModel
 
             // 获取时长
             var duration = mediaInfo.Duration;
-            Log.Information($"视频[{videoPath}]时长: {duration.Minutes} 分钟");
-            return duration.Minutes;
+            Log.Information($"视频[{videoPath}]时长: {duration.TotalSeconds} 秒");
+            return Convert.ToInt64(duration.TotalSeconds);
         }
 
-        return double.NaN;
+        return 0l;
     }
 
     /// <summary>
@@ -402,19 +462,22 @@ partial class MainViewModel
     ///     删除视频图片
     /// </summary>
     /// <param name="enty">视频实体</param>
-    private void DelOriginalPictures(Video enty)
+    private async Task DelOriginalImagesAsync(Video enty)
     {
-        var imgs = enty.Snapshots.ToList();
-        enty.Snapshots.Clear();
-        foreach (var item in imgs)
-            try
-            {
-                File.Delete(item.Path);
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"File Del Error:{item}{Environment.NewLine}{ex}");
-            }
+        var imgs = enty.Snapshots?.ToList();
+
+        if (!(imgs?.Any() ?? false))
+            return;
+
+        await this.dataService.SnapshotsService.DelAsync(imgs);
+        for (int i = imgs.Count - 1; i >= 0; i--)
+        {
+            var fullPath = Path.Combine(AppSettingsUtils.Default.Current.DataDir, imgs[i]?.Path);
+            if (File.Exists(fullPath))
+                File.Delete(fullPath);
+
+            imgs.RemoveAt(i);
+        }
     }
 
     #endregion

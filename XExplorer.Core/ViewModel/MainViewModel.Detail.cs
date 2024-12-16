@@ -72,8 +72,8 @@ partial class MainViewModel
             {
                 var video = await dataService.VideosService.FirstAsync(m => m.Id == enty.Id);
                 var path = this.AdjustPath(video.VideoPath);
-                var length = await this.GetVideoLength(path);
-                this.Notification($"视频 [{path}] 时长 [{length}] m");
+                var length = await this.GetVideoTimes(path);
+                this.Notification($"视频 [{path}] 时长 [{length}] s");
             }
         }
         catch (Exception ex)

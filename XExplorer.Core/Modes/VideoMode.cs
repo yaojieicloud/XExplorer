@@ -75,6 +75,12 @@ public partial class VideoMode : ObservableObject
     private string? md5;
 
     /// <summary>
+    /// 获取或设置视频的时长（单位：秒）。
+    /// </summary>
+    [ObservableProperty]
+    private long? times;
+    
+    /// <summary>
     /// Status
     /// </summary>
     [ObservableProperty]
