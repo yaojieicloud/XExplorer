@@ -12,25 +12,24 @@ public static class DataUtils
     /// 将 VideoMode 转换为 Video 实体。
     /// </summary>
     /// <returns>Video 实例</returns>
-    public static Video ToVideo(this VideoMode mode)
+    public static Video ToVideo(this VideoMode mode, Video video = null)
     {
-        return new Video
-        {
-            Id = mode.Id,
-            Caption = mode.Caption,
-            Dir = mode.Dir,
-            VideoDir = mode.VideoDir,
-            DataDir = mode.DataDir,
-            VideoPath = mode.VideoPath,
-            Length = mode.Length,
-            PlayCount = mode.PlayCount,
-            ModifyTime = mode.ModifyTime,
-            Evaluate = mode.Evaluate,
-            MD5 = mode.Md5,
-            Times = mode.Times,
-            Status = mode.Status,
-            Snapshots = new List<Snapshot>(mode.Snapshots)
-        };
+        var result = video ?? new Video();
+        result.Id = video == null ? mode.Id : video.Id;
+        result.Caption = mode.Caption;
+        result.Dir = mode.Dir;
+        result.VideoDir = mode.VideoDir;
+        result.DataDir = mode.DataDir;
+        result.VideoPath = mode.VideoPath;
+        result.Length = mode.Length;
+        result.PlayCount = mode.PlayCount;
+        result.ModifyTime = mode.ModifyTime;
+        result.Evaluate = mode.Evaluate;
+        result.MD5 = mode.Md5;
+        result.Times = mode.Times;
+        result.Status = mode.Status;
+        result.Snapshots = mode.Snapshots.ToList();
+        return result;
     }
 
     /// <summary>
@@ -38,32 +37,32 @@ public static class DataUtils
     /// </summary>
     /// <param name="modes">要转换的 VideoMode 对象列表。</param>
     /// <returns>一个包含转换后的 Video 实例的列表。</returns>
-    public static List<Video> ToVideos(this List<VideoMode> modes) => modes.Select(m => m.ToVideo()).ToList(); 
-    
+    public static List<Video> ToVideos(this List<VideoMode> modes) => modes.Select(m => m.ToVideo()).ToList();
+
     /// <summary>
     /// 将 Video 实体转换为 VideoMode。
     /// </summary>
     /// <param name="video">Video 实例</param>
     /// <returns>VideoMode 实例</returns>
-    public static VideoMode ToMode(this Video video)
+    public static VideoMode ToMode(this Video video, VideoMode mode = null)
     {
-        return new VideoMode
-        {
-            Id = video.Id,
-            Caption = video.Caption,
-            Dir = video.Dir,
-            VideoDir = video.VideoDir,
-            DataDir = video.DataDir,
-            VideoPath = video.VideoPath,
-            Length = video.Length,
-            PlayCount = video.PlayCount,
-            ModifyTime = video.ModifyTime,
-            Evaluate = video.Evaluate,
-            Md5 = video.MD5,
-            Times = video.Times,
-            Status = video.Status,
-            Snapshots = new ObservableCollection<Snapshot>(video.Snapshots)
-        };
+        var result = mode ?? new VideoMode();
+        result.Id = mode == null ? video.Id : mode.Id;
+        result.Caption = video.Caption;
+        result.Dir = video.Dir;
+        result.VideoDir = video.VideoDir;
+        result.DataDir = video.DataDir;
+        result.VideoPath = video.VideoPath;
+        result.Length = video.Length;
+        result.PlayCount = video.PlayCount;
+        result.ModifyTime = video.ModifyTime;
+        result.Evaluate = video.Evaluate;
+        result.Md5 = video.MD5;
+        result.Times = video.Times;
+        result.Status = video.Status;
+        result.Snapshots = new ObservableCollection<Snapshot>(video.Snapshots);
+
+        return result;
     }
 
     /// <summary>

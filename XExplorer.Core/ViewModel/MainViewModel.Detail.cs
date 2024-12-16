@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Serilog;
 using XExplorer.Core.Dictionaries;
 using XExplorer.Core.Modes;
+using XExplorer.Core.Utils;
 
 namespace XExplorer.Core.ViewModel;
 
@@ -70,10 +71,12 @@ partial class MainViewModel
         {
             if (param is VideoMode enty)
             {
-                var video = await dataService.VideosService.FirstAsync(m => m.Id == enty.Id);
-                var path = this.AdjustPath(video.VideoPath);
-                var length = await this.GetVideoTimes(path);
-                this.Notification($"视频 [{path}] 时长 [{length}] s");
+                var st = Stopwatch.StartNew();
+                var video = await this.ProcessVideoAsync(enty.VideoPath);
+                await this.dataService.VideosService.UpdateAsync(video);
+                video.ToMode(enty);
+                st.Stop();
+                this.Notification($"视频重置完成，耗时 {st.Elapsed.TotalSeconds} 秒");
             }
         }
         catch (Exception ex)

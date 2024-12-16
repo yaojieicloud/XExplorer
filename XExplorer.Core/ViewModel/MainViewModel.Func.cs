@@ -200,35 +200,46 @@ partial class MainViewModel
     /// </example>
     private async Task<Video> ProcessVideoAsync(string path)
     {
-        path = AdjustPath(path);
+        var st = Stopwatch.StartNew();
 
-        if (!File.Exists(path))
-            return null;
+        try
+        {
+            path = AdjustPath(path);
+            if (!path.StartsWith(AppSettingsUtils.Default.Current.Volume))
+                path = Path.Combine(AppSettingsUtils.Default.Current.Volume, path);
 
-        var fileName = Path.GetFileName(path);
-        var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(path);
-        var file = new FileInfo(path);
-        var dataDir = Path.Combine(AppSettingsUtils.Default.Current.DataDir, this.GetRelativeDir(path));
-        var video = await this.dataService.VideosService.FirstAsync(m => m.VideoPath == path);
-        var times = await this.GetVideoTimes(path);
-        var md5Task = this.GetMd5CodeAsync(path);
-        var timestamps = this.GetTimestamps(times);
-        var images = await this.GetVideoImages(path, dataDir, timestamps);
+            if (!File.Exists(path))
+                return null;
 
-        video ??= this.dataService.VideosService.Create(path);
-        video.Status = 1;
-        await this.DelOriginalImagesAsync(video);
-        video.VideoDir = this.GetRelativeDir(path);
-        video.VideoPath = this.GetRelativeDir(path);
-        video.Dir = Path.GetDirectoryName(path)?.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty);
-        video.Caption = fileNameWithoutExtension;
-        video.Times = times;
-        video.Length = file.Length / 1024 / 1024;
-        video.DataDir = video.VideoPath;
-        video.Snapshots = images.Select(m => this.dataService.SnapshotsService.Create(m, video.Id)).ToList();
-        video.MD5 = await md5Task;
-        video.ModifyTime = DateTime.Now;
-        return video;
+            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(path);
+            var file = new FileInfo(path);
+            var dataDir = Path.Combine(AppSettingsUtils.Default.Current.DataDir, this.GetRelativeDir(path));
+            var video = await this.dataService.VideosService.FirstAsync(m => m.VideoPath == path);
+            var times = await this.GetVideoTimes(path);
+            var md5Task = this.GetMd5CodeAsync(path);
+            var timestamps = this.GetTimestamps(times);
+            var images = await this.GetVideoImages(path, dataDir, timestamps);
+
+            video ??= this.dataService.VideosService.Create(path);
+            video.Status = 1;
+            await this.DelOriginalImagesAsync(video);
+            video.VideoDir = this.GetRelativeDir(path);
+            video.VideoPath = this.GetRelativeDir(path);
+            video.Dir = Path.GetDirectoryName(path)?.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty);
+            video.Caption = fileNameWithoutExtension;
+            video.Times = times;
+            video.Length = file.Length / 1024 / 1024;
+            video.DataDir = video.VideoPath;
+            video.Snapshots = images.Select(m => this.dataService.SnapshotsService.Create(m, video.Id)).ToList();
+            video.MD5 = await md5Task;
+            video.ModifyTime = DateTime.Now;
+            return video;
+        }
+        finally
+        {
+            st.Stop();
+            Log.Information($"视频 [{path}] 处理完成，耗时 [{st.Elapsed.TotalSeconds}] 秒");
+        }
     }
 
     /// <summary>
