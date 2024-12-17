@@ -231,7 +231,7 @@ partial class DataService
             query = query.Where(m => m.Status == status);
 
             if (!string.IsNullOrWhiteSpace(dir))
-                query = query.Where(m => m.VideoDir.Replace(@"\", "/").EndsWith(dir.Replace(@"\", "/")));
+                query = query.Where(m => m.RootDir.Replace(@"\", "/").EndsWith(dir.Replace(@"\", "/")));
 
             if (!string.IsNullOrWhiteSpace(caption))
                 query = query.Where(m => m.Caption.Contains(caption));
@@ -240,9 +240,9 @@ partial class DataService
                 query = query.Where(m => m.Evaluate >= evaluate.Value);
 
             query = isDesc
-                ? query.OrderByDescending(m => m.Evaluate).ThenByDescending(v => v.ModifyTime).ThenBy(m => m.Dir)
+                ? query.OrderByDescending(m => m.Evaluate).ThenByDescending(v => v.ModifyTime).ThenBy(m => m.RootDir)
                 : (IQueryable<Video>)query.OrderByDescending(m => m.Evaluate).ThenBy(v => v.ModifyTime)
-                    .ThenBy(m => m.Dir);
+                    .ThenBy(m => m.RootDir);
 
             var sql = query.ToQueryString();
 
@@ -273,6 +273,19 @@ partial class DataService
                 .Include(v => v.Snapshots).AsQueryable();
 
             return await query.Where(predicate).FirstOrDefaultAsync();
+        }
+        
+        /// <summary>
+        /// 异步查询视频的方法，根据指定的谓词条件从数据库中检索视频列表。
+        /// </summary>
+        /// <param name="predicate">用于筛选视频的谓词表达式。</param>
+        /// <returns>满足条件的视频列表。</returns>
+        public Video First(Expression<Func<Video, bool>> predicate)
+        {
+            var query = this.dataContext.Videos
+                .Include(v => v.Snapshots).AsQueryable();
+
+            return query.Where(predicate).FirstOrDefault();
         }
     }
 }

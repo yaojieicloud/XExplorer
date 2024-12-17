@@ -17,7 +17,7 @@ public class Video : ModeBase
     /// <summary>
     /// 获取或设置视频文件的存储目录。
     /// </summary>
-    public string? Dir { get; set; }
+    public string? RootDir { get; set; }
 
     /// <summary>
     /// 获取或设置视频文件的存储目录。
@@ -63,6 +63,12 @@ public class Video : ModeBase
     /// 获取或设置视频的时长（单位：秒）。
     /// </summary>
     public long? Times { get; set; }
+
+    /// <summary>
+    /// 获取或设置最小值，该属性未映射到数据库。
+    /// </summary>
+    [NotMapped]
+    public long? Minute => this.Times / 60;
     
     /// <summary>
     /// Status

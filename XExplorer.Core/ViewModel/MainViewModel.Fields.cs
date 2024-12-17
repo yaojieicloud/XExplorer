@@ -18,6 +18,26 @@ namespace XExplorer.Core.ViewModel;
 /// </summary>
 partial class MainViewModel
 {
+    #region Static
+
+    /// <summary>
+    /// 支持的图片扩展名列表
+    /// </summary>
+    private static readonly List<string> picExts = new List<string> { ".jpg", ".png", ".gif", ".bmp" };
+
+    /// <summary>
+    /// 支持的视频扩展名列表
+    /// </summary>
+    private static readonly List<string> videoExts = new List<string>
+        { ".mp4", ".avi", ".mkv", ".rmvb", ".wmv", ".ts", ".m4v", ".mov", ".flv" };
+
+    /// <summary>
+    /// 视频最小大小（单位：MB）
+    /// </summary>
+    private readonly decimal videoMiniSize = 110 * 1024 * 1024;
+    
+    #endregion
+    
     #region Fields
 
     /// <summary>
@@ -52,7 +72,7 @@ partial class MainViewModel
     ///     此变量会更新以反映用户的新选择。
     /// </summary>
     [ObservableProperty]
-    private DirInfo selectedDir;
+    private DirRecord selectedDir;
 
     /// <summary>
     ///     一个私有变量，用于存储目录路径的集合。该集合是
@@ -61,7 +81,7 @@ partial class MainViewModel
     ///     中需要显示的所有目录路径。
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<DirInfo> dirs = new();
+    private ObservableCollection<DirRecord> dirs = new();
 
     /// <summary>
     /// 一个私有字段，用于存储与应用程序状态或用户界面相关的消息内容。
@@ -79,5 +99,6 @@ partial class MainViewModel
     /// </summary>
     [ObservableProperty]
     private bool isShow;
+    
     #endregion
 }

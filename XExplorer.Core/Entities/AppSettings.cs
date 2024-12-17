@@ -50,6 +50,11 @@ public class AppSettings
 public class Conf
 {
     /// <summary>
+    /// 获取或设置存储应用程序图片的目录路径信息。
+    /// </summary>
+    public string SnapshotsDir { get; set; }
+    
+    /// <summary>
     /// 获取或设置音量存储路径配置。
     /// 此属性指定了存储数据的卷路径，
     /// 它通常与相应的操作系统配置文件关联，例如 Windows 或 Mac 的存储卷路径。

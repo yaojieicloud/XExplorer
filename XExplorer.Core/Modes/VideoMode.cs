@@ -21,10 +21,10 @@ public partial class VideoMode : ObservableObject
     private string caption;
 
     /// <summary>
-    /// 获取或设置视频文件的存储目录。
+    /// 获取或设置视频文件的存储根目录。
     /// </summary>
     [ObservableProperty]
-    private string? dir;
+    private string? rootDir;
 
     /// <summary>
     /// 获取或设置视频文件的存储目录。
@@ -79,6 +79,12 @@ public partial class VideoMode : ObservableObject
     /// </summary>
     [ObservableProperty]
     private long? times;
+
+    /// <summary>
+    /// 获取视频的时长最小值（单位：分钟）。
+    /// </summary>
+    [ObservableProperty]
+    private long? minute;
     
     /// <summary>
     /// Status

@@ -18,4 +18,10 @@ public class Snapshot : ModeBase
     /// 获取或设置快照的文件路径。
     /// </summary>
     public string Path { get; set; }
+
+    /// <summary>
+    /// 获取或设置快照完整的路径。
+    /// </summary>
+    [NotMapped]
+    public string FullPath => System.IO.Path.Combine(AppSettingsUtils.Default.Current.SnapshotsDir, this.Path);
 }

@@ -68,6 +68,19 @@ partial class DataService
                 await this.dataContext.SaveChangesAsync();
             }
         }
+        
+        /// <summary>
+        /// 从数据库中批量删除视频快照列表。
+        /// </summary>
+        /// <param name="snapshots">要从数据库中删除的视频快照对象列表。</param> 
+        public void Del(List<Snapshot> snapshots)
+        { 
+            if (snapshots?.Any() ?? false)
+            {
+                this.dataContext.Snapshots.RemoveRange(snapshots);
+                this.dataContext.SaveChanges();
+            }
+        }
 
         /// <summary>
         /// Asynchronously deletes video snapshots from the database based on the specified video ID.

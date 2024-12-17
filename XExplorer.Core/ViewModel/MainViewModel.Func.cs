@@ -8,10 +8,10 @@ using Emgu.CV.Structure;
 using Serilog;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.PixelFormats;
 using Xabe.FFmpeg;
 using XExplorer.Core.Dictionaries;
 using XExplorer.Core.Modes;
+using XExplorer.Core.Utils;
 
 namespace XExplorer.Core.ViewModel;
 
@@ -25,41 +25,30 @@ namespace XExplorer.Core.ViewModel;
 partial class MainViewModel
 {
     /// <summary>
-    ///     初始化目录信息的方法。
-    ///     此方法会从配置的根目录中获取所有子目录，并将其信息转化为 <see cref="DirInfo" /> 对象集合，
-    ///     最终赋值给当前 ViewModel 的 <c>Dirs</c> 属性。
+    ///     初始化目录列表的方法。
+    ///     此方法从应用程序配置的根目录中加载所有子目录，
+    ///     并将其转换为包含名称、完整路径和有效名称的目录记录集合。
     /// </summary>
     /// <remarks>
-    ///     具体步骤如下：
-    ///     1. 调用 <see cref="Directory.GetDirectories(string)" /> 方法获取根目录中的所有子目录路径。
-    ///     2. 遍历每一个子目录路径，将其转换为 <see cref="DirInfo" /> 对象实例，包含目录的名称、完整路径和有效名称信息。
-    ///     3. 将所有的 <see cref="DirInfo" /> 对象存入 <see cref="ObservableCollection{T}" /> 集合中，并更新 <c>Dirs</c> 属性。
+    ///     本方法使用应用程序设定的根目录路径（RootDir）读取所有子目录，
+    ///     并生成用于绑定显示的 ObservableCollection
+    ///     <DirRecord>
+    ///         对象，
+    ///         以便供界面或后续逻辑使用。
     /// </remarks>
-    /// <example>
-    ///     假设配置的根目录包括如下子目录：
-    ///     <list type="bullet">
-    ///         <item>C:\Root\Dir1</item>
-    ///         <item>C:\Root\Dir2</item>
-    ///     </list>
-    ///     调用本方法后，<c>Dirs</c> 属性会包含以下内容：
-    ///     <list type="bullet">
-    ///         <item>目录名称：Dir1，有效名称：\Dir1，完整路径：C:\Root\Dir1</item>
-    ///         <item>目录名称：Dir2，有效名称：\Dir2，完整路径：C:\Root\Dir2</item>
-    ///     </list>
-    /// </example>
     private void InitDirs()
     {
-        var videoDirs = new List<DirInfo>();
+        var videoDirs = new List<DirRecord>();
         var allDirs = Directory.GetDirectories(AppSettingsUtils.Default.Current.RootDir);
         for (var i = 0; i < allDirs.Length; i++)
         {
             var dir = allDirs[i];
             var dirInfo = new DirectoryInfo(dir);
             var valid = dir.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty);
-            videoDirs.Add(new DirInfo { Name = dirInfo.Name, FullName = dir, ValidName = valid });
+            videoDirs.Add(new DirRecord { Name = dirInfo.Name, FullName = dir, ValidName = valid });
         }
 
-        Dirs = new ObservableCollection<DirInfo>(videoDirs);
+        Dirs = new ObservableCollection<DirRecord>(videoDirs);
     }
 
     /// <summary>
@@ -124,9 +113,24 @@ partial class MainViewModel
     /// </example>
     private string GetRelativeDir(string path)
     {
+        path = AdjustPath(path);
         path = path.Replace(AppSettingsUtils.Default.Windows.Volume, string.Empty);
         path = path.Replace(AppSettingsUtils.Default.Mac.Volume, string.Empty);
         path = Path.GetDirectoryName(path);
+        return path;
+    }
+
+    /// <summary>
+    ///     获取相对路径的方法。
+    ///     此方法根据当前应用的设置，将传入的路径去掉 Windows 或 Mac 的根目录前缀，返回去除前缀后的相对路径。
+    /// </summary>
+    /// <param name="path">需要处理的绝对路径。</param>
+    /// <returns>去掉根目录前缀后的相对路径字符串。</returns>
+    private string GetRelativePath(string path)
+    {
+        path = AdjustPath(path);
+        path = path.Replace(AppSettingsUtils.Default.Windows.Volume, string.Empty);
+        path = path.Replace(AppSettingsUtils.Default.Mac.Volume, string.Empty);
         return path;
     }
 
@@ -136,20 +140,6 @@ partial class MainViewModel
     ///     打开目录界面，便于用户浏览目录内容。
     /// </summary>
     /// <param name="dir">需要打开的目录路径。可以是目录路径或文件路径。</param>
-    /// <remarks>
-    ///     此方法将执行以下步骤：
-    ///     1. 调用 <c>AdjustPath(string)</c> 方法对提供的路径做标准化处理，确保路径有效。
-    ///     2. 如果路径指向一个文件，将自动获取文件所在的目录。
-    ///     3. 根据系统平台（通过 <see cref="AppSettingsUtils.Default.OS" /> 判断），
-    ///     在 Windows 上通过调用 `explorer.exe`，在其他平台（例如 macOS）调用对应的目录打开命令。
-    ///     4. 在发生异常情况下，会记录错误日志，并向用户展示错误通知。
-    /// </remarks>
-    /// <example>
-    ///     <list type="number">
-    ///         <item>假设输入路径为 "C:\Root\Dir1\File1.txt"（文件路径），调用后将打开 "C:\Root\Dir1"。</item>
-    ///         <item>假设输入路径为 "/User/Documents/Dir2"，调用后将在 macOS 上打开 Finder 并展示该目录。</item>
-    ///     </list>
-    /// </example>
     private void OpenFolder(string dir)
     {
         try
@@ -173,64 +163,72 @@ partial class MainViewModel
 
     #region 视频处理
 
+    public async Task ProcessVideosAsync(DirRecord dir)
+    {
+        object lckObj = new object();
+        this.Videos = new ObservableCollection<VideoMode>();
+        var dirInfo = new DirectoryInfo(dir.FullName);
+        var files = dirInfo.GetFiles(string.Empty, SearchOption.AllDirectories);
+        if (!(files?.Any() ?? false))
+            throw new FileNotFoundException(dir.FullName);
+
+        var videoFiles = files.Where(f => videoExts.Contains(f.Extension.ToLower())).ToList();
+        var videoStoreFiles = videoFiles?.Where(m => m.Length >= videoMiniSize).ToList() ?? new List<FileInfo>();
+        var videoData = await dataService.VideosService.QueryAsync(m => m.VideoDir == dir.ValidName);
+        var videoDict = videoData.ToDictionary(m => m.VideoPath, m => m);
+
+        foreach (var fileInfo in videoStoreFiles)
+        {
+            var videoRecord = new FileRecord(fileInfo.FullName);
+            if (videoDict.ContainsKey(videoRecord.RelativePath))
+            {
+                Log.Information($"视频 [{fileInfo.FullName}] 已存在，无需处理。");
+                continue;
+            }
+
+            var video = await ProcessVideoAsync(new FileRecord(fileInfo.FullName));
+            this.dataService.VideosService.AddAsync(video);
+            Log.Information($"视频 [{fileInfo.FullName}] 处理完成。");
+        }
+    }
+
     /// <summary>
     /// 异步处理视频的方法。
-    /// 此方法根据传入的视频路径生成一个 <see cref="Video" /> 对象，并返回该对象。
+    /// 此方法从指定的文件记录中提取视频信息，生成或更新视频对象，
+    /// 并处理视频截图及相关元数据信息。
     /// </summary>
-    /// <param name="path">
-    /// 视频文件的路径，用于创建对应的 <see cref="Video" /> 对象。
-    /// </param>
-    /// <returns>
-    /// 一个任务，表示异步操作的结果。任务完成时返回一个 <see cref="Video" /> 对象，
-    /// 其中包含生成的视频信息（如标题、路径等）。
-    /// </returns>
-    /// <remarks>
-    /// 具体流程如下：
-    /// 1. 调用 <see cref="DataService.VideoService.Create(string)" /> 方法，根据提供的路径创建一个 <see cref="Video" /> 对象。
-    /// 2. 通过 <c>await</c> 保证异步任务的执行流程。
-    /// 3. 返回该 <see cref="Video" /> 对象作为结果。
-    /// </remarks>
-    /// <example>
-    /// 假设输入路径为 "C:\Videos\Sample.mp4"，调用此方法后将生成一个具有以下信息的 <see cref="Video" /> 对象：
-    /// <list type="bullet">
-    /// <item>Caption：自动生成的标题（可能基于文件名）。</item>
-    /// <item>Dir：文件所在的主目录。</item>
-    /// <item>VideoDir：文件的完整路径。</item>
-    /// </list>
-    /// </example>
-    private async Task<Video> ProcessVideoAsync(string videoPath)
+    /// <param name="record">视频文件的文件记录对象，包含文件的路径及相关信息。</param>
+    /// <param name="video">可选参数，用于更新的已有视频对象；若为 null，则创建新的视频对象。</param>
+    /// <returns>处理完成的 <see cref="Video"/> 对象。</returns>
+    private async Task<Video> ProcessVideoAsync(FileRecord record)
     {
         var st = Stopwatch.StartNew();
 
         try
         {
-            var path = AdjustPath(videoPath);
-            if (!path.StartsWith(AppSettingsUtils.Default.Current.Volume))
-                path = Path.Combine(AppSettingsUtils.Default.Current.Volume, path);
-
-            if (!File.Exists(path))
+            if (!File.Exists(record.FullName))
                 return null;
 
-            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(path);
-            var file = new FileInfo(path);
-            var dataDir = Path.Combine(AppSettingsUtils.Default.Current.DataDir, this.GetRelativeDir(path));
-            var video = await this.dataService.VideosService.FirstAsync(m => m.VideoPath == videoPath);
-            var times = await this.GetVideoTimes(path);
-            var md5Task = this.GetMd5CodeAsync(path);
-            var timestamps = this.GetTimestamps(times);
-            var images = await this.GetVideoImages(path, dataDir, timestamps);
+            var file = new FileInfo(record.FullName);
+            var video = await this.dataService.VideosService.FirstAsync(m => m.VideoPath == record.ValidName);
+            var dataDir = Path.Combine(AppSettingsUtils.Default.Current.DataDir, record.Dir.ValidName);
+            var times = await GetVideoTimes(record.FullName);
+            var md5Task = GetMd5CodeAsync(record.FullName);
+            var timestamps = GetTimestamps(times);
+            var images = await GetVideoImagesAsync(record.FullName, timestamps);
 
-            video ??= this.dataService.VideosService.Create(path);
+            video ??= dataService.VideosService.Create(record.ValidName);
             video.Status = 1;
-            await this.DelOriginalImagesAsync(video);
-            video.VideoDir = this.GetRelativeDir(path);
-            video.VideoPath = this.GetRelativeDir(path);
-            video.Dir = Path.GetDirectoryName(path)?.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty);
-            video.Caption = fileNameWithoutExtension;
+            this.DelOriginalImages(video);
+            video.VideoDir = record.Dir.ValidName;
+            video.VideoPath = record.ValidName;
+            video.RootDir = selectedDir.ValidName;
+            video.Caption = record.NameWithoutExt;
             video.Times = times;
             video.Length = file.Length / 1024 / 1024;
-            video.DataDir = video.VideoPath;
-            video.Snapshots = images.Select(m => this.dataService.SnapshotsService.Create(m, video.Id)).ToList();
+            video.DataDir = record.Dir.ValidName;
+            video.Snapshots = images.Select(m => dataService.SnapshotsService.Create(m.Name, video.Id))
+                .ToList();
             video.MD5 = await md5Task;
             video.ModifyTime = DateTime.Now;
             return video;
@@ -238,71 +236,70 @@ partial class MainViewModel
         finally
         {
             st.Stop();
-            Log.Information($"视频 [{videoPath}] 处理完成，耗时 [{st.Elapsed.TotalSeconds}] 秒");
+            Log.Information($"视频 [{record}] 处理完成，耗时 [{st.Elapsed.TotalSeconds}] 秒");
         }
     }
 
-    /// <summary>
-    ///     从指定的视频文件中提取多个时间点的截图，并将其保存到指定的输出文件夹中。
-    ///     此方法通过 <see cref="Xabe.FFmpeg" /> 库实现视频文件的处理和截图功能。
-    /// </summary>
-    /// <param name="videoPath">待处理的视频文件的路径。</param>
-    /// <param name="outputFolderPath">保存截图的目标文件夹路径。如果文件夹不存在，将自动创建。</param>
-    /// <param name="timestamps">一个时间点集合，表示在视频中需截取画面的时间点。</param>
-    /// <remarks>
-    ///     具体步骤如下：
-    ///     1. 调用 <see cref="Directory.CreateDirectory(string)" /> 确保输出文件夹已存在。
-    ///     2. 创建一个新的 FFmpeg 转换实例，通过 <see cref="Xabe.FFmpeg.FFmpeg.Conversions.New()" /> 方法完成。
-    ///     3. 遍历传入的时间点集合，为每个时间点构建截图参数，并将其添加到转换实例中。
-    ///     4. 调用 <c>conversion.Start()</c> 执行转换任务，生成截图文件。
-    ///     5. 通过 <see cref="Serilog.Log.Information(string)" /> 记录操作日志以标识任务完成。
-    /// </remarks>
-    /// <returns>异步任务 (<see cref="Task" />)，用于表示截取过程的完成状态。</returns>
-    private async Task<List<string>> GetVideoImages(string videoPath, string outputFolderPath,
-        List<TimeSpan> timestamps)
+    private async Task<List<FileRecord>> GetVideoImagesAsync(string videoPath, List<TimeSpan> timestamps)
     {
-        var images = new List<string>();
-
+        var images = new List<FileRecord>();
+        var outputFolderPath = AppSettingsUtils.Default.Current.SnapshotsDir;
         // 确保输出文件夹存在
         if (!Directory.Exists(outputFolderPath))
             Directory.CreateDirectory(outputFolderPath);
-
-        // 创建一个 FFmpeg 转换实例
-        var conversion = FFmpeg.Conversions.New();
-
+ 
         // 遍历时间点并添加截图参数
         foreach (var timestamp in timestamps)
         {
-            var img = $"{Guid.NewGuid():N}.jpg";
-            var outputPath = Path.Combine(outputFolderPath, img);
-            conversion.AddParameter($"-ss {timestamp} -i \"{videoPath}\" -frames:v 1 \"{outputPath}\"");
-            images.Add(outputPath);
+            var name = $"{Guid.NewGuid():N}.jpg";
+            var fullName = Path.Combine(outputFolderPath, name);
+            var record = new FileRecord(fullName, AppSettingsUtils.Default.Current.DataDir);
+            //conversion.AddParameter($"-ss {timestamp} -i \"{videoPath}\" -frames:v 1 \"{fullName}\"");
+            await this.CaptureFrameAtTime(videoPath, fullName, timestamp);
+            images.Add(record);
         }
-
-        // 执行转换任务
-        await conversion.Start();
+        
         Log.Information($"视频 「{videoPath}」截图已保存到: [{outputFolderPath}] ");
         return images;
     }
 
     /// <summary>
-    /// 根据总时长（单位为秒）计算出若干个关键时间点的时间戳。
-    /// 本方法会将输入的时长分为 10 个时间段，提取中间 8 个时间点的时间戳（剔除第一个和最后一个时间点）。
+    /// 从视频文件中指定时间戳截图并保存为图像文件。
+    /// 此方法利用FFmpeg库提取视频帧并保存到指定输出目录。
+    /// </summary>
+    /// <param name="videoPath">视频文件的路径。</param>
+    /// <param name="outputFolderPath">保存截图的输出文件夹路径。</param>
+    /// <param name="timestamp">截图的时间戳位置。</param>
+    /// <returns>一个表示异步操作的 Task。</returns>
+    private async Task CaptureFrameAtTime(string videoPath, string outputFolderPath, TimeSpan timestamp)
+    {
+        var name = $"{Guid.NewGuid():N}.jpg"; 
+        var conversion = FFmpeg.Conversions.New()
+            .AddParameter($"-ss {timestamp}")
+            .AddParameter($"-i \"{videoPath}\"")
+            .AddParameter("-frames:v 1")
+            .AddParameter($"\"{outputFolderPath}\"");
+        await conversion.Start();
+    }
+    
+    /// <summary>
+    ///     根据总时长（单位为秒）计算出若干个关键时间点的时间戳。
+    ///     本方法会将输入的时长分为 10 个时间段，提取中间 8 个时间点的时间戳（剔除第一个和最后一个时间点）。
     /// </summary>
     /// <param name="times">
-    /// 视频的总时长（单位为秒）。该值必须大于 1，否则返回空集合。
+    ///     视频的总时长（单位为秒）。该值必须大于 1，否则返回空集合。
     /// </param>
     /// <returns>
-    /// 一个包含 8 个时间戳 (<see cref="TimeSpan" />) 的集合列表。这些时间戳为中间的
-    /// 分段点时间值，依次从第 2 段到第 9 段的计算结果。
-    /// 如果输入的时长不足以分为 10 个时间点，返回空集合。
+    ///     一个包含 8 个时间戳 (<see cref="TimeSpan" />) 的集合列表。这些时间戳为中间的
+    ///     分段点时间值，依次从第 2 段到第 9 段的计算结果。
+    ///     如果输入的时长不足以分为 10 个时间点，返回空集合。
     /// </returns>
     /// <remarks>
-    /// 具体实现过程为：
-    /// 1. 首先检查输入的时长。如果时长小于或等于 1，直接返回空集合。
-    /// 2. 计算时间间隔，即将总时长除以 10，作为每段的距离。
-    /// 3. 遍历第 2 到第 9 段，生成对应的时间戳；若因误差导致时间点超出总时长，则取总时长作为限制。
-    /// 4. 将剔除的第一个和最后一个段时间点外的时间戳加入集合后返回。
+    ///     具体实现过程为：
+    ///     1. 首先检查输入的时长。如果时长小于或等于 1，直接返回空集合。
+    ///     2. 计算时间间隔，即将总时长除以 10，作为每段的距离。
+    ///     3. 遍历第 2 到第 9 段，生成对应的时间戳；若因误差导致时间点超出总时长，则取总时长作为限制。
+    ///     4. 将剔除的第一个和最后一个段时间点外的时间戳加入集合后返回。
     /// </remarks>
     private List<TimeSpan> GetTimestamps(long times)
     {
@@ -312,11 +309,11 @@ partial class MainViewModel
             return timestamps;
 
         // 计算时间间隔，确保分为10段
-        double interval = (double)times / 10;
-        for (int i = 1; i <= 10; i++)
+        var interval = (double)times / 10;
+        for (var i = 1; i <= 10; i++)
         {
-            double timeInSeconds = i == 10 ? times : i * interval;
-            TimeSpan timeStamp = TimeSpan.FromSeconds(timeInSeconds);
+            var timeInSeconds = i == 10 ? times : i * interval;
+            var timeStamp = TimeSpan.FromSeconds(timeInSeconds);
             if (!timestamps.Contains(timeStamp))
                 timestamps.Add(timeStamp);
         }
@@ -333,29 +330,16 @@ partial class MainViewModel
     }
 
     /// <summary>
-    ///     异步获取视频文件的时长（以分钟为单位）。
-    ///     此方法使用指定的文件路径检查视频文件的存在性，
-    ///     并调用 <see cref="FFmpeg.GetMediaInfo(string)" /> 获得视频的媒体信息以提取时长。
-    ///     如果文件不存在，则返回 <c>double.NaN</c>。
+    /// 获取指定视频文件总时长的方法。
+    /// 此方法通过调用 FFmpeg 工具解析视频元信息，返回视频总时长（以秒为单位）。
     /// </summary>
-    /// <param name="videoPath">视频文件的完整路径。</param>
-    /// <returns>以分钟为单位的视频时长。如果文件不存在，则返回 <c>double.NaN</c>。</returns>
-    /// <remarks>
-    ///     此功能依赖于 FFmpeg 库及其 <see cref="FFmpeg.GetMediaInfo(string)" /> 方法，
-    ///     请确保视频路径指向有效且存在的媒体文件。
-    /// </remarks>
-    /// <example>
-    ///     假设提供的视频文件路径为 <c>C:\Videos\Sample.mp4</c> 且文件有效：
-    ///     <code>
-    /// double length = await GetVideoLength(@"C:\Videos\Sample.mp4");
-    /// Console.WriteLine($"视频时长: {length} 秒");
-    /// </code>
-    ///     如果文件不存在：
-    ///     <code>
-    /// double length = await GetVideoLength(@"C:\Videos\NonExistent.mp4");
-    /// Console.WriteLine($"返回值为 {length}，表示文件无效");
-    /// </code>
-    /// </example>
+    /// <param name="videoPath">
+    /// 视频文件的完整路径。
+    /// 提供目标文件路径，用于解析视频的元信息。
+    /// </param>
+    /// <returns>
+    /// 返回视频的时长（以秒为单位）。如果文件不存在，返回 0。
+    /// </returns>
     private async Task<long> GetVideoTimes(string videoPath)
     {
         if (File.Exists(videoPath))
@@ -434,28 +418,11 @@ partial class MainViewModel
     }
 
     /// <summary>
-    ///     异步方法，用于计算指定文件的 MD5 哈希值。
-    ///     该方法读取文件内容并生成其对应的 MD5 哈希，以字符串形式返回。
+    /// 异步获取文件的 MD5 校验码。
+    /// 此方法读取指定文件，并计算其 MD5 哈希值，返回小写的十六进制字符串格式。
     /// </summary>
-    /// <param name="filePath">目标文件的完整路径。</param>
-    /// <returns>
-    ///     返回文件的 MD5 哈希值，以小写字母形式的字符串表示。
-    ///     如果文件路径无效或文件读取失败，可能会抛出相应的异常。
-    /// </returns>
-    /// <remarks>
-    ///     此方法通过流式读取文件内容，利用 <see cref="System.Security.Cryptography.MD5" />
-    ///     对象计算文件的 MD5 哈希，适用于检查文件的完整性或进行文件比对等场景。
-    /// </remarks>
-    /// <example>
-    ///     示例代码：
-    ///     <code>
-    /// string filePath = @"C:\example.txt";
-    /// string md5Hash = await GetMd5CodeAsync(filePath);
-    /// Console.WriteLine($"文件的 MD5 值为: {md5Hash}");
-    /// </code>
-    ///     假设文件内容为 "Hello World"，则输出结果类似于：
-    ///     文件的 MD5 值为: b10a8db164e0754105b7a99be72e3fe5
-    /// </example>
+    /// <param name="filePath">文件的完整路径。</param>
+    /// <returns>返回文件的 MD5 哈希值，格式为小写的十六进制字符串。</returns>
     private async Task<string> GetMd5CodeAsync(string filePath)
     {
         using (var md5 = MD5.Create())
@@ -469,7 +436,28 @@ partial class MainViewModel
     }
 
     /// <summary>
-    ///     删除视频图片
+    /// 删除视频图片
+    /// </summary>
+    /// <param name="enty">视频实体</param>
+    private void DelOriginalImages(Video enty)
+    {
+        var imgs = enty.Snapshots?.ToList();
+
+        if (!(imgs?.Any() ?? false))
+            return;
+
+        for (var i = imgs.Count - 1; i >= 0; i--)
+        {
+            var fullPath = Path.Combine(AppSettingsUtils.Default.Current.DataDir, imgs[i]?.Path);
+            if (File.Exists(fullPath))
+                File.Delete(fullPath);
+
+            imgs.RemoveAt(i);
+        }
+    }
+    
+    /// <summary>
+    /// 删除视频图片
     /// </summary>
     /// <param name="enty">视频实体</param>
     private async Task DelOriginalImagesAsync(Video enty)
@@ -480,7 +468,7 @@ partial class MainViewModel
             return;
 
         await this.dataService.SnapshotsService.DelAsync(imgs);
-        for (int i = imgs.Count - 1; i >= 0; i--)
+        for (var i = imgs.Count - 1; i >= 0; i--)
         {
             var fullPath = Path.Combine(AppSettingsUtils.Default.Current.DataDir, imgs[i]?.Path);
             if (File.Exists(fullPath))

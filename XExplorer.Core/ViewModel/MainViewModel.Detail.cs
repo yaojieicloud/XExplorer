@@ -35,6 +35,7 @@ partial class MainViewModel
             if (!string.IsNullOrWhiteSpace(path))
             {
                 var currPath = AdjustPath(path);
+                currPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, currPath);
                 if (AppSettingsUtils.Default.OS == OS.Windows)
                     Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"--no-one-instance \"{currPath}\"");
                 else
@@ -55,6 +56,25 @@ partial class MainViewModel
     }
 
     /// <summary>
+    /// 打开包含指定文件的文件夹。
+    /// </summary>
+    /// <param name="param">表示文件路径的对象。</param>
+    /// <remarks>
+    /// 此方法首先将传入的参数转换为字符串，然后获取该路径的目录名。最后，如果路径不为空，它会使用Windows资源管理器打开该目录。
+    /// </remarks>
+    [RelayCommand]
+    public async Task OpenFolderAsync(object param)
+    {
+        var path = param as string;
+        if (!string.IsNullOrWhiteSpace(path))
+        {
+            path = Path.Combine(AppSettingsUtils.Default.Current.Volume, path);
+            this.OpenFolder($"{path}");
+            await Task.CompletedTask;
+        }
+    }
+    
+    /// <summary>
     ///     异步处理单个视频文件。
     /// </summary>
     /// <param name="param">表示视频实体的对象。</param>
@@ -72,7 +92,8 @@ partial class MainViewModel
             if (param is VideoMode enty)
             {
                 var st = Stopwatch.StartNew();
-                var video = await ProcessVideoAsync(enty.VideoPath);
+                var fullName = Path.Combine(AppSettingsUtils.Default.Current.Volume,enty.VideoPath); 
+                var video = await ProcessVideoAsync(new FileRecord(fullName));
                 await dataService.VideosService.UpdateAsync(video);
                 video.ToMode(enty);
                 st.Stop();

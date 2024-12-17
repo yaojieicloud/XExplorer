@@ -17,7 +17,7 @@ public static class DataUtils
         var result = video ?? new Video();
         result.Id = video == null ? mode.Id : video.Id;
         result.Caption = mode.Caption;
-        result.Dir = mode.Dir;
+        result.RootDir = mode.RootDir;
         result.VideoDir = mode.VideoDir;
         result.DataDir = mode.DataDir;
         result.VideoPath = mode.VideoPath;
@@ -49,7 +49,7 @@ public static class DataUtils
         var result = mode ?? new VideoMode();
         result.Id = mode == null ? video.Id : mode.Id;
         result.Caption = video.Caption;
-        result.Dir = video.Dir;
+        result.RootDir = video.RootDir;
         result.VideoDir = video.VideoDir;
         result.DataDir = video.DataDir;
         result.VideoPath = video.VideoPath;
@@ -60,6 +60,7 @@ public static class DataUtils
         result.Md5 = video.MD5;
         result.Times = video.Times;
         result.Status = video.Status;
+        result.Minute = video.Minute;
         result.Snapshots = new ObservableCollection<Snapshot>(video.Snapshots);
 
         return result;

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
+using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
@@ -48,18 +49,6 @@ public partial class MainViewModel : ObservableObject
             Processing = true;
             Videos.Clear();
             var enties = await dataService.VideosService.QueryAsync(this.SelectedDir.ValidName);
-
-            Parallel.ForEach(enties, m =>
-            {
-                m.Snapshots.ForEach(s =>
-                {
-                    s.Path = Path.Combine(AppSettingsUtils.Default.Current.DataDir, s.Path);
-                    s.Path = AppSettingsUtils.Default.OS == OS.MacCatalyst
-                        ? s.Path.Replace('\\', '/')
-                        : s.Path.Replace('/', '\\');
-                });
-            });
-
             var modes = enties.ToModes();
             Videos = new ObservableCollection<VideoMode>(modes);
             this.Notification($"数据加载完成！");
@@ -76,18 +65,60 @@ public partial class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// 打开包含指定文件的文件夹。
+    /// 异步处理选定文件夹中的视频文件。
+    /// 此方法通过命令模式触发，会记录处理耗时并显示通知。
+    /// 若在处理过程中出现异常，将捕获并记录错误信息。
     /// </summary>
-    /// <param name="param">表示文件路径的对象。</param>
-    /// <remarks>
-    /// 此方法首先将传入的参数转换为字符串，然后获取该路径的目录名。最后，如果路径不为空，它会使用Windows资源管理器打开该目录。
-    /// </remarks>
+    /// <returns>表示异步操作完成的任务。</returns>
     [RelayCommand]
-    public async Task FolderAsync(object param)
+    public async Task ProcessVideosAsync()
     {
-        this.OpenFolder($"{param}");
+        var st = Stopwatch.StartNew();
+        
+        try
+        {
+            await this.ProcessVideosAsync(this.SelectedDir);
+            st.Stop();
+            this.Notification($"文件夹 [{this.selectedDir.FullName}] 全部处理完成，耗时[{st.Elapsed.TotalSeconds}]秒。");
+        }
+        catch (Exception e)
+        {
+            this.Notification($"{e}");
+            Log.Error(e, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+        }
+        finally
+        {
+            st.Stop();
+            Log.Information($"文件夹 [{this.selectedDir.FullName}] 全部处理完成，耗时[{st.Elapsed.TotalSeconds}]秒。");
+        }
     }
-
+     
+    /// <summary>
+    /// 异步方法，用于通过文件夹选择器功能让用户选择一个文件夹并将其信息加载到应用状态中。
+    /// 如果选择了文件夹，该方法会生成一个 <see cref="DirRecord"/> 对象，
+    /// 包含文件夹的名称、完整路径以及格式化后的路径信息（相对于配置中的卷路径）。
+    /// 此方法在选择文件夹后会更新 ViewModel 中的 <c>SelectedDir</c> 属性。
+    /// </summary>
+    /// <returns>
+    /// 返回一个 <see cref="Task"/>，表示异步操作的执行状态。
+    /// 如果用户成功选择了文件夹，则更新模型状态；否则，无状态变化。
+    /// </returns>
+    [RelayCommand]
+    public async Task SelectFolderAsync()
+    { 
+        var result = await FolderPicker.PickAsync(default);
+        if (result != null)
+        {
+            var dir = new DirRecord()
+            {
+                Name = result.Folder.Name,
+                FullName = result.Folder.Path,
+                ValidName = result.Folder.Path.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty)
+            };
+            this.SelectedDir = dir;
+        }
+    }
+    
     /// <summary>
     /// 打开日志目录。
     /// </summary>
