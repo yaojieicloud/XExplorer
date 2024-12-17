@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Maui.Views;
+﻿using System;
+using CommunityToolkit.Maui.Views;
+using Microsoft.Maui.Controls;
 using XExplorer.Core.ViewModel;
 
 namespace XExplorer.Maui;
@@ -33,5 +35,13 @@ public partial class MainPage : ContentPage
     private void Button_OnClicked(object? sender, EventArgs e)
     {
         //this.ShowPopup(DirPopup);
+    }
+
+    private void MainGrid_OnSizeChanged(object? sender, EventArgs e)
+    {
+        if (this.BindingContext is MainViewModel vm)
+        {
+            vm.MainViewHeight = this.MainGrid.Height - this.MainTool.Height - 30;
+        }
     }
 }

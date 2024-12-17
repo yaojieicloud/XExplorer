@@ -79,6 +79,7 @@
         <PackageReference Include="UraniumUI.Dialogs.Mopups" Version="2.11.0" />
         <PackageReference Include="UraniumUI.Icons.MaterialIcons" Version="2.11.0" />
         <PackageReference Include="UraniumUI.Material" Version="2.11.0" />
+        <PackageReference Include="XGENO.Maui.RatingView" Version="1.0.0" />
     </ItemGroup>
 
     <ItemGroup>

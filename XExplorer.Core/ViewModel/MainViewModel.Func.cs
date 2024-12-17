@@ -236,7 +236,8 @@ partial class MainViewModel
         finally
         {
             st.Stop();
-            Log.Information($"视频 [{record}] 处理完成，耗时 [{st.Elapsed.TotalSeconds}] 秒");
+            Log.Information($"视频 [{record.FullName}] 处理完成，耗时 [{st.Elapsed.TotalSeconds}] 秒");
+            this.Message = $"视频 [{record.FullName}] 处理完成，耗时 [{st.Elapsed.TotalSeconds}] 秒";
         }
     }
 

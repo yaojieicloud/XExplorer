@@ -99,6 +99,12 @@ partial class MainViewModel
     /// </summary>
     [ObservableProperty]
     private bool isShow;
-    
+
+    /// <summary>
+    /// 主视图的高度
+    /// </summary>
+    [ObservableProperty]
+    private double mainViewHeight;
+
     #endregion
 }

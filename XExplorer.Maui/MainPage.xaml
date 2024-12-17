@@ -4,6 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:XExplorer.Core.ViewModel;assembly=XExplorer.Core"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+             xmlns:xgeno="clr-namespace:XGENO.Maui.Controls;assembly=Maui.Controls.RatingView"
              x:Class="XExplorer.Maui.MainPage">
     <ContentPage.Resources>
     </ContentPage.Resources>
@@ -12,7 +13,7 @@
     </ContentPage.BindingContext>
     <ContentPage.Style>
     </ContentPage.Style>
-    <VerticalStackLayout Margin="10" x:Name="MainGrid">
+    <VerticalStackLayout Margin="10" x:Name="MainGrid" SizeChanged="MainGrid_OnSizeChanged">
         <!-- 遮罩层 -->
         <Grid IsVisible="{Binding IsShow}" BackgroundColor="#80000000"
               WidthRequest="{Binding Source={x:Reference MainGrid}, Path=WidthRequest}">
@@ -30,7 +31,7 @@
                 </VerticalStackLayout>
             </Frame>
         </Grid>
-        <HorizontalStackLayout>
+        <HorizontalStackLayout x:Name="MainTool">
             <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Text="目录：" />
             <Picker SelectedItem="{Binding SelectedDir}"
                     ItemsSource="{Binding Dirs}"
@@ -67,8 +68,9 @@
             <!-- <Button Text="删数据" ToolTipProperties.Text="删除选中目录的数据目录" Command="{Binding ClearDataCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
         </HorizontalStackLayout>
         <BoxView StyleClass="Divider" />
+        <!-- HeightRequest="{Binding Source={x:Reference MainGrid}, Path=Height}"> -->
         <CollectionView ItemsSource="{Binding Videos}" x:Name="MainView" VerticalOptions="FillAndExpand"
-                        HeightRequest="{Binding Source={x:Reference MainGrid}, Path=Height}">
+                        HeightRequest="{Binding MainViewHeight}">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" />
             </CollectionView.ItemsLayout>
@@ -80,7 +82,7 @@
                                 <Label Text="{Binding VideoDir}" FontSize="18" Padding="15,10,0,0" />
                             </HorizontalStackLayout>
                             <BoxView StyleClass="Divider" />
-                            <HorizontalStackLayout HeightRequest="30">
+                            <HorizontalStackLayout HeightRequest="30" VerticalOptions="Center">
                                 <Label Text="{Binding Caption}" FontSize="18" Padding="15,0,10,0" />
                                 <Label Text="===" FontSize="18" />
                                 <Label Text="{Binding Length}" FontSize="18" Padding="10,0"/>
@@ -93,6 +95,16 @@
                                 <Label Text="===" FontSize="18" />
                                 <Label Text="{Binding ModifyTime}" FontSize="18" Padding="10,0" />
                                 <Label Text="===" FontSize="18" />
+                                <xgeno:RatingView
+                                    ItemCount="5"
+                                    ItemSize="20"
+                                    ItemSpacing="6"
+                                    Value="{Binding Evaluate}"
+                                    RatedFillColor="Yellow"
+                                    UnRatedFillColor="LightGrey"
+                                    StrokeColor="Black"
+                                    StrokeWidth="1"
+                                    HorizontalOptions="Start" />
                             </HorizontalStackLayout>
                             <BoxView StyleClass="Divider" />
                             <CollectionView ItemsSource="{Binding Snapshots}" HeightRequest="310"
@@ -104,7 +116,7 @@
                                     <DataTemplate>
                                         <VerticalStackLayout>
                                             <Image Source="{Binding FullPath}"
-                                                   HeightRequest="250"
+                                                   HeightRequest="300"
                                                    WidthRequest="400" />
                                         </VerticalStackLayout>
                                     </DataTemplate>
@@ -133,5 +145,8 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+        <HorizontalStackLayout HorizontalOptions="EndAndExpand" MaximumHeightRequest="20">
+            <Label Text="{Binding Message}"></Label>
+        </HorizontalStackLayout>
     </VerticalStackLayout>
 </ContentPage>
