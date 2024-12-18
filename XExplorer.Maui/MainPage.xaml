@@ -3,10 +3,14 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:XExplorer.Core.ViewModel;assembly=XExplorer.Core"
-             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:xgeno="clr-namespace:XGENO.Maui.Controls;assembly=Maui.Controls.RatingView"
+             xmlns:syfCore="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:syfButton="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:rating="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+             xmlns:sfPopup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
+             xmlns:sync="clr-namespace:Syncfusion.Maui.Themes;assembly=Syncfusion.Maui.Core"
              x:Class="XExplorer.Maui.MainPage">
     <ContentPage.Resources>
+        <sync:SyncfusionThemeResourceDictionary x:Key="SyncfusionTheme" />
     </ContentPage.Resources>
     <ContentPage.BindingContext>
         <vm:MainViewModel />
@@ -14,51 +18,90 @@
     <ContentPage.Style>
     </ContentPage.Style>
     <VerticalStackLayout Margin="10" x:Name="MainGrid" SizeChanged="MainGrid_OnSizeChanged">
-        <!-- 遮罩层 -->
-        <Grid IsVisible="{Binding IsShow}" BackgroundColor="#80000000"
-              WidthRequest="{Binding Source={x:Reference MainGrid}, Path=WidthRequest}">
-            <!-- 弹窗 -->
-            <Frame BackgroundColor="Moccasin"
-                   Padding="20"
-                   VerticalOptions="Center"
-                   CornerRadius="5"
-                   HorizontalOptions="Center">
-                <VerticalStackLayout Padding="10">
-                    <Label Text="{Binding Message}" TextColor="Black" HorizontalOptions="Center" />
-                    <BoxView StyleClass="Divider"
-                             WidthRequest="{Binding Source={x:Reference MainGrid}, Path=WidthRequest}" />
-                    <Button Text="关闭" Command="{Binding CloseNotificationCommand}" StyleClass="ElevatedButton" />
-                </VerticalStackLayout>
-            </Frame>
-        </Grid>
+        <sfPopup:SfPopup x:Name="popup" AppearanceMode="OneButton" 
+                         ShowFooter="True"
+                         OverlayMode="Blur" 
+                         AnimationMode="Fade"
+                         HeaderTitle="提醒"  
+                         IsOpen="{Binding IsShow}">
+            <sfPopup:SfPopup.PopupStyle>
+                <sfPopup:PopupStyle FooterBackground="LightGray" 
+                                    MessageTextColor="#292929"
+                                    AcceptButtonBackground="DimGray"
+                                    AcceptButtonTextColor="White"
+                                    DeclineButtonBackground="DimGray"
+                                    DeclineButtonTextColor="White"
+                                    FooterButtonCornerRadius="0,20,20,0" />
+            </sfPopup:SfPopup.PopupStyle>
+            <sfPopup:SfPopup.ContentTemplate>
+                <DataTemplate>
+                    <Label Text="{Binding Message}" TextColor="#292929"
+                           HorizontalTextAlignment="Center" Padding="10" />
+                </DataTemplate>
+            </sfPopup:SfPopup.ContentTemplate>
+        </sfPopup:SfPopup>
         <HorizontalStackLayout x:Name="MainTool">
-            <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Text="目录：" />
+            <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Text="目录：" Padding="10,0" />
             <Picker SelectedItem="{Binding SelectedDir}"
                     ItemsSource="{Binding Dirs}"
                     ItemDisplayBinding="{Binding Name}"
                     HorizontalTextAlignment="Start"
                     HorizontalOptions="StartAndExpand"
+                    Margin="10,0"
                     MinimumWidthRequest="400" />
+            <syfButton:SfButton Text="加载" CornerRadius="20" HeightRequest="40"
+                                Command="{Binding LoadDirCommand}">
+                <syfButton:SfButton.Background>
+                    <LinearGradientBrush>
+                        <LinearGradientBrush.GradientStops>
+                            <GradientStop Color="#0D62D4" Offset="0" />
+                            <GradientStop Color="#9F3CDC" Offset="1" />
+                        </LinearGradientBrush.GradientStops>
+                    </LinearGradientBrush>
+                </syfButton:SfButton.Background>
+            </syfButton:SfButton>
+            <syfButton:SfButton Text="日志" CornerRadius="20" HeightRequest="40"
+                                Command="{Binding OpenLogDirCommand}">
+                <syfButton:SfButton.Background>
+                    <LinearGradientBrush>
+                        <LinearGradientBrush.GradientStops>
+                            <GradientStop Color="#0D62D4" Offset="0" />
+                            <GradientStop Color="#9F3CDC" Offset="1" />
+                        </LinearGradientBrush.GradientStops>
+                    </LinearGradientBrush>
+                </syfButton:SfButton.Background>
+            </syfButton:SfButton>
+            <syfButton:SfButton Text="处理" CornerRadius="20" HeightRequest="40"
+                                Command="{Binding ProcessVideosCommand}">
+                <syfButton:SfButton.Background>
+                    <LinearGradientBrush>
+                        <LinearGradientBrush.GradientStops>
+                            <GradientStop Color="#0D62D4" Offset="0" />
+                            <GradientStop Color="#9F3CDC" Offset="1" />
+                        </LinearGradientBrush.GradientStops>
+                    </LinearGradientBrush>
+                </syfButton:SfButton.Background>
+            </syfButton:SfButton>
             <!-- <uranium:Dropdown WidthRequest="300" ItemDisplayBinding="{Binding Name}"  -->
             <!--                   ItemsSource="{Binding Dirs}"  -->
             <!--                   SelectedItem="{Binding SelectedDir}" Placeholder="Choose" /> -->
 
-            <material:ButtonView ToolTipProperties.Text="浏览并选取目录"
-                                 PressedCommand="{Binding SelectFolderCommand}">
-                <Label Text="浏览" Padding="5,0,5,0" />
-            </material:ButtonView>
-            <material:ButtonView ToolTipProperties.Text="加载选中文件目录的视频"
-                                 PressedCommand="{Binding LoadDirCommand}">
-                <Label Text="加载" Padding="5,0,5,0" />
-            </material:ButtonView>
-            <material:ButtonView ToolTipProperties.Text="打开日志目录"
-                                 PressedCommand="{Binding OpenLogDirCommand}">
-                <Label Text="日志" Padding="5,0,5,0" />
-            </material:ButtonView>
-            <material:ButtonView ToolTipProperties.Text="处理视频"
-                                 PressedCommand="{Binding ProcessVideosCommand}">
-                <Label Text="处理" Padding="5,0,5,0" />
-            </material:ButtonView>
+            <!-- <material:ButtonView ToolTipProperties.Text="浏览并选取目录" -->
+            <!--                      PressedCommand="{Binding SelectFolderCommand}"> -->
+            <!--     <Label Text="浏览" Padding="5,0,5,0" /> -->
+            <!-- </material:ButtonView> -->
+            <!-- <material:ButtonView ToolTipProperties.Text="加载选中文件目录的视频" -->
+            <!--                      PressedCommand="{Binding LoadDirCommand}"> -->
+            <!--     <Label Text="加载" Padding="5,0,5,0" /> -->
+            <!-- </material:ButtonView> -->
+            <!-- <material:ButtonView ToolTipProperties.Text="打开日志目录" -->
+            <!--                      PressedCommand="{Binding OpenLogDirCommand}"> -->
+            <!--     <Label Text="日志" Padding="5,0,5,0" /> -->
+            <!-- </material:ButtonView> -->
+            <!-- <material:ButtonView ToolTipProperties.Text="处理视频" -->
+            <!--                      PressedCommand="{Binding ProcessVideosCommand}"> -->
+            <!--     <Label Text="处理" Padding="5,0,5,0" /> -->
+            <!-- </material:ButtonView> -->
             <!-- <Button Text="全载" ToolTipProperties.Text="全部加载" Command="{Binding LoadAllDirsCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
             <!-- <Button Text="处理" ToolTipProperties.Text="视频处理" Command="{Binding ProcessVideosCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
             <!-- <Button Text="清源" ToolTipProperties.Text="清理原始目录" Command="{Binding DeleteOriginalCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
@@ -68,9 +111,11 @@
             <!-- <Button Text="删数据" ToolTipProperties.Text="删除选中目录的数据目录" Command="{Binding ClearDataCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
         </HorizontalStackLayout>
         <BoxView StyleClass="Divider" />
-        <!-- HeightRequest="{Binding Source={x:Reference MainGrid}, Path=Height}"> -->
+        <syfCore:SfBusyIndicator x:Name="busyIndicator" IsVisible="{Binding Processing}"
+                                 IsRunning="{Binding Processing}"
+                                 AnimationType="DoubleCircle" />
         <CollectionView ItemsSource="{Binding Videos}" x:Name="MainView" VerticalOptions="FillAndExpand"
-                        HeightRequest="{Binding MainViewHeight}">
+                        HeightRequest="{Binding MainViewHeight}" Margin="10">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" />
             </CollectionView.ItemsLayout>
@@ -82,71 +127,103 @@
                                 <Label Text="{Binding VideoDir}" FontSize="18" Padding="15,10,0,0" />
                             </HorizontalStackLayout>
                             <BoxView StyleClass="Divider" />
-                            <HorizontalStackLayout HeightRequest="30" VerticalOptions="Center">
-                                <Label Text="{Binding Caption}" FontSize="18" Padding="15,0,10,0" />
-                                <Label Text="===" FontSize="18" />
-                                <Label Text="{Binding Length}" FontSize="18" Padding="10,0"/>
-                                <Label Text="MB" FontSize="18" />
-                                <Label Text="===" FontSize="18" />
-                                <Label Text="{Binding Minute}" FontSize="18" Padding="10,0"/>
-                                <Label Text="分钟" FontSize="18" />
-                                <Label Text="===" FontSize="18" />
-                                <Label Text="{Binding PlayCount}" FontSize="18" Padding="10,0" />
-                                <Label Text="===" FontSize="18" />
-                                <Label Text="{Binding ModifyTime}" FontSize="18" Padding="10,0" />
-                                <Label Text="===" FontSize="18" />
-                                <xgeno:RatingView
-                                    ItemCount="5"
-                                    ItemSize="20"
-                                    ItemSpacing="6"
-                                    Value="{Binding Evaluate}"
-                                    RatedFillColor="Yellow"
-                                    UnRatedFillColor="LightGrey"
-                                    StrokeColor="Black"
-                                    StrokeWidth="1"
-                                    HorizontalOptions="Start" />
+                            <HorizontalStackLayout>
+                                <HorizontalStackLayout HeightRequest="30" VerticalOptions="Center">
+                                    <Label Text="{Binding Caption}" FontSize="18" Padding="15,0,10,0" />
+                                    <Label Text="===" FontSize="18" />
+                                    <Label Text="{Binding Length}" FontSize="18" Padding="10,0" />
+                                    <Label Text="MB" FontSize="18" />
+                                    <Label Text="===" FontSize="18" />
+                                    <Label Text="{Binding Minute}" FontSize="18" Padding="10,0" />
+                                    <Label Text="分钟" FontSize="18" />
+                                    <Label Text="===" FontSize="18" />
+                                    <Label Text="{Binding PlayCount}" FontSize="18" Padding="10,0" />
+                                    <Label Text="===" FontSize="18" />
+                                    <Label Text="{Binding ModifyTime}" FontSize="18" Padding="10,0" />
+                                    <Label Text="===" FontSize="18" Padding="0,0,10,0" />
+                                    <rating:SfRating Precision="Standard" Value="{Binding Evaluate}"
+                                                     ItemSize="30" ItemCount="5" ItemSpacing="6"
+                                                     BackgroundColor="Transparent">
+                                        <rating:SfRating.RatingSettings>
+                                            <rating:RatingSettings RatedFill="Yellow" UnratedFill="LightGrey"
+                                                                   UnratedStroke="Blue" RatedStrokeThickness="1"
+                                                                   UnratedStrokeThickness="1" />
+                                        </rating:SfRating.RatingSettings>
+                                    </rating:SfRating>
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout HorizontalOptions="EndAndExpand"
+                                                       VerticalOptions="CenterAndExpand"
+                                                       Padding="10,0">
+                                    <syfCore:SfBadgeView HorizontalOptions="Center"
+                                                         VerticalOptions="Center"
+                                                         BadgeText="{Binding PlayCount}">
+                                        <syfCore:SfBadgeView.BadgeSettings>
+                                            <syfCore:BadgeSettings BadgeAlignment="End" CornerRadius="20" />
+                                        </syfCore:SfBadgeView.BadgeSettings>
+                                        <syfCore:SfBadgeView.Content>
+                                            <syfButton:SfButton Text="播放" CornerRadius="20"
+                                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=PlayCommand}"
+                                                                CommandParameter="{Binding VideoPath}">
+                                                <syfButton:SfButton.Background>
+                                                    <LinearGradientBrush>
+                                                        <LinearGradientBrush.GradientStops>
+                                                            <GradientStop Color="#0D62D4" Offset="0" />
+                                                            <GradientStop Color="#9F3CDC" Offset="1" />
+                                                        </LinearGradientBrush.GradientStops>
+                                                    </LinearGradientBrush>
+                                                </syfButton:SfButton.Background>
+                                            </syfButton:SfButton>
+                                        </syfCore:SfBadgeView.Content>
+                                    </syfCore:SfBadgeView>
+                                    <Button Text="Play" StyleClass="ElevatedButton"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=PlayCommand}"
+                                            CommandParameter="{Binding VideoPath}" HeightRequest="20" />
+                                    <Button Text="Folder" StyleClass="ElevatedButton"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=OpenFolderCommand}"
+                                            CommandParameter="{Binding VideoPath}" HeightRequest="20" />
+                                    <!-- <Button MinimumWidthRequest="150" Text="Del"  -->
+                                    <!--         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteCommand}" -->
+                                    <!--         CommandParameter="{Binding}" /> -->
+                                    <!-- <Button MinimumWidthRequest="150" Text="Del folder"  -->
+                                    <!--         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteFolderCommand}" -->
+                                    <!--         CommandParameter="{Binding}" /> -->
+                                    <Button Text="Reset" StyleClass="ElevatedButton" HeightRequest="20"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=ResetVideoCommand}"
+                                            CommandParameter="{Binding}" />
+                                </HorizontalStackLayout>
                             </HorizontalStackLayout>
                             <BoxView StyleClass="Divider" />
-                            <CollectionView ItemsSource="{Binding Snapshots}" HeightRequest="310"
-                                            HorizontalOptions="FillAndExpand">
-                                <CollectionView.ItemsLayout>
-                                    <LinearItemsLayout Orientation="Horizontal" />
-                                </CollectionView.ItemsLayout>
-                                <CollectionView.ItemTemplate>
-                                    <DataTemplate>
-                                        <VerticalStackLayout>
-                                            <Image Source="{Binding FullPath}"
-                                                   HeightRequest="300"
-                                                   WidthRequest="400" />
-                                        </VerticalStackLayout>
-                                    </DataTemplate>
-                                </CollectionView.ItemTemplate>
-                            </CollectionView>
-                            <HorizontalStackLayout HorizontalOptions="StartAndExpand"
-                                                   VerticalOptions="CenterAndExpand">
-                                <Button Text="Play" StyleClass="ElevatedButton"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=PlayCommand}"
-                                        CommandParameter="{Binding VideoPath}" />
-                                <Button Text="Folder" StyleClass="ElevatedButton"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=OpenFolderCommand}"
-                                        CommandParameter="{Binding VideoPath}" />
-                                <!-- <Button MinimumWidthRequest="150" Text="Del"  -->
-                                <!--         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteCommand}" -->
-                                <!--         CommandParameter="{Binding}" /> -->
-                                <!-- <Button MinimumWidthRequest="150" Text="Del folder"  -->
-                                <!--         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteFolderCommand}" -->
-                                <!--         CommandParameter="{Binding}" /> -->
-                                <Button Text="Reset" StyleClass="ElevatedButton"
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=ResetVideoCommand}"
-                                        CommandParameter="{Binding}" />
-                            </HorizontalStackLayout>
+                            <VerticalStackLayout Padding="10,0">
+                                <CollectionView ItemsSource="{Binding Snapshots}" HeightRequest="310"
+                                                HorizontalOptions="FillAndExpand">
+                                    <CollectionView.ItemsLayout>
+                                        <LinearItemsLayout Orientation="Horizontal" />
+                                    </CollectionView.ItemsLayout>
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Frame BackgroundColor="LightGray" CornerRadius="5"
+                                                   Padding="3"
+                                                   Margin="5"
+                                                   BorderColor="Gray"
+                                                   HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                                                <Frame.Background>
+                                                    <SolidColorBrush Color="Gray" />
+                                                </Frame.Background>
+                                                <Image Source="{Binding FullPath}" HeightRequest="300"
+                                                       WidthRequest="400" />
+                                            </Frame>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </VerticalStackLayout>
                         </VerticalStackLayout>
                     </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+        <BoxView StyleClass="Divider" />
         <HorizontalStackLayout HorizontalOptions="EndAndExpand" MaximumHeightRequest="20">
-            <Label Text="{Binding Message}"></Label>
+            <Label Text="{Binding Message}" />
         </HorizontalStackLayout>
     </VerticalStackLayout>
 </ContentPage>

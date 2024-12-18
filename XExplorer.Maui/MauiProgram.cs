@@ -1,10 +1,9 @@
-﻿using System.Runtime.CompilerServices;
-using CommunityToolkit.Maui;
+﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Syncfusion.Maui.Core.Hosting;
 using UraniumUI;
 using Xabe.FFmpeg;
-using Xabe.FFmpeg.Downloader;
 using XExplorer.Core.Modes;
 
 namespace XExplorer.Maui;
@@ -15,11 +14,13 @@ public static class MauiProgram
     {
         var builder = MauiApp.CreateBuilder();
         builder.UseMauiApp<App>().ConfigureFonts(fonts =>
-        {
-            fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-            fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-            fonts.AddMaterialIconFonts();
-        }).UseMauiCommunityToolkit();
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                fonts.AddMaterialIconFonts();
+            })
+            .ConfigureSyncfusionCore()
+            .UseMauiCommunityToolkit();
 
         builder.UseUraniumUI()
             .UseMauiCommunityToolkit()
@@ -41,6 +42,8 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzYzMjY4NEAzMjM4MmUzMDJlMzBWeTYvOGVWT201ekVwOTZxZW91QnJUemQyRTkrR2FIVTZmb0c3RWxqbi9FPQ==");
+        
         return builder.Build();
     }
 
@@ -52,7 +55,7 @@ public static class MauiProgram
         basePath = Path.Combine(basePath, "Contents", "Resources");
 #endif
 
-        return Path.Combine(basePath, "appsettings.json");
+        return Path.Combine(basePath, "appsettings.json"); 
     }
 
     private static void SetFFmpegPath()

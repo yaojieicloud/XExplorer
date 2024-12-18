@@ -48,6 +48,7 @@ public partial class MainViewModel : ObservableObject
         {
             Processing = true;
             Videos.Clear();
+            await Task.Delay(5000);
             var enties = await dataService.VideosService.QueryAsync(this.SelectedDir.ValidName);
             var modes = enties.ToModes();
             Videos = new ObservableCollection<VideoMode>(modes);

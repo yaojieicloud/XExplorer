@@ -240,7 +240,6 @@ partial class MainViewModel
             this.Message = $"视频 [{record.FullName}] 处理完成，耗时 [{st.Elapsed.TotalSeconds}] 秒";
         }
     }
-
     private async Task<List<FileRecord>> GetVideoImagesAsync(string videoPath, List<TimeSpan> timestamps)
     {
         var images = new List<FileRecord>();
