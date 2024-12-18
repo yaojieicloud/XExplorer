@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui.Views;
 using Microsoft.Maui.Controls;
 using XExplorer.Core.ViewModel;
+using ValueChangedEventArgs = Syncfusion.Maui.Inputs.ValueChangedEventArgs;
 
 namespace XExplorer.Maui;
 

@@ -8,6 +8,7 @@
              xmlns:rating="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
              xmlns:sfPopup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
              xmlns:sync="clr-namespace:Syncfusion.Maui.Themes;assembly=Syncfusion.Maui.Core"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="XExplorer.Maui.MainPage">
     <ContentPage.Resources>
         <sync:SyncfusionThemeResourceDictionary x:Key="SyncfusionTheme" />
@@ -18,14 +19,14 @@
     <ContentPage.Style>
     </ContentPage.Style>
     <VerticalStackLayout Margin="10" x:Name="MainGrid" SizeChanged="MainGrid_OnSizeChanged">
-        <sfPopup:SfPopup x:Name="popup" AppearanceMode="OneButton" 
+        <sfPopup:SfPopup x:Name="popup" AppearanceMode="OneButton"
                          ShowFooter="True"
-                         OverlayMode="Blur" 
+                         OverlayMode="Blur"
                          AnimationMode="Fade"
-                         HeaderTitle="提醒"  
+                         HeaderTitle="提醒"
                          IsOpen="{Binding IsShow}">
             <sfPopup:SfPopup.PopupStyle>
-                <sfPopup:PopupStyle FooterBackground="LightGray" 
+                <sfPopup:PopupStyle FooterBackground="LightGray"
                                     MessageTextColor="#292929"
                                     AcceptButtonBackground="DimGray"
                                     AcceptButtonTextColor="White"
@@ -149,6 +150,11 @@
                                                                    UnratedStroke="Blue" RatedStrokeThickness="1"
                                                                    UnratedStrokeThickness="1" />
                                         </rating:SfRating.RatingSettings>
+                                        <rating:SfRating.Behaviors>
+                                            <toolkit:EventToCommandBehavior EventName="ValueChanged"
+                                                                            Command="{Binding Path= RatingChangedCommand}"
+                                                                            CommandParameter="{Binding}" />
+                                        </rating:SfRating.Behaviors>
                                     </rating:SfRating>
                                 </HorizontalStackLayout>
                                 <HorizontalStackLayout HorizontalOptions="EndAndExpand"
@@ -175,12 +181,20 @@
                                             </syfButton:SfButton>
                                         </syfCore:SfBadgeView.Content>
                                     </syfCore:SfBadgeView>
-                                    <Button Text="Play" StyleClass="ElevatedButton"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=PlayCommand}"
-                                            CommandParameter="{Binding VideoPath}" HeightRequest="20" />
                                     <Button Text="Folder" StyleClass="ElevatedButton"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=OpenFolderCommand}"
                                             CommandParameter="{Binding VideoPath}" HeightRequest="20" />
+                                    <syfButton:SfButton Text="删除" CornerRadius="20" HeightRequest="40"
+                                                        Command="{Binding DeleteFolderCommand}">
+                                        <syfButton:SfButton.Background>
+                                            <LinearGradientBrush>
+                                                <LinearGradientBrush.GradientStops>
+                                                    <GradientStop Color="#0D62D4" Offset="0" />
+                                                    <GradientStop Color="#9F3CDC" Offset="1" />
+                                                </LinearGradientBrush.GradientStops>
+                                            </LinearGradientBrush>
+                                        </syfButton:SfButton.Background>
+                                    </syfButton:SfButton>
                                     <!-- <Button MinimumWidthRequest="150" Text="Del"  -->
                                     <!--         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteCommand}" -->
                                     <!--         CommandParameter="{Binding}" /> -->

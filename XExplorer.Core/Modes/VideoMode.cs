@@ -1,5 +1,11 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Serilog;
+using XExplorer.Core.Service;
+using XExplorer.Core.Utils;
 
 namespace XExplorer.Core.Modes;
 
@@ -13,7 +19,7 @@ public partial class VideoMode : ObservableObject
     /// </summary>
     [ObservableProperty]
     private long id;
-    
+
     /// <summary>
     /// 获取或设置视频的标题。
     /// </summary>
@@ -66,7 +72,7 @@ public partial class VideoMode : ObservableObject
     /// 获取或设置视频评价分数。
     /// </summary>
     [ObservableProperty]
-    private int evaluate = 0;
+    private int evaluate;
 
     /// <summary>
     /// MD5
@@ -85,7 +91,7 @@ public partial class VideoMode : ObservableObject
     /// </summary>
     [ObservableProperty]
     private long? minute;
-    
+
     /// <summary>
     /// Status
     /// </summary>
@@ -97,4 +103,29 @@ public partial class VideoMode : ObservableObject
     /// </summary>
     [ObservableProperty]
     private ObservableCollection<Snapshot> snapshots = new ObservableCollection<Snapshot>();
+
+    /// <summary>
+    /// 更新视频评分信息。
+    /// </summary>
+    /// <param name="param">表示包含视频信息的对象参数。</param>
+    /// <returns>一个异步任务，用于表示操作的完成状态。</returns>
+    [RelayCommand]
+    public async Task RatingChangedAsync(object param)
+    {
+        try
+        {
+            if (param is VideoMode enty)
+            {
+                enty.Status = 2;
+                var video = enty.ToVideo();
+                var dataService = new DataService();
+                await dataService.VideosService.UpdateOnlyAsync(video);
+                Log.Information($"视频 [{enty.VideoPath}] 更新完成。");
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+        }
+    }
 }

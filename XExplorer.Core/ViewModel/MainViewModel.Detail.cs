@@ -73,7 +73,7 @@ partial class MainViewModel
             await Task.CompletedTask;
         }
     }
-    
+
     /// <summary>
     ///     异步处理单个视频文件。
     /// </summary>
@@ -92,7 +92,7 @@ partial class MainViewModel
             if (param is VideoMode enty)
             {
                 var st = Stopwatch.StartNew();
-                var fullName = Path.Combine(AppSettingsUtils.Default.Current.Volume,enty.VideoPath); 
+                var fullName = Path.Combine(AppSettingsUtils.Default.Current.Volume, enty.VideoPath);
                 var video = await ProcessVideoAsync(new FileRecord(fullName));
                 await dataService.VideosService.UpdateAsync(video);
                 video.ToMode(enty);
@@ -107,5 +107,29 @@ partial class MainViewModel
         }
     }
 
+    /// <summary>
+    /// 更新视频评分信息。
+    /// </summary>
+    /// <param name="param">表示包含视频信息的对象参数。</param>
+    /// <returns>一个异步任务，用于表示操作的完成状态。</returns>
+    [RelayCommand]
+    public async Task RatingChangedAsync(object param)
+    {
+        try
+        {
+            if (param is VideoMode enty)
+            {
+                var video = enty.ToVideo();
+                await dataService.VideosService.UpdateOnlyAsync(video);
+                this.Notification($"视频更新完成。");
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+            Notification($"{ex}");
+        }
+    }
+ 
     #endregion
 }

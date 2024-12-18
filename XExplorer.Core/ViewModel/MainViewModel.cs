@@ -75,6 +75,7 @@ public partial class MainViewModel : ObservableObject
     public async Task ProcessVideosAsync()
     {
         var st = Stopwatch.StartNew();
+        this.Processing = true;
         
         try
         {
@@ -91,6 +92,7 @@ public partial class MainViewModel : ObservableObject
         {
             st.Stop();
             Log.Information($"文件夹 [{this.selectedDir.FullName}] 全部处理完成，耗时[{st.Elapsed.TotalSeconds}]秒。");
+            this.Processing = false;
         }
     }
      
@@ -135,8 +137,7 @@ public partial class MainViewModel : ObservableObject
             if (AppSettingsUtils.Default.OS == OS.MacCatalyst)
             {
                 // Adjust the path for macOS to get the app bundle root directory
-                var path = Path.GetFullPath(Path.Combine(baseDirectory, "..", ".."));
-                path = Path.Combine(path, "logs");
+                var path = Path.GetDirectoryName(AppSettingsUtils.Default.Current.LogFile); 
                 this.OpenFolder(path);
             }
             else

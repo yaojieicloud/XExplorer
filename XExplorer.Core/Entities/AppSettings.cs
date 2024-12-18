@@ -75,6 +75,12 @@ public class Conf
     public string DBPath { get; set; } = "";
 
     /// <summary>
+    /// 获取或设置日志文件的路径。
+    /// 用于记录应用程序的运行日志信息。
+    /// </summary>
+    public string LogFile { get; set; }
+    
+    /// <summary>
     /// 获取或设置VLC播放器的路径。
     /// 默认值为 "/Applications/VLC.app/Contents/MacOS/VLC"。
     /// 该属性用于指定VLC播放器的可执行文件路径，以便在系统上运行或与其他应用程序进行交互。

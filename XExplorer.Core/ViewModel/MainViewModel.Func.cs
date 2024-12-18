@@ -240,6 +240,20 @@ partial class MainViewModel
             this.Message = $"视频 [{record.FullName}] 处理完成，耗时 [{st.Elapsed.TotalSeconds}] 秒";
         }
     }
+
+    /// <summary>
+    /// 异步获取视频指定时间点的截图文件集合。
+    /// 此方法通过提供的视频路径与多个时间戳点，截取对应的视频帧作为图片并保存到指定目录。
+    /// </summary>
+    /// <param name="videoPath">
+    /// 视频文件的完整路径。
+    /// </param>
+    /// <param name="timestamps">
+    /// 视频需要截取的多个时间点列表。
+    /// </param>
+    /// <returns>
+    /// 返回包含所有保存的截图文件信息的集合。
+    /// </returns>
     private async Task<List<FileRecord>> GetVideoImagesAsync(string videoPath, List<TimeSpan> timestamps)
     {
         var images = new List<FileRecord>();

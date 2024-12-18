@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using XExplorer.Core.Context;
 using XExplorer.Core.Modes;
 
@@ -228,8 +229,6 @@ partial class DataService
             var query = this.dataContext.Videos
                 .Include(v => v.Snapshots).AsQueryable();
 
-            query = query.Where(m => m.Status == status);
-
             if (!string.IsNullOrWhiteSpace(dir))
                 query = query.Where(m => m.RootDir.Replace(@"\", "/").EndsWith(dir.Replace(@"\", "/")));
 
@@ -245,7 +244,7 @@ partial class DataService
                     .ThenBy(m => m.RootDir);
 
             var sql = query.ToQueryString();
-
+            Log.Information($"[SQL] {sql}");
             return await query.Skip(skip).Take(take).ToListAsync();
         }
 
