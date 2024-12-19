@@ -74,6 +74,79 @@ partial class MainViewModel
     }
 
     /// <summary>
+    /// 删除指定视频文件及其相关数据。
+    /// </summary>
+    /// <param name="param">表示视频文件信息的对象，该对象应为 <see cref="VideoMode"/> 类型。</param>
+    /// <returns>异步任务对象，表示该删除操作完成的状态。</returns>
+    [RelayCommand]
+    public async Task DelFolderAsync(object param)
+    {
+        if (param is VideoMode mode)
+        {
+            this.Processing = true; 
+            
+            try
+            {
+                if (await this.Ask($"确认删除视频 「{mode.VideoPath}」?"))
+                    return;
+                
+                var fullDir = Path.Combine(AppSettingsUtils.Default.Current.Volume, mode.VideoDir);
+                var fullPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, mode.VideoPath);
+                var videos =
+                    await this.dataService.VideosService.QueryAsync(m =>
+                        m.VideoDir == mode.VideoDir && m.Id != mode.Id);
+
+                if (File.Exists(fullPath))
+                {
+                    File.Delete(fullPath);
+                    Log.Information($"视频文件 [{fullPath}] 已删除。");
+                }
+                else
+                {
+                    Log.Information($"视频文件 [{fullPath}] 不存在，无需删除。");
+                }
+
+                if (!(videos?.Any() ?? false))
+                {
+                    var files = Directory.GetFiles(fullDir);
+                    foreach (var file in files)
+                    {
+                        File.Delete(file);
+                        Log.Information($"视频文件 [{file}] 已删除。");
+                    }
+                }
+
+                foreach (var snapshot in mode.Snapshots)
+                {
+                    if (File.Exists(snapshot.FullPath))
+                    {
+                        File.Delete(snapshot.FullPath);
+                        Log.Information($"视频快照 [{snapshot.FullPath}] 已删除。");
+                    }
+                    else
+                    {
+                        Log.Information($"视频快照 [{snapshot.FullPath}] 不存在，无需删除。");
+                    }
+                }
+
+                this.dataService.VideosService.DeleteAsync(mode.Id);
+                this.Videos.Remove(mode);
+                Log.Information($"视频数据 [{mode.Caption}] 已删除。");
+                //this.Notification($"视频数据 [{mode.Caption}] 已删除。");
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+                this.Notification($"{e}");
+            }
+            finally
+            {
+                this.Processing = false; 
+            }
+        }
+    }
+
+    /// <summary>
     ///     异步处理单个视频文件。
     /// </summary>
     /// <param name="param">表示视频实体的对象。</param>
@@ -146,6 +219,6 @@ partial class MainViewModel
 
         await Task.CompletedTask;
     }
-    
+
     #endregion
 }

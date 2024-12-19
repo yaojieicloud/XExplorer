@@ -3,6 +3,7 @@ using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
+using Syncfusion.Maui.Popup;
 using XExplorer.Core.Modes;
 using XExplorer.Core.Service;
 using XExplorer.Core.Utils;
@@ -117,6 +118,18 @@ partial class MainViewModel
     /// </summary>
     [ObservableProperty]
     private string selectedImg;
+
+    /// <summary>
+    /// 表示取消操作的状态
+    /// </summary>
+    [ObservableProperty]
+    private bool isCancel = true;
+
+    /// <summary>
+    /// 控制弹出按钮的外观模式
+    /// </summary>
+    [ObservableProperty]
+    private PopupButtonAppearanceMode appearanceMode = PopupButtonAppearanceMode.OneButton;
 
     #endregion
 }

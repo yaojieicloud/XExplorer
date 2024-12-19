@@ -102,7 +102,12 @@ public partial class VideoMode : ObservableObject
     /// 快照列表.
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<SnapshotMode> snapshots = new ();
+    private ObservableCollection<SnapshotMode> snapshots = new();
+
+    /// <summary>
+    /// 获取视频快照的完整路径列表。
+    /// </summary>
+    public List<string> Images => snapshots.Select(m => m.FullPath).ToList();
 
     /// <summary>
     /// 更新视频评分信息。
@@ -116,7 +121,9 @@ public partial class VideoMode : ObservableObject
         {
             if (param is VideoMode enty)
             {
-                enty.Status = 2;
+                if (enty.Evaluate == 0)
+                    return;
+                
                 var video = enty.ToVideo();
                 var dataService = new DataService();
                 await dataService.VideosService.UpdateOnlyAsync(video);

@@ -88,7 +88,7 @@ partial class DataService
         public async Task UpdateAsync(Video video)
         {
             var existingVideo = this.dataContext.Videos
-                .Include(v => v.Snapshots)
+                .Include(v => v.Snapshots).AsNoTracking()
                 .FirstOrDefault(v => v.Id == video.Id);
 
             if (existingVideo != null)
@@ -129,7 +129,7 @@ partial class DataService
         public async Task UpdateOnlyAsync(Video video)
         {
             var existingVideo = this.dataContext.Videos
-                .Include(v => v.Snapshots)
+                .Include(v => v.Snapshots).AsNoTracking()
                 .FirstOrDefault(v => v.Id == video.Id);
 
             if (existingVideo != null)
@@ -161,7 +161,7 @@ partial class DataService
         /// </remarks>
         public async Task DeleteAsync(long id)
         {
-            var video = this.dataContext.Videos.FirstOrDefault(v => v.Id == id);
+            var video = this.dataContext.Videos.AsNoTracking().FirstOrDefault(v => v.Id == id);
             var delSnapshots = this.dataContext.Snapshots.Where(s => s.VideoId == video.Id).ToList();
             if (video != null)
                 this.dataContext.Videos.Remove(video);
@@ -198,8 +198,8 @@ partial class DataService
         /// </remarks>
         public async Task DeleteDirAsync(string dir)
         {
-            var delVideos = this.dataContext.Videos.Where(v => v.VideoDir == dir).ToList();
-            var delSnapshots = this.dataContext.Snapshots.Where(s => delVideos.Any(v => v.Id == s.VideoId)).ToList();
+            var delVideos = this.dataContext.Videos.AsNoTracking().Where(v => v.VideoDir == dir).ToList();
+            var delSnapshots = this.dataContext.Snapshots.AsNoTracking().Where(s => delVideos.Any(v => v.Id == s.VideoId)).ToList();
 
             if (delVideos?.Any() ?? false)
                 this.dataContext.Videos.RemoveRange(delVideos);
@@ -226,8 +226,8 @@ partial class DataService
         public async Task<List<Video>> QueryAsync(string? dir = null, string? caption = null, int? evaluate = null,
             bool isDesc = true, int skip = 0, int take = int.MaxValue, decimal status = 1)
         {
-            var query = this.dataContext.Videos
-                .Include(v => v.Snapshots).AsQueryable();
+            var query = this.dataContext.Videos.AsNoTracking()
+                .Include(v => v.Snapshots).AsNoTracking().AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(dir))
                 query = query.Where(m => m.RootDir.Replace(@"\", "/").EndsWith(dir.Replace(@"\", "/")));
@@ -255,8 +255,8 @@ partial class DataService
         /// <returns>满足条件的视频列表。</returns>
         public async Task<List<Video>> QueryAsync(Expression<Func<Video, bool>> predicate)
         {
-            var query = this.dataContext.Videos
-                .Include(v => v.Snapshots).AsQueryable();
+            var query = this.dataContext.Videos.AsNoTracking()
+                .Include(v => v.Snapshots).AsNoTracking().AsQueryable();
 
             return await query.Where(predicate).ToListAsync();
         }
@@ -269,7 +269,7 @@ partial class DataService
         public async Task<Video> FirstAsync(Expression<Func<Video, bool>> predicate)
         {
             var query = this.dataContext.Videos
-                .Include(v => v.Snapshots).AsQueryable();
+                .Include(v => v.Snapshots).AsNoTracking().AsQueryable();
 
             return await query.Where(predicate).FirstOrDefaultAsync();
         }
@@ -284,7 +284,7 @@ partial class DataService
             var query = this.dataContext.Videos
                 .Include(v => v.Snapshots).AsQueryable();
 
-            return query.Where(predicate).FirstOrDefault();
+            return query.Where(predicate).AsNoTracking().FirstOrDefault();
         }
     }
 }

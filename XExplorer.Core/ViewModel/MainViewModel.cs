@@ -5,6 +5,7 @@ using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
+using Syncfusion.Maui.Popup;
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Downloader;
 using XExplorer.Core.Dictionaries;
@@ -187,9 +188,34 @@ public partial class MainViewModel : ObservableObject
         {
             this.Message = msg;
             this.IsShow = true;
+            this.AppearanceMode = PopupButtonAppearanceMode.OneButton;
         }
     }
 
+    /// <summary>
+    /// Ask方法用于处理参数，并根据传入的消息内容更新相关的UI显示和交互模式。
+    /// </summary>
+    /// <param name="param">传入的参数，期望为字符串类型的消息内容。</param>
+    [RelayCommand]
+    public async Task<bool> Ask(object param)
+    {
+        if (param is string msg)
+        {
+            this.Message = msg;
+            this.IsShow = true;
+            this.IsCancel = true;
+            this.AppearanceMode = PopupButtonAppearanceMode.TwoButton;
+
+            while (this.IsShow) 
+                await Task.Delay(500);
+
+            await Task.Delay(500);
+            return this.IsCancel;
+        }
+
+        return true;
+    }
+    
     /// <summary>
     /// CloseNotification 是一个用于关闭通知的方法。
     /// 此方法通过将 Message 属性设置为 null 和 IsShow 属性设置为 false，
@@ -200,7 +226,28 @@ public partial class MainViewModel : ObservableObject
     {
         this.Message = null;
         this.IsShow = false;
+        this.IsCancel = true;
     }
 
+    /// <summary>
+    /// Decline 方法用于执行用户拒绝操作，处理相关的业务逻辑。
+    /// </summary>
+    [RelayCommand]
+    public void Decline()
+    {
+        this.IsCancel = true;
+        this.IsShow = false; 
+    }
+
+    /// <summary>
+    /// Accept 方法用于处理对话框的接受操作。
+    /// 执行逻辑将更改相关标志状态以关闭用户界面提示或通知。
+    /// </summary>
+    [RelayCommand]
+    public void Accept()
+    {
+        this.IsCancel = false;
+        this.IsShow = false;
+    }
     #endregion
 }

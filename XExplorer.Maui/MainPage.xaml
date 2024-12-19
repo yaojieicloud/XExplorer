@@ -8,6 +8,7 @@
              xmlns:inputs="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
              xmlns:sfPopup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
              xmlns:sync="clr-namespace:Syncfusion.Maui.Themes;assembly=Syncfusion.Maui.Core"
+             xmlns:syfCarousel="clr-namespace:Syncfusion.Maui.Carousel;assembly=Syncfusion.Maui.Carousel"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="XExplorer.Maui.MainPage">
     <ContentPage.Resources>
@@ -19,13 +20,15 @@
     <ContentPage.Style>
     </ContentPage.Style>
     <VerticalStackLayout Margin="10" x:Name="MainGrid" SizeChanged="MainGrid_OnSizeChanged">
-        <sfPopup:SfPopup x:Name="popup" AppearanceMode="OneButton"
+        <sfPopup:SfPopup AppearanceMode="{Binding AppearanceMode}"
                          ShowFooter="True"
                          OverlayMode="Blur"
                          AnimationMode="Fade"
                          StaysOpen="True"
                          ShowCloseButton="True"
                          HeaderTitle="提醒"
+                         DeclineCommand="{Binding DeclineCommand}"
+                         AcceptCommand="{Binding AcceptCommand}"
                          IsOpen="{Binding IsShow}">
             <sfPopup:SfPopup.PopupStyle>
                 <sfPopup:PopupStyle FooterBackground="LightGray"
@@ -63,9 +66,9 @@
             </sfPopup:SfPopup.PopupStyle>
             <sfPopup:SfPopup.ContentTemplate>
                 <DataTemplate>
-                    <Image Source="{Binding SelectedImg}" 
+                    <Image Source="{Binding SelectedImg}"
                            WidthRequest="{Binding Source={x:Reference MainView}, Path=WidthRequest}"
-                           HeightRequest="{Binding Source={x:Reference MainView}, Path=HeightRequest}"/>
+                           HeightRequest="{Binding Source={x:Reference MainView}, Path=HeightRequest}" />
                 </DataTemplate>
             </sfPopup:SfPopup.ContentTemplate>
         </sfPopup:SfPopup>
@@ -173,7 +176,7 @@
                                     <Label Text="===" FontSize="18" />
                                     <Label Text="{Binding ModifyTime}" FontSize="18" Padding="10,0" />
                                     <Label Text="===" FontSize="18" Padding="0,0,10,0" />
-                                    <inputs:SfRating Precision="Standard" Value="{Binding Evaluate}"
+                                    <inputs:SfRating Precision="Standard" Value="{Binding Evaluate,Mode=TwoWay}"
                                                      ItemSize="30" ItemCount="5" ItemSpacing="6"
                                                      BackgroundColor="Transparent">
                                         <inputs:SfRating.RatingSettings>
@@ -225,7 +228,8 @@
                                         </syfButton:SfButton.Background>
                                     </syfButton:SfButton>
                                     <syfButton:SfButton Text="删除" CornerRadius="20" HeightRequest="40"
-                                                        Command="{Binding DeleteFolderCommand}">
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DelFolderCommand}"
+                                                        CommandParameter="{Binding}">
                                         <syfButton:SfButton.Background>
                                             <LinearGradientBrush>
                                                 <LinearGradientBrush.GradientStops>
@@ -257,6 +261,12 @@
                             </HorizontalStackLayout>
                             <BoxView StyleClass="Divider" />
                             <VerticalStackLayout Padding="10,0">
+                                <!-- <syfCarousel:SfCarousel x:Name="carousel" -->
+                                <!--                         EnableVirtualization="True" -->
+                                <!--                         ItemsSource="{Binding Images}" -->
+                                <!--                         ItemHeight="170" -->
+                                <!--                         ItemWidth="270" -->
+                                <!--                         SelectedIndex="4" /> -->
                                 <CollectionView ItemsSource="{Binding Snapshots}" HeightRequest="310"
                                                 HorizontalOptions="FillAndExpand">
                                     <CollectionView.ItemsLayout>
