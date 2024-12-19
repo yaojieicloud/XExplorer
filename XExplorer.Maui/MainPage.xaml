@@ -212,11 +212,32 @@
                                             </syfButton:SfButton>
                                         </syfCore:SfBadgeView.Content>
                                     </syfCore:SfBadgeView>
-                                    <Button Text="Folder" StyleClass="ElevatedButton"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=OpenFolderCommand}"
-                                            CommandParameter="{Binding VideoPath}" HeightRequest="20" />
+                                    <syfButton:SfButton Text="目录" CornerRadius="20" HeightRequest="40"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=OpenFolderCommand}"
+                                                        CommandParameter="{Binding}">
+                                        <syfButton:SfButton.Background>
+                                            <LinearGradientBrush>
+                                                <LinearGradientBrush.GradientStops>
+                                                    <GradientStop Color="#0D62D4" Offset="0" />
+                                                    <GradientStop Color="#9F3CDC" Offset="1" />
+                                                </LinearGradientBrush.GradientStops>
+                                            </LinearGradientBrush>
+                                        </syfButton:SfButton.Background>
+                                    </syfButton:SfButton>
                                     <syfButton:SfButton Text="删除" CornerRadius="20" HeightRequest="40"
                                                         Command="{Binding DeleteFolderCommand}">
+                                        <syfButton:SfButton.Background>
+                                            <LinearGradientBrush>
+                                                <LinearGradientBrush.GradientStops>
+                                                    <GradientStop Color="#0D62D4" Offset="0" />
+                                                    <GradientStop Color="#9F3CDC" Offset="1" />
+                                                </LinearGradientBrush.GradientStops>
+                                            </LinearGradientBrush>
+                                        </syfButton:SfButton.Background>
+                                    </syfButton:SfButton>
+                                    <syfButton:SfButton Text="重置" CornerRadius="20" HeightRequest="40"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=ResetVideoCommand}"
+                                                        CommandParameter="{Binding}">
                                         <syfButton:SfButton.Background>
                                             <LinearGradientBrush>
                                                 <LinearGradientBrush.GradientStops>
@@ -232,9 +253,6 @@
                                     <!-- <Button MinimumWidthRequest="150" Text="Del folder"  -->
                                     <!--         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteFolderCommand}" -->
                                     <!--         CommandParameter="{Binding}" /> -->
-                                    <Button Text="Reset" StyleClass="ElevatedButton" HeightRequest="20"
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=ResetVideoCommand}"
-                                            CommandParameter="{Binding}" />
                                 </HorizontalStackLayout>
                             </HorizontalStackLayout>
                             <BoxView StyleClass="Divider" />

@@ -65,10 +65,9 @@ partial class MainViewModel
     [RelayCommand]
     public async Task OpenFolderAsync(object param)
     {
-        var path = param as string;
-        if (!string.IsNullOrWhiteSpace(path))
+        if (param is VideoMode mode)
         {
-            path = Path.Combine(AppSettingsUtils.Default.Current.Volume, path);
+            var path = Path.Combine(AppSettingsUtils.Default.Current.Volume, mode.VideoDir);
             this.OpenFolder($"{path}");
             await Task.CompletedTask;
         }

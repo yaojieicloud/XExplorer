@@ -294,6 +294,7 @@ partial class MainViewModel
             .AddParameter($"-ss {timestamp}")
             .AddParameter($"-i \"{videoPath}\"")
             .AddParameter("-frames:v 1")
+            .AddParameter("-q:v 1")                     // 设置JPEG图片质量（数字越小质量越高）
             .AddParameter($"\"{outputFolderPath}\"");
         await conversion.Start();
     }
