@@ -44,5 +44,5 @@ public partial class MainPage : ContentPage
         {
             vm.MainViewHeight = this.MainGrid.Height - this.MainTool.Height - 50;
         }
-    }
+    } 
 }

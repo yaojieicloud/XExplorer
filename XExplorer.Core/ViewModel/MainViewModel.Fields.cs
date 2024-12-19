@@ -106,5 +106,17 @@ partial class MainViewModel
     [ObservableProperty]
     private double mainViewHeight;
 
+    /// <summary>
+    /// 是否显示图片的布尔值
+    /// </summary>
+    [ObservableProperty]
+    private bool showImg;
+    
+    /// <summary>
+    /// 当前选中的图片路径
+    /// </summary>
+    [ObservableProperty]
+    private string selectedImg;
+
     #endregion
 }

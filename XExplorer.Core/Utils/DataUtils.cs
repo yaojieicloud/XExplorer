@@ -28,16 +28,38 @@ public static class DataUtils
         result.MD5 = mode.Md5;
         result.Times = mode.Times;
         result.Status = mode.Status;
-        result.Snapshots = mode.Snapshots.ToList();
+        result.Snapshots = mode.Snapshots.ToSnapshots();
         return result;
     }
 
+    /// <summary>
+    /// 将 SnapshotMode 转换为 Snapshot 实体。
+    /// </summary>
+    /// <param name="mode">源 SnapshotMode 实例。</param>
+    /// <param name="snapshot">可选的目标 Snapshot 实例，若为 null 则创建一个新的实例。</param>
+    /// <returns>Snapshot 实例。</returns>
+    public static Snapshot ToSnapshot(this SnapshotMode mode, Snapshot snapshot = null)
+    {
+        var result = snapshot ?? new Snapshot();
+        result.Id = mode.Id;
+        result.Path = mode.Path;
+        return result;
+    }
+
+    /// <summary>
+    /// 将 SnapshotMode 列表转换为 Snapshot 实例列表。
+    /// </summary>
+    /// <param name="modes">包含 SnapshotMode 的列表。</param>
+    /// <returns>转换后的 Snapshot 实例列表。</returns>
+    public static List<Snapshot> ToSnapshots(this IList<SnapshotMode> modes) =>
+        modes.Select(m => m.ToSnapshot()).ToList();
+ 
     /// <summary>
     /// 将 VideoMode 列表转换为 Video 实体的列表。
     /// </summary>
     /// <param name="modes">要转换的 VideoMode 对象列表。</param>
     /// <returns>一个包含转换后的 Video 实例的列表。</returns>
-    public static List<Video> ToVideos(this List<VideoMode> modes) => modes.Select(m => m.ToVideo()).ToList();
+    public static List<Video> ToVideos(this IList<VideoMode> modes) => modes.Select(m => m.ToVideo()).ToList();
 
     /// <summary>
     /// 将 Video 实体转换为 VideoMode。
@@ -61,15 +83,38 @@ public static class DataUtils
         result.Times = video.Times;
         result.Status = video.Status;
         result.Minute = video.Minute;
-        result.Snapshots = new ObservableCollection<Snapshot>(video.Snapshots);
+        result.Snapshots = new ObservableCollection<SnapshotMode>(video.Snapshots.ToModes());
 
         return result;
     }
+
+    /// <summary>
+    /// 将 Snapshot 转换为 SnapshotMode 实体。
+    /// </summary>
+    /// <param name="snapshot">源 Snapshot 实例。</param>
+    /// <param name="mode">可选的目标 SnapshotMode 实例，若为 null 则创建一个新的实例。</param>
+    /// <returns>SnapshotMode 实例。</returns>
+    public static SnapshotMode ToMode(this Snapshot snapshot, SnapshotMode mode = null)
+    {
+        var result = mode ?? new SnapshotMode();
+        result.Id = snapshot.Id;
+        result.Path = snapshot.Path;
+        result.FullPath = snapshot.FullPath;
+        return result;
+    }
+
+    /// <summary>
+    /// 将快照列表转换为快照模式列表。
+    /// </summary>
+    /// <param name="snapshots">要转换的快照列表。</param>
+    /// <returns>转换后的快照模式列表。</returns>
+    public static List<SnapshotMode> ToModes(this IList<Snapshot> snapshots) =>
+        snapshots.Select(m => m.ToMode()).ToList();
 
     /// <summary>
     /// 将 Video 实例列表转换为 VideoMode 实例列表。
     /// </summary>
     /// <param name="videos">要转换的 Video 实例列表。</param>
     /// <returns>转换后的 VideoMode 实例列表。</returns>
-    public static List<VideoMode> ToModes(this List<Video> videos) => videos.Select(m => m.ToMode()).ToList();
+    public static List<VideoMode> ToModes(this IList<Video> videos) => videos.Select(m => m.ToMode()).ToList();
 }

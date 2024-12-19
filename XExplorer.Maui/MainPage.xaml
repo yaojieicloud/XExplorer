@@ -23,6 +23,8 @@
                          ShowFooter="True"
                          OverlayMode="Blur"
                          AnimationMode="Fade"
+                         StaysOpen="True"
+                         ShowCloseButton="True"
                          HeaderTitle="提醒"
                          IsOpen="{Binding IsShow}">
             <sfPopup:SfPopup.PopupStyle>
@@ -41,6 +43,32 @@
                 </DataTemplate>
             </sfPopup:SfPopup.ContentTemplate>
         </sfPopup:SfPopup>
+        <sfPopup:SfPopup x:Name="popupImg" AppearanceMode="OneButton"
+                         ShowFooter="True"
+                         OverlayMode="Blur"
+                         StaysOpen="True"
+                         AnimationMode="Fade"
+                         ShowCloseButton="True"
+                         IsFullScreen="True"
+                         HeaderTitle="原图"
+                         IsOpen="{Binding ShowImg}">
+            <sfPopup:SfPopup.PopupStyle>
+                <sfPopup:PopupStyle FooterBackground="LightGray"
+                                    MessageTextColor="#292929"
+                                    AcceptButtonBackground="DimGray"
+                                    AcceptButtonTextColor="White"
+                                    DeclineButtonBackground="DimGray"
+                                    DeclineButtonTextColor="White"
+                                    FooterButtonCornerRadius="0,20,20,0" />
+            </sfPopup:SfPopup.PopupStyle>
+            <sfPopup:SfPopup.ContentTemplate>
+                <DataTemplate>
+                    <Image Source="{Binding SelectedImg}" 
+                           WidthRequest="{Binding Source={x:Reference MainView}, Path=WidthRequest}"
+                           HeightRequest="{Binding Source={x:Reference MainView}, Path=HeightRequest}"/>
+                </DataTemplate>
+            </sfPopup:SfPopup.ContentTemplate>
+        </sfPopup:SfPopup>
         <HorizontalStackLayout x:Name="MainTool">
             <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Text="目录：" FontSize="18"
                    Padding="10,0,0,0" />
@@ -51,8 +79,8 @@
                                VerticalOptions="EndAndExpand"
                                HorizontalOptions="StartAndExpand"
                                HorizontalTextAlignment="Start"
-                               Margin="10,0" 
-                               MinimumWidthRequest="400"/> 
+                               Margin="10,0"
+                               MinimumWidthRequest="400" />
             <syfButton:SfButton Text="加载" CornerRadius="20" HeightRequest="40"
                                 Command="{Binding LoadDirCommand}">
                 <syfButton:SfButton.Background>
@@ -226,8 +254,14 @@
                                                 <Frame.Background>
                                                     <SolidColorBrush Color="Gray" />
                                                 </Frame.Background>
-                                                <Image Source="{Binding FullPath1}" HeightRequest="300"
-                                                       WidthRequest="400" />
+                                                <Image Source="{Binding FullPath}" HeightRequest="300"
+                                                       WidthRequest="400">
+                                                    <Image.GestureRecognizers>
+                                                        <TapGestureRecognizer
+                                                            Command="{Binding Source={x:Reference MainView}, Path=BindingContext.ImageTappedCommand}"
+                                                            CommandParameter="{Binding .}" />
+                                                    </Image.GestureRecognizers>
+                                                </Image>
                                             </Frame>
                                         </DataTemplate>
                                     </CollectionView.ItemTemplate>

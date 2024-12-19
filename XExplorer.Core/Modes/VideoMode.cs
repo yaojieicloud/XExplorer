@@ -102,7 +102,7 @@ public partial class VideoMode : ObservableObject
     /// 快照列表.
     /// </summary>
     [ObservableProperty]
-    private ObservableCollection<Snapshot> snapshots = new ObservableCollection<Snapshot>();
+    private ObservableCollection<SnapshotMode> snapshots = new ();
 
     /// <summary>
     /// 更新视频评分信息。

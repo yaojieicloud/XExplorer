@@ -130,6 +130,23 @@ partial class MainViewModel
             Notification($"{ex}");
         }
     }
- 
+
+    /// <summary>
+    /// 处理图片点击事件，触发与特定逻辑相关的操作。
+    /// </summary>
+    /// <param name="param">传递的与点击事件相关的参数对象。</param>
+    /// <returns>表示异步操作的任务。</returns>
+    [RelayCommand]
+    public async Task ImageTappedAsync(object param)
+    {
+        if (param is SnapshotMode snapshot)
+        {
+            this.SelectedImg = snapshot.FullPath;
+            this.ShowImg = true;
+        }
+
+        await Task.CompletedTask;
+    }
+    
     #endregion
 }
