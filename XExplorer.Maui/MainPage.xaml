@@ -5,7 +5,7 @@
              xmlns:vm="clr-namespace:XExplorer.Core.ViewModel;assembly=XExplorer.Core"
              xmlns:syfCore="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
              xmlns:syfButton="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
-             xmlns:rating="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+             xmlns:inputs="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
              xmlns:sfPopup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
              xmlns:sync="clr-namespace:Syncfusion.Maui.Themes;assembly=Syncfusion.Maui.Core"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -42,14 +42,17 @@
             </sfPopup:SfPopup.ContentTemplate>
         </sfPopup:SfPopup>
         <HorizontalStackLayout x:Name="MainTool">
-            <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Text="目录：" Padding="10,0" />
-            <Picker SelectedItem="{Binding SelectedDir}"
-                    ItemsSource="{Binding Dirs}"
-                    ItemDisplayBinding="{Binding Name}"
-                    HorizontalTextAlignment="Start"
-                    HorizontalOptions="StartAndExpand"
-                    Margin="10,0"
-                    MinimumWidthRequest="400" />
+            <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Text="目录：" FontSize="18"
+                   Padding="10,0,0,0" />
+            <inputs:SfComboBox SelectedItem="{Binding SelectedDir}"
+                               ItemsSource="{Binding Dirs}"
+                               DisplayMemberPath="ValidName"
+                               VerticalTextAlignment="Center"
+                               VerticalOptions="EndAndExpand"
+                               HorizontalOptions="StartAndExpand"
+                               HorizontalTextAlignment="Start"
+                               Margin="10,0" 
+                               MinimumWidthRequest="400"/> 
             <syfButton:SfButton Text="加载" CornerRadius="20" HeightRequest="40"
                                 Command="{Binding LoadDirCommand}">
                 <syfButton:SfButton.Background>
@@ -142,20 +145,20 @@
                                     <Label Text="===" FontSize="18" />
                                     <Label Text="{Binding ModifyTime}" FontSize="18" Padding="10,0" />
                                     <Label Text="===" FontSize="18" Padding="0,0,10,0" />
-                                    <rating:SfRating Precision="Standard" Value="{Binding Evaluate}"
+                                    <inputs:SfRating Precision="Standard" Value="{Binding Evaluate}"
                                                      ItemSize="30" ItemCount="5" ItemSpacing="6"
                                                      BackgroundColor="Transparent">
-                                        <rating:SfRating.RatingSettings>
-                                            <rating:RatingSettings RatedFill="Yellow" UnratedFill="LightGrey"
+                                        <inputs:SfRating.RatingSettings>
+                                            <inputs:RatingSettings RatedFill="Yellow" UnratedFill="LightGrey"
                                                                    UnratedStroke="Blue" RatedStrokeThickness="1"
                                                                    UnratedStrokeThickness="1" />
-                                        </rating:SfRating.RatingSettings>
-                                        <rating:SfRating.Behaviors>
+                                        </inputs:SfRating.RatingSettings>
+                                        <inputs:SfRating.Behaviors>
                                             <toolkit:EventToCommandBehavior EventName="ValueChanged"
                                                                             Command="{Binding Path= RatingChangedCommand}"
                                                                             CommandParameter="{Binding}" />
-                                        </rating:SfRating.Behaviors>
-                                    </rating:SfRating>
+                                        </inputs:SfRating.Behaviors>
+                                    </inputs:SfRating>
                                 </HorizontalStackLayout>
                                 <HorizontalStackLayout HorizontalOptions="EndAndExpand"
                                                        VerticalOptions="CenterAndExpand"
@@ -223,7 +226,7 @@
                                                 <Frame.Background>
                                                     <SolidColorBrush Color="Gray" />
                                                 </Frame.Background>
-                                                <Image Source="{Binding FullPath}" HeightRequest="300"
+                                                <Image Source="{Binding FullPath1}" HeightRequest="300"
                                                        WidthRequest="400" />
                                             </Frame>
                                         </DataTemplate>

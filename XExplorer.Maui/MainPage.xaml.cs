@@ -42,7 +42,7 @@ public partial class MainPage : ContentPage
     {
         if (this.BindingContext is MainViewModel vm)
         {
-            vm.MainViewHeight = this.MainGrid.Height - this.MainTool.Height - 30;
+            vm.MainViewHeight = this.MainGrid.Height - this.MainTool.Height - 50;
         }
     }
 }

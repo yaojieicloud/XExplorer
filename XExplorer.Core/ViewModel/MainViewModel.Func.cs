@@ -188,6 +188,8 @@ partial class MainViewModel
 
             var video = await ProcessVideoAsync(new FileRecord(fileInfo.FullName));
             this.dataService.VideosService.AddAsync(video);
+            var videoMode = video.ToMode();
+            this.Videos.Add(videoMode);
             Log.Information($"视频 [{fileInfo.FullName}] 处理完成。");
         }
     }

@@ -6,7 +6,7 @@ namespace XExplorer.Core.Modes;
 /// <summary>
 /// DirInfo类用于表示目录信息。
 /// </summary>
-public class DirRecord
+public partial class DirRecord : ObservableObject
 {
     /// <summary>
     /// 表示一个目录的信息记录。
@@ -25,24 +25,27 @@ public class DirRecord
     {
         this.FullName = this.AdjustPath(fullName);
         this.Name = Path.GetFileName(this.FullName);
-        this.ValidName = Path.GetRelativePath(AppSettingsUtils.Default.Current.Volume,this.FullName);
+        this.ValidName = Path.GetRelativePath(AppSettingsUtils.Default.Current.Volume, this.FullName);
     }
-    
+
     /// <summary>
     /// 获取或设置目录的名称。
     /// </summary>
-    public string Name { get; set; }
+    [ObservableProperty]
+    private string name;
 
     /// <summary>
     /// 获取或设置目录的有效名称。
     /// </summary>
-    public string ValidName { get; set; }
-    
+    [ObservableProperty]
+    private string validName;
+
     /// <summary>
     /// 获取或设置目录的完整路径。
     /// </summary>
-    public string FullName { get; set; }
-    
+    [ObservableProperty]
+    private string fullName;
+
     /// <summary>
     /// 调整路径格式，根据运行平台将路径在 Windows 和 Mac 之间进行转换。
     /// </summary>
