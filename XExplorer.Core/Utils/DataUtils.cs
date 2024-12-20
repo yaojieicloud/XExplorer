@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 using XExplorer.Core.Modes;
 
 namespace XExplorer.Core.Utils;
@@ -27,6 +28,9 @@ public static class DataUtils
         result.Evaluate = mode.Evaluate;
         result.MD5 = mode.Md5;
         result.Times = mode.Times;
+        result.Width = mode.Width;
+        result.Height = mode.Height;
+        result.WideScrenn = mode.WideScrenn;
         result.Status = mode.Status;
         result.Snapshots = mode.Snapshots.ToSnapshots();
         return result;
@@ -83,6 +87,9 @@ public static class DataUtils
         result.Times = video.Times;
         result.Status = video.Status;
         result.Minute = video.Minute;
+        result.WideScrenn = video.WideScrenn;
+        result.Width = video.Width;
+        result.Height = video.Height;
         result.Snapshots = new ObservableCollection<SnapshotMode>(video.Snapshots.ToModes());
 
         return result;

@@ -11,7 +11,6 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 using Xabe.FFmpeg;
 using XExplorer.Core.Dictionaries;
 using XExplorer.Core.Modes;
-using XExplorer.Core.Utils;
 
 namespace XExplorer.Core.ViewModel;
 
@@ -39,6 +38,7 @@ partial class MainViewModel
     private void InitDirs()
     {
         var videoDirs = new List<DirRecord>();
+        ;
         var allDirs = Directory.GetDirectories(AppSettingsUtils.Default.Current.RootDir);
         for (var i = 0; i < allDirs.Length; i++)
         {
@@ -48,6 +48,8 @@ partial class MainViewModel
             videoDirs.Add(new DirRecord { Name = dirInfo.Name, FullName = dir, ValidName = valid });
         }
 
+        videoDirs = videoDirs.OrderByDescending(m => m.ValidName).ToList();
+        videoDirs.Insert(0, new DirRecord() { Name = Screnn.All, FullName = Screnn.All, ValidName = Screnn.All });
         Dirs = new ObservableCollection<DirRecord>(videoDirs);
     }
 
@@ -165,8 +167,6 @@ partial class MainViewModel
 
     public async Task ProcessVideosAsync(DirRecord dir)
     {
-        object lckObj = new object();
-        this.Videos = new ObservableCollection<VideoMode>();
         var dirInfo = new DirectoryInfo(dir.FullName);
         var files = dirInfo.GetFiles(string.Empty, SearchOption.AllDirectories);
         if (!(files?.Any() ?? false))
@@ -178,30 +178,37 @@ partial class MainViewModel
         var videoDict = videoData.ToDictionary(m => m.VideoPath, m => m);
 
         foreach (var fileInfo in videoStoreFiles)
-        {
-            var videoRecord = new FileRecord(fileInfo.FullName);
-            if (videoDict.ContainsKey(videoRecord.RelativePath))
+            try
             {
-                Log.Information($"视频 [{fileInfo.FullName}] 已存在，无需处理。");
-                continue;
-            }
+                var videoRecord = new FileRecord(fileInfo.FullName);
+                if (videoDict.ContainsKey(videoRecord.RelativePath))
+                {
+                    Log.Information($"视频 [{fileInfo.FullName}] 已存在，无需处理。");
+                    Message = $"视频 [{fileInfo.FullName}] 已存在，无需处理。";
+                    continue;
+                }
 
-            var video = await ProcessVideoAsync(new FileRecord(fileInfo.FullName));
-            this.dataService.VideosService.AddAsync(video);
-            var videoMode = video.ToMode();
-            this.Videos.Add(videoMode);
-            Log.Information($"视频 [{fileInfo.FullName}] 处理完成。");
-        }
+                Message = $"视频 [{fileInfo.FullName}] 处理中。。。";
+                var video = await ProcessVideoAsync(new FileRecord(fileInfo.FullName));
+                dataService.VideosService.AddAsync(video);
+                Log.Information($"视频 [{fileInfo.FullName}] 处理完成。");
+                Message = $"视频 [{fileInfo.FullName}] 处理完成。";
+            }
+            catch (Exception e)
+            {
+                Log.Information($"视频 [{fileInfo.FullName}] 处理报错： {e}。");
+                Message = $"视频 [{fileInfo.FullName}] 处理出错：{e.Message}";
+            }
     }
 
     /// <summary>
-    /// 异步处理视频的方法。
-    /// 此方法从指定的文件记录中提取视频信息，生成或更新视频对象，
-    /// 并处理视频截图及相关元数据信息。
+    ///     异步处理视频的方法。
+    ///     此方法从指定的文件记录中提取视频信息，生成或更新视频对象，
+    ///     并处理视频截图及相关元数据信息。
     /// </summary>
     /// <param name="record">视频文件的文件记录对象，包含文件的路径及相关信息。</param>
     /// <param name="video">可选参数，用于更新的已有视频对象；若为 null，则创建新的视频对象。</param>
-    /// <returns>处理完成的 <see cref="Video"/> 对象。</returns>
+    /// <returns>处理完成的 <see cref="Video" /> 对象。</returns>
     private async Task<Video> ProcessVideoAsync(FileRecord record)
     {
         var st = Stopwatch.StartNew();
@@ -212,11 +219,11 @@ partial class MainViewModel
                 return null;
 
             var file = new FileInfo(record.FullName);
-            var video = await this.dataService.VideosService.FirstAsync(m => m.VideoPath == record.ValidName);
+            var video = await dataService.VideosService.FirstAsync(m => m.VideoPath == record.ValidName);
             var dataDir = Path.Combine(AppSettingsUtils.Default.Current.DataDir, record.Dir.ValidName);
-            var times = await GetVideoTimes(record.FullName);
+            var info = await GetVideoInfo(record.FullName);
             var md5Task = GetMd5CodeAsync(record.FullName);
-            var timestamps = GetTimestamps(times);
+            var timestamps = GetTimestamps(info.times);
             var images = await GetVideoImagesAsync(record.FullName, timestamps);
 
             video ??= dataService.VideosService.Create(record.ValidName);
@@ -226,12 +233,15 @@ partial class MainViewModel
             video.VideoPath = record.ValidName;
             video.RootDir = selectedDir.ValidName;
             video.Caption = record.NameWithoutExt;
-            video.Times = times;
+            video.Times = info.times;
             video.Length = file.Length / 1024 / 1024;
             video.DataDir = record.Dir.ValidName;
             video.Snapshots = images.Select(m => dataService.SnapshotsService.Create(m.Name, video.Id))
                 .ToList();
             video.MD5 = await md5Task;
+            video.Width = info.width;
+            video.Height = info.height;
+            video.WideScrenn = info.widescreen;
             video.ModifyTime = DateTime.Now;
             return video;
         }
@@ -239,22 +249,22 @@ partial class MainViewModel
         {
             st.Stop();
             Log.Information($"视频 [{record.FullName}] 处理完成，耗时 [{st.Elapsed.TotalSeconds}] 秒");
-            this.Message = $"视频 [{record.FullName}] 处理完成，耗时 [{st.Elapsed.TotalSeconds}] 秒";
+            Message = $"视频 [{record.FullName}] 处理完成，耗时 [{st.Elapsed.TotalSeconds}] 秒";
         }
     }
 
     /// <summary>
-    /// 异步获取视频指定时间点的截图文件集合。
-    /// 此方法通过提供的视频路径与多个时间戳点，截取对应的视频帧作为图片并保存到指定目录。
+    ///     异步获取视频指定时间点的截图文件集合。
+    ///     此方法通过提供的视频路径与多个时间戳点，截取对应的视频帧作为图片并保存到指定目录。
     /// </summary>
     /// <param name="videoPath">
-    /// 视频文件的完整路径。
+    ///     视频文件的完整路径。
     /// </param>
     /// <param name="timestamps">
-    /// 视频需要截取的多个时间点列表。
+    ///     视频需要截取的多个时间点列表。
     /// </param>
     /// <returns>
-    /// 返回包含所有保存的截图文件信息的集合。
+    ///     返回包含所有保存的截图文件信息的集合。
     /// </returns>
     private async Task<List<FileRecord>> GetVideoImagesAsync(string videoPath, List<TimeSpan> timestamps)
     {
@@ -263,7 +273,7 @@ partial class MainViewModel
         // 确保输出文件夹存在
         if (!Directory.Exists(outputFolderPath))
             Directory.CreateDirectory(outputFolderPath);
- 
+
         // 遍历时间点并添加截图参数
         foreach (var timestamp in timestamps)
         {
@@ -271,17 +281,17 @@ partial class MainViewModel
             var fullName = Path.Combine(outputFolderPath, name);
             var record = new FileRecord(fullName, AppSettingsUtils.Default.Current.DataDir);
             //conversion.AddParameter($"-ss {timestamp} -i \"{videoPath}\" -frames:v 1 \"{fullName}\"");
-            await this.CaptureFrameAtTime(videoPath, fullName, timestamp);
+            await CaptureFrameAtTime(videoPath, fullName, timestamp);
             images.Add(record);
         }
-        
+
         Log.Information($"视频 「{videoPath}」截图已保存到: [{outputFolderPath}] ");
         return images;
     }
 
     /// <summary>
-    /// 从视频文件中指定时间戳截图并保存为图像文件。
-    /// 此方法利用FFmpeg库提取视频帧并保存到指定输出目录。
+    ///     从视频文件中指定时间戳截图并保存为图像文件。
+    ///     此方法利用FFmpeg库提取视频帧并保存到指定输出目录。
     /// </summary>
     /// <param name="videoPath">视频文件的路径。</param>
     /// <param name="outputFolderPath">保存截图的输出文件夹路径。</param>
@@ -289,16 +299,16 @@ partial class MainViewModel
     /// <returns>一个表示异步操作的 Task。</returns>
     private async Task CaptureFrameAtTime(string videoPath, string outputFolderPath, TimeSpan timestamp)
     {
-        var name = $"{Guid.NewGuid():N}.jpg"; 
+        var name = $"{Guid.NewGuid():N}.jpg";
         var conversion = FFmpeg.Conversions.New()
             .AddParameter($"-ss {timestamp}")
             .AddParameter($"-i \"{videoPath}\"")
             .AddParameter("-frames:v 1")
-            .AddParameter("-q:v 1")                     // 设置JPEG图片质量（数字越小质量越高）
+            .AddParameter("-q:v 1") // 设置JPEG图片质量（数字越小质量越高）
             .AddParameter($"\"{outputFolderPath}\"");
         await conversion.Start();
     }
-    
+
     /// <summary>
     ///     根据总时长（单位为秒）计算出若干个关键时间点的时间戳。
     ///     本方法会将输入的时长分为 10 个时间段，提取中间 8 个时间点的时间戳（剔除第一个和最后一个时间点）。
@@ -347,29 +357,29 @@ partial class MainViewModel
     }
 
     /// <summary>
-    /// 获取指定视频文件总时长的方法。
-    /// 此方法通过调用 FFmpeg 工具解析视频元信息，返回视频总时长（以秒为单位）。
+    /// 获取指定视频文件的基本信息（时长、分辨率、宽高比例等）。
+    /// 此方法使用 FFmpeg 库解析视频文件并返回相关数据。
     /// </summary>
-    /// <param name="videoPath">
-    /// 视频文件的完整路径。
-    /// 提供目标文件路径，用于解析视频的元信息。
-    /// </param>
+    /// <param name="videoPath">视频文件的完整路径。</param>
     /// <returns>
-    /// 返回视频的时长（以秒为单位）。如果文件不存在，返回 0。
+    /// 一个包含视频时长（秒）、宽度、高度以及是否为宽屏的元组数据；
+    /// 如果文件不存在则返回默认值。
     /// </returns>
-    private async Task<long> GetVideoTimes(string videoPath)
+    private async Task<(long times, int width, int height, bool widescreen)> GetVideoInfo(string videoPath)
     {
         if (File.Exists(videoPath))
         {
             var mediaInfo = await FFmpeg.GetMediaInfo(videoPath);
-
-            // 获取时长
-            var duration = mediaInfo.Duration;
+            var videoStream = mediaInfo.VideoStreams.First(); // 获取视频流 
+            var width = videoStream.Width; // 获取视频宽度和高度
+            var height = videoStream.Height; // 获取视频宽度和高度 
+            var widescrenn = width > height; // 判断视频是宽屏还是窄屏  
+            var duration = mediaInfo.Duration; // 获取时长
             Log.Information($"视频[{videoPath}]时长: {duration.TotalSeconds} 秒");
-            return Convert.ToInt64(duration.TotalSeconds);
+            return (Convert.ToInt64(duration.TotalSeconds), width, height, widescrenn);
         }
 
-        return 0l;
+        return default;
     }
 
     /// <summary>
@@ -472,7 +482,7 @@ partial class MainViewModel
             imgs.RemoveAt(i);
         }
     }
-    
+
     /// <summary>
     /// 删除视频图片
     /// </summary>
@@ -484,7 +494,7 @@ partial class MainViewModel
         if (!(imgs?.Any() ?? false))
             return;
 
-        await this.dataService.SnapshotsService.DelAsync(imgs);
+        await dataService.SnapshotsService.DelAsync(imgs);
         for (var i = imgs.Count - 1; i >= 0; i--)
         {
             var fullPath = Path.Combine(AppSettingsUtils.Default.Current.DataDir, imgs[i]?.Path);

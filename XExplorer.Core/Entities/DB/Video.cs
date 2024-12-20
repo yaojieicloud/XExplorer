@@ -65,6 +65,21 @@ public class Video : ModeBase
     public long? Times { get; set; }
 
     /// <summary>
+    /// 获取或设置视频的宽度。
+    /// </summary>
+    public int Width { get; set; }
+
+    /// <summary>
+    /// 获取或设置视频的高度。
+    /// </summary>
+    public int Height { get; set; }
+
+    /// <summary>
+    /// 指示视频是否为宽屏格式。
+    /// </summary>
+    public bool WideScrenn { get; set; }
+
+    /// <summary>
     /// 获取或设置最小值，该属性未映射到数据库。
     /// </summary>
     [NotMapped]

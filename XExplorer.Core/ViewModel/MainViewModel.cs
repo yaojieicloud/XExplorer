@@ -32,8 +32,8 @@ public partial class MainViewModel : ObservableObject
     /// </summary>
     public MainViewModel()
     {
-        this.dataService = new DataService();
-        this.InitDirs();
+        dataService = new DataService();
+        InitDirs();
     }
 
     #region Command
@@ -49,14 +49,22 @@ public partial class MainViewModel : ObservableObject
         {
             Processing = true;
             Videos.Clear();
-            var enties = await dataService.VideosService.QueryAsync(this.SelectedDir.ValidName);
+            var dir = this.SelectedDir.ValidName == Screnn.All ? null : this.SelectedDir.ValidName;
+            bool? wideScrenn = this.ScrennMode == Screnn.None
+                ? null
+                : ScrennMode == Screnn.Wide ? true : false;
+            var enties = await dataService.VideosService.QueryAsync(
+                dir,
+                wideScrenn: wideScrenn);
             var modes = enties.ToModes();
-            Videos = new ObservableCollection<VideoMode>(modes); 
+            Videos = new ObservableCollection<VideoMode>(modes);
+            Message = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] 目录 {SelectedDir.FullName} 加载完成。";
         }
         catch (Exception ex)
         {
             Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
-            this.Notification($"{ex}");
+            Notification($"{ex}");
+            Message = ex.Message;
         }
         finally
         {
@@ -65,99 +73,110 @@ public partial class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    /// 异步处理选定文件夹中的视频文件。
-    /// 此方法通过命令模式触发，会记录处理耗时并显示通知。
-    /// 若在处理过程中出现异常，将捕获并记录错误信息。
+    ///     异步处理选定文件夹中的视频文件。
+    ///     此方法通过命令模式触发，会记录处理耗时并显示通知。
+    ///     若在处理过程中出现异常，将捕获并记录错误信息。
     /// </summary>
     /// <returns>表示异步操作完成的任务。</returns>
     [RelayCommand]
     public async Task ProcessVideosAsync()
     {
         var st = Stopwatch.StartNew();
-        this.Processing = true;
-        
+        Processing = true;
+
         try
         {
-            await this.ProcessVideosAsync(this.SelectedDir);
-            st.Stop();
-            this.Notification($"文件夹 [{this.selectedDir.FullName}] 全部处理完成，耗时[{st.Elapsed.TotalSeconds}]秒。");
+            var result = await FolderPicker.PickAsync(default);
+            if (result != null)
+            {
+                var dir = new DirRecord
+                {
+                    Name = result.Folder.Name,
+                    FullName = result.Folder.Path,
+                    ValidName = result.Folder.Path.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty)
+                };
+
+                await ProcessVideosAsync(dir);
+                st.Stop();
+                Notification($"文件夹 [{selectedDir.FullName}] 全部处理完成，耗时[{st.Elapsed.TotalSeconds}]秒。");
+            }
         }
         catch (Exception e)
         {
-            this.Notification($"{e}");
+            Notification($"{e}");
             Log.Error(e, $"{MethodBase.GetCurrentMethod().Name} Is Error");
         }
         finally
         {
             st.Stop();
-            Log.Information($"文件夹 [{this.selectedDir.FullName}] 全部处理完成，耗时[{st.Elapsed.TotalSeconds}]秒。");
-            this.Processing = false;
+            Log.Information($"文件夹 [{selectedDir.FullName}] 全部处理完成，耗时[{st.Elapsed.TotalSeconds}]秒。");
+            Processing = false;
         }
     }
-     
+
     /// <summary>
-    /// 异步方法，用于通过文件夹选择器功能让用户选择一个文件夹并将其信息加载到应用状态中。
-    /// 如果选择了文件夹，该方法会生成一个 <see cref="DirRecord"/> 对象，
-    /// 包含文件夹的名称、完整路径以及格式化后的路径信息（相对于配置中的卷路径）。
-    /// 此方法在选择文件夹后会更新 ViewModel 中的 <c>SelectedDir</c> 属性。
+    ///     异步方法，用于通过文件夹选择器功能让用户选择一个文件夹并将其信息加载到应用状态中。
+    ///     如果选择了文件夹，该方法会生成一个 <see cref="DirRecord" /> 对象，
+    ///     包含文件夹的名称、完整路径以及格式化后的路径信息（相对于配置中的卷路径）。
+    ///     此方法在选择文件夹后会更新 ViewModel 中的 <c>SelectedDir</c> 属性。
     /// </summary>
     /// <returns>
-    /// 返回一个 <see cref="Task"/>，表示异步操作的执行状态。
-    /// 如果用户成功选择了文件夹，则更新模型状态；否则，无状态变化。
+    ///     返回一个 <see cref="Task" />，表示异步操作的执行状态。
+    ///     如果用户成功选择了文件夹，则更新模型状态；否则，无状态变化。
     /// </returns>
     [RelayCommand]
     public async Task SelectFolderAsync()
-    { 
+    {
         var result = await FolderPicker.PickAsync(default);
         if (result != null)
         {
-            var dir = new DirRecord()
+            var dir = new DirRecord
             {
                 Name = result.Folder.Name,
                 FullName = result.Folder.Path,
                 ValidName = result.Folder.Path.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty)
             };
-            this.SelectedDir = dir;
+            SelectedDir = dir;
         }
     }
-    
+
     /// <summary>
-    /// 打开日志目录。
+    ///     打开日志目录。
     /// </summary>
     /// <remarks>
-    /// 此方法首先获取当前应用程序域的基目录，然后构造日志目录的路径。最后，它使用Windows资源管理器打开日志目录。
+    ///     此方法首先获取当前应用程序域的基目录，然后构造日志目录的路径。最后，它使用Windows资源管理器打开日志目录。
     /// </remarks>
     [RelayCommand]
     public async Task OpenLogDirAsync()
     {
         try
         {
-            string baseDirectory = AppContext.BaseDirectory;
+            var baseDirectory = AppContext.BaseDirectory;
             if (AppSettingsUtils.Default.OS == OS.MacCatalyst)
             {
                 // Adjust the path for macOS to get the app bundle root directory
-                var path = Path.GetDirectoryName(AppSettingsUtils.Default.Current.LogFile); 
-                this.OpenFolder(path);
+                var path = Path.GetDirectoryName(AppSettingsUtils.Default.Current.LogFile);
+                OpenFolder(path);
             }
             else
             {
                 var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs");
-                this.OpenFolder(path);
+                OpenFolder(path);
             }
         }
         catch (Exception ex)
         {
             Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
-            this.Notification($"{ex}");
+            Notification($"{ex}");
         }
 
         await Task.CompletedTask;
     }
 
     /// <summary>
-    /// 异步方法 DownloadRuntimeAsync 用于下载和配置 FFmpeg 的运行时文件。
-    /// 此方法将 FFmpeg 的运行时文件下载到指定的路径，并设置可执行文件路径，
-    /// 确保在应用程序中可以正确使用 FFmpeg 功能。
+    ///     异步方法 DownloadRuntimeAsync 用于下载和配置 FFmpeg 的运行时文件。
+    ///     此方法将 FFmpeg 的运行时文件下载到指定的路径，并设置可执行文件路径，
+    ///     确保在应用程序中可以正确使用 FFmpeg 功能。
     /// </summary>
     /// <returns>表示异步操作的 Task。</returns>
     [RelayCommand]
@@ -171,29 +190,29 @@ public partial class MainViewModel : ObservableObject
         await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Shared, ffmpegDir);
         FFmpeg.SetExecutablesPath(ffmpegDir);
         Log.Information($"已经将 FFmpeg 运行时下载到 [{ffmpegDir}]");
-        this.Notification($"已经将 FFmpeg 运行时下载到 [{ffmpegDir}]");
+        Notification($"已经将 FFmpeg 运行时下载到 [{ffmpegDir}]");
     }
 
     /// <summary>
-    /// 通知方法，用于在应用程序中显示消息通知。
-    /// 根据输入参数设置消息内容，并控制消息显示状态。
+    ///     通知方法，用于在应用程序中显示消息通知。
+    ///     根据输入参数设置消息内容，并控制消息显示状态。
     /// </summary>
     /// <param name="param">
-    /// 消息内容的参数。如果参数为字符串类型，则其内容将被设置为通知消息。
+    ///     消息内容的参数。如果参数为字符串类型，则其内容将被设置为通知消息。
     /// </param>
     [RelayCommand]
     public void Notification(object param)
     {
         if (param is string msg)
         {
-            this.Message = msg;
-            this.IsShow = true;
-            this.AppearanceMode = PopupButtonAppearanceMode.OneButton;
+            Message = msg;
+            IsShow = true;
+            AppearanceMode = PopupButtonAppearanceMode.OneButton;
         }
     }
 
     /// <summary>
-    /// Ask方法用于处理参数，并根据传入的消息内容更新相关的UI显示和交互模式。
+    ///     Ask方法用于处理参数，并根据传入的消息内容更新相关的UI显示和交互模式。
     /// </summary>
     /// <param name="param">传入的参数，期望为字符串类型的消息内容。</param>
     [RelayCommand]
@@ -201,53 +220,54 @@ public partial class MainViewModel : ObservableObject
     {
         if (param is string msg)
         {
-            this.Message = msg;
-            this.IsShow = true;
-            this.IsCancel = true;
-            this.AppearanceMode = PopupButtonAppearanceMode.TwoButton;
+            Message = msg;
+            IsShow = true;
+            IsCancel = true;
+            AppearanceMode = PopupButtonAppearanceMode.TwoButton;
 
-            while (this.IsShow) 
+            while (IsShow)
                 await Task.Delay(500);
 
             await Task.Delay(500);
-            return this.IsCancel;
+            return IsCancel;
         }
 
         return true;
     }
-    
+
     /// <summary>
-    /// CloseNotification 是一个用于关闭通知的方法。
-    /// 此方法通过将 Message 属性设置为 null 和 IsShow 属性设置为 false，
-    /// 清除当前通知信息并隐藏通知界面。
+    ///     CloseNotification 是一个用于关闭通知的方法。
+    ///     此方法通过将 Message 属性设置为 null 和 IsShow 属性设置为 false，
+    ///     清除当前通知信息并隐藏通知界面。
     /// </summary>
     [RelayCommand]
     public void CloseNotification()
     {
-        this.Message = null;
-        this.IsShow = false;
-        this.IsCancel = true;
+        Message = null;
+        IsShow = false;
+        IsCancel = true;
     }
 
     /// <summary>
-    /// Decline 方法用于执行用户拒绝操作，处理相关的业务逻辑。
+    ///     Decline 方法用于执行用户拒绝操作，处理相关的业务逻辑。
     /// </summary>
     [RelayCommand]
     public void Decline()
     {
-        this.IsCancel = true;
-        this.IsShow = false; 
+        IsCancel = true;
+        IsShow = false;
     }
 
     /// <summary>
-    /// Accept 方法用于处理对话框的接受操作。
-    /// 执行逻辑将更改相关标志状态以关闭用户界面提示或通知。
+    ///     Accept 方法用于处理对话框的接受操作。
+    ///     执行逻辑将更改相关标志状态以关闭用户界面提示或通知。
     /// </summary>
     [RelayCommand]
     public void Accept()
     {
-        this.IsCancel = false;
-        this.IsShow = false;
+        IsCancel = false;
+        IsShow = false;
     }
+
     #endregion
 }

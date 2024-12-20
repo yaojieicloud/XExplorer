@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
 using Syncfusion.Maui.Popup;
+using XExplorer.Core.Dictionaries;
 using XExplorer.Core.Modes;
 using XExplorer.Core.Service;
 using XExplorer.Core.Utils;
@@ -129,6 +130,12 @@ partial class MainViewModel
     /// 最近一次交互或操作的对象，用于记录状态或执行逻辑判断。
     /// </summary>
     private object last;
+
+    /// <summary>
+    /// 当前屏幕模式，指示视图的显示布局（如无模式、宽屏或窄屏）。
+    /// </summary>
+    [ObservableProperty]
+    private string scrennMode = Screnn.None;
 
     /// <summary>
     /// 控制弹出按钮的外观模式

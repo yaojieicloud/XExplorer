@@ -87,6 +87,24 @@ public partial class VideoMode : ObservableObject
     private long? times;
 
     /// <summary>
+    /// 获取或设置视频的宽度。
+    /// </summary>
+    [ObservableProperty]
+    private int width;
+
+    /// <summary>
+    /// 获取或设置视频的高度。
+    /// </summary>
+    [ObservableProperty]
+    private int height;
+
+    /// <summary>
+    /// 指示视频是否为宽屏格式。
+    /// </summary>
+    [ObservableProperty]
+    private bool wideScrenn;
+    
+    /// <summary>
     /// 获取视频的时长最小值（单位：分钟）。
     /// </summary>
     [ObservableProperty]
