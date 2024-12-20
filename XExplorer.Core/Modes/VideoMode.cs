@@ -104,6 +104,8 @@ public partial class VideoMode : ObservableObject
     [ObservableProperty]
     private ObservableCollection<SnapshotMode> snapshots = new();
 
+    private object last;
+
     /// <summary>
     /// 获取视频快照的完整路径列表。
     /// </summary>
@@ -123,7 +125,10 @@ public partial class VideoMode : ObservableObject
             {
                 if (enty.Evaluate == 0)
                     return;
-                
+
+                if (this.last != null && Convert.ToInt32(last) == enty.Evaluate)
+                    return;
+
                 var video = enty.ToVideo();
                 var dataService = new DataService();
                 await dataService.VideosService.UpdateOnlyAsync(video);

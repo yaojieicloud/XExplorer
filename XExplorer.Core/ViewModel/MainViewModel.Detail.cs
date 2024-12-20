@@ -31,21 +31,22 @@ partial class MainViewModel
     {
         try
         {
-            var path = param as string;
-            if (!string.IsNullOrWhiteSpace(path))
+            if (param is VideoMode mode)
             {
-                var currPath = AdjustPath(path);
+                mode.PlayCount++;
+                var currPath = AdjustPath(mode.VideoPath);
                 currPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, currPath);
                 if (AppSettingsUtils.Default.OS == OS.Windows)
                     Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"--no-one-instance \"{currPath}\"");
                 else
                     Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"\"{currPath}\"");
 
-                var entry = await dataService.VideosService.FirstAsync(m => m.VideoPath == path);
+                var entry = await dataService.VideosService.FirstAsync(m => m.Id == mode.Id);
                 if (entry != null)
                 {
                     entry.PlayCount++;
                     await dataService.VideosService.UpdateOnlyAsync(entry);
+                    Log.Information($"视频 [{mode.Id} {mode.VideoPath}] 播放次数已更新。");
                 }
             }
         }
@@ -83,13 +84,13 @@ partial class MainViewModel
     {
         if (param is VideoMode mode)
         {
-            this.Processing = true; 
-            
+            this.Processing = true;
+
             try
             {
                 if (await this.Ask($"确认删除视频 「{mode.VideoPath}」?"))
                     return;
-                
+
                 var fullDir = Path.Combine(AppSettingsUtils.Default.Current.Volume, mode.VideoDir);
                 var fullPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, mode.VideoPath);
                 var videos =
@@ -141,7 +142,7 @@ partial class MainViewModel
             }
             finally
             {
-                this.Processing = false; 
+                this.Processing = false;
             }
         }
     }
@@ -191,15 +192,20 @@ partial class MainViewModel
         {
             if (param is VideoMode enty)
             {
-                var video = enty.ToVideo();
-                await dataService.VideosService.UpdateOnlyAsync(video);
-                this.Notification($"视频更新完成。");
+                if (enty.Evaluate == 0)
+                    return;
+
+                if (this.last != null && Convert.ToInt32(last) == enty.Evaluate)
+                    return;
+
+                var video = enty.ToVideo(); 
+                await this.dataService.VideosService.UpdateOnlyAsync(video);
+                Log.Information($"视频 [{enty.Id} {enty.VideoPath}] 更新星级完成。");
             }
         }
         catch (Exception ex)
         {
             Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
-            Notification($"{ex}");
         }
     }
 

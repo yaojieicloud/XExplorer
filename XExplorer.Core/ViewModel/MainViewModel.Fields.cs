@@ -126,6 +126,11 @@ partial class MainViewModel
     private bool isCancel = true;
 
     /// <summary>
+    /// 最近一次交互或操作的对象，用于记录状态或执行逻辑判断。
+    /// </summary>
+    private object last;
+
+    /// <summary>
     /// 控制弹出按钮的外观模式
     /// </summary>
     [ObservableProperty]

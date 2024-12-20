@@ -49,7 +49,7 @@
         <sfPopup:SfPopup x:Name="popupImg" AppearanceMode="OneButton"
                          ShowFooter="True"
                          OverlayMode="Blur"
-                         StaysOpen="True"
+                         StaysOpen="False"
                          AnimationMode="Fade"
                          ShowCloseButton="True"
                          IsFullScreen="True"
@@ -186,8 +186,8 @@
                                         </inputs:SfRating.RatingSettings>
                                         <inputs:SfRating.Behaviors>
                                             <toolkit:EventToCommandBehavior EventName="ValueChanged"
-                                                                            Command="{Binding Path= RatingChangedCommand}"
-                                                                            CommandParameter="{Binding}" />
+                                                                            Command="{Binding Source={x:Reference MainGrid}, Path=BindingContext.RatingChangedCommand}"
+                                                                            CommandParameter="{Binding .}" />
                                         </inputs:SfRating.Behaviors>
                                     </inputs:SfRating>
                                 </HorizontalStackLayout>
@@ -203,7 +203,7 @@
                                         <syfCore:SfBadgeView.Content>
                                             <syfButton:SfButton Text="播放" CornerRadius="20"
                                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=PlayCommand}"
-                                                                CommandParameter="{Binding VideoPath}">
+                                                                CommandParameter="{Binding}">
                                                 <syfButton:SfButton.Background>
                                                     <LinearGradientBrush>
                                                         <LinearGradientBrush.GradientStops>
@@ -282,7 +282,7 @@
                                                 <Frame.Background>
                                                     <SolidColorBrush Color="Gray" />
                                                 </Frame.Background>
-                                                <Image Source="{Binding FullPath}" HeightRequest="300"
+                                                <Image Source="{Binding FullPath1}" HeightRequest="300"
                                                        WidthRequest="400">
                                                     <Image.GestureRecognizers>
                                                         <TapGestureRecognizer
