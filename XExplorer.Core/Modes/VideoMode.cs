@@ -103,7 +103,7 @@ public partial class VideoMode : ObservableObject
     /// </summary>
     [ObservableProperty]
     private bool wideScrenn;
-    
+
     /// <summary>
     /// 获取视频的时长最小值（单位：分钟）。
     /// </summary>
@@ -119,15 +119,26 @@ public partial class VideoMode : ObservableObject
     /// <summary>
     /// 快照列表.
     /// </summary>
-    [ObservableProperty]
     private ObservableCollection<SnapshotMode> snapshots = new();
+
+    public ObservableCollection<SnapshotMode> Snapshots
+    {
+        get => snapshots;
+        set
+        { 
+            this.SetProperty(ref snapshots, value);
+            var imgs = value?.Select(m => m.FullPath).ToList();
+            this.Images = new ObservableCollection<string>(imgs ?? new List<string>());
+        }
+    }
 
     private object last;
 
     /// <summary>
     /// 获取视频快照的完整路径列表。
     /// </summary>
-    public List<string> Images => snapshots.Select(m => m.FullPath).ToList();
+    [ObservableProperty]
+    public ObservableCollection<string> images = new();
 
     /// <summary>
     /// 更新视频评分信息。

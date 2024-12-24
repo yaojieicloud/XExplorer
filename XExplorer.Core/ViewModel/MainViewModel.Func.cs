@@ -1,10 +1,12 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Net.Mime;
 using System.Reflection;
 using System.Security.Cryptography;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using Microsoft.Maui.ApplicationModel;
 using Serilog;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -163,8 +165,212 @@ partial class MainViewModel
         }
     }
 
+    /// <summary>
+    /// 显示信息消息的方法。
+    /// 此方法记录信息消息，并更新 UI 线程中的消息字段。
+    /// </summary>
+    /// <param name="message">需要显示或记录的消息内容。</param>
+    /// <param name="title">可选的标题，用于覆盖主消息字段的显示值。</param>
+    private void Information(string message, string title = null)
+    {
+        Log.Information(message);
+        if (MainThread.IsMainThread)
+            this.Message = title ?? message;
+        else
+            MainThread.BeginInvokeOnMainThread(() => this.Message = title ?? message);
+    }
+
+    #region 批处理视频
+
+    /// <summary>
+    /// 异步处理给定目录下符合条件的视频文件，并将处理结果保存到数据服务中。
+    /// </summary>
+    /// <param name="dir">待处理的目录记录对象，包含目录的名称和路径等信息。</param>
+    /// <returns>返回一个异步任务，表示处理完成后的状态。</returns>
+    /// <exception cref="FileNotFoundException">当目录内没有任何符合条件的文件时抛出此异常。</exception>
+    public async Task WithVideosAsync(DirRecord dir)
+    {
+        var dirInfo = new DirectoryInfo(dir.FullName);
+        var newVideos = new List<Video>();
+        var files = dirInfo.GetFiles(string.Empty, SearchOption.AllDirectories);
+
+        if (!(files?.Any() ?? false))
+            throw new FileNotFoundException($"目录内没有任何文件: {dir.FullName}");
+
+        // 筛选符合条件的视频文件
+        var videoFiles = files.Where(f => videoExts.Contains(f.Extension.ToLower())).ToList();
+        var videoStoreFiles = videoFiles?.Where(m => m.Length >= videoMiniSize).ToList() ?? new List<FileInfo>();
+
+        // 查询已有的视频数据
+        var videoData = await dataService.VideosService.QueryAsync(m => m.VideoDir == dir.ValidName);
+        var videoDict = videoData.ToDictionary(m => m.VideoPath, m => m);
+
+        // 使用 Parallel.ForEachAsync 并发处理所有视频文件
+        await Parallel.ForEachAsync(videoStoreFiles, async (fileInfo, cancellationToken) =>
+        {
+            try
+            {
+                var videoRecord = new FileRecord(fileInfo.FullName);
+
+                // 判断是否已经存在
+                if (videoDict.TryGetValue(videoRecord.ValidName, out var _))
+                {
+                    this.Information($"视频 [{fileInfo.FullName}] 已存在，无需处理。");
+                    return;
+                }
+
+                this.Information($"视频 [{fileInfo.FullName}] 处理中。。。");
+
+                // 处理视频并返回结果
+                var video = await WithVideoAsync(dir, new FileRecord(fileInfo.FullName));
+
+                // 使用锁保护对共享列表的访问
+                lock (newVideos)
+                {
+                    if (!(newVideos?.Any(m => m.VideoPath == video.VideoPath) ?? false))
+                        newVideos.Add(video);
+                }
+
+                this.Information($"视频数据 [{fileInfo.FullName}] 处理完成。");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            catch (Exception e)
+            {
+                this.Information($"视频 [{fileInfo.FullName}] 处理失败: {e.Message}");
+            }
+        });
+
+        this.Information($"目录：{dir.FullName} 开始写入数据...");
+        await this.dataService.VideosService.AddAsync(newVideos);
+        this.Information($"目录：{dir.FullName} 写入数据完成，目录处理结束。");
+    }
+
+    /// <summary>
+    /// 异步处理视频文件的方法。
+    /// 该方法接收目录记录和文件记录对象，通过特定的逻辑处理视频文件，
+    /// 并返回处理完成的 <see cref="Video"/> 对象。
+    /// </summary>
+    /// <param name="dir">包含视频文件所属目录信息的 <see cref="DirRecord"/> 对象。</param>
+    /// <param name="record">表示待处理视频文件的 <see cref="FileRecord"/> 对象。</param>
+    /// <returns>返回处理完成的 <see cref="Video"/> 对象。</returns>
+    private async Task<Video> WithVideoAsync(DirRecord dir, FileRecord record, Video video = null)
+    {
+        var st = Stopwatch.StartNew();
+
+        try
+        {
+            if (!File.Exists(record.FullName))
+                return null;
+
+            var file = new FileInfo(record.FullName);
+            var dataDir = Path.Combine(AppSettingsUtils.Default.Current.DataDir, record.Dir.ValidName);
+            var info = await GetVideoInfo(record.FullName);
+            var timestamps = GetTimestamps(info.times);
+            var images = await GetVideoImagesAsync(record.FullName, timestamps);
+
+            video ??= dataService.VideosService.Create(record.ValidName);
+            video.Status = 1;
+            this.DelOriginalImages(video);
+            video.VideoDir = record.Dir.ValidName;
+            video.VideoPath = record.ValidName;
+            video.RootDir = dir.ValidName;
+            video.Caption = record.NameWithoutExt;
+            video.Times = info.times;
+            video.Length = file.Length / 1024 / 1024;
+            video.DataDir = record.Dir.ValidName;
+            video.Snapshots = images.Select(m => dataService.SnapshotsService.Create(m.Name, video.Id))
+                .ToList();
+            video.Width = info.width;
+            video.Height = info.height;
+            video.WideScrenn = info.widescreen;
+            video.ModifyTime = DateTime.Now;
+            return video;
+        }
+        finally
+        {
+            st.Stop();
+            this.Information($"视频 [{record.FullName}] 解析完成，耗时 [{st.Elapsed.TotalSeconds}] 秒");
+        }
+    }
+
+    /// <summary>
+    /// 异步处理视频文件的 MD5 计算并更新视频数据的方法。
+    /// 此方法查询现有视频数据，为每个视频文件计算 MD5 值，并将结果写入数据库。
+    /// </summary>
+    /// <remarks>
+    /// 使用并行处理（Parallel.ForEachAsync）高效地计算视频文件的 MD5 值，同时在失败时提供详细的错误信息。
+    /// 在所有处理完成后，调用数据服务接口更新视频数据。
+    /// </remarks>
+    /// <returns>返回一个表示异步操作的任务。</returns>
+    private async Task WithMd5Async()
+    {
+        // 查询已有的视频数据
+        var videoData = await dataService.VideosService.QueryOnlyAsync(m => string.IsNullOrWhiteSpace(m.MD5));
+
+        // 使用 Parallel.ForEachAsync 并发处理所有视频文件
+        await Parallel.ForEachAsync(videoData, async (fileInfo, cancellationToken) =>
+        {
+            try
+            {
+                this.Information($"视频 [{fileInfo.VideoPath}] MD5处理中。。。");
+                fileInfo.MD5 =
+                    await this.GetMd5CodeAsync(
+                        Path.Combine(AppSettingsUtils.Default.Current.Volume, fileInfo.VideoPath));
+                this.Information($"视频数据 [{fileInfo.VideoPath}] MD5处理完成。");
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            catch (Exception e)
+            {
+                this.Information($"视频 [{fileInfo.VideoPath}] 处理失败: {e.Message}");
+            }
+        });
+
+        this.Information($"MD5处理开始写入数据...");
+        await this.dataService.VideosService.UpdateOnlyAsync(videoData);
+        this.Information($"MD5处理写入数据完成。");
+    }
+
+    #endregion
+
     #region 视频处理
 
+    /// <summary>
+    /// 异步批量处理指定目录及其子目录中的视频文件。
+    /// 此方法遍历指定目录下的所有子目录，依次调用视频处理逻辑。
+    /// </summary>
+    /// <param name="dir">要处理的目录信息，包含目录路径及相关属性的 <see cref="DirRecord"/> 对象。</param>
+    /// <returns>
+    /// 返回一个表示异步操作的任务对象。
+    /// 处理完成后，所有子目录的视频文件均完成批量处理。
+    /// </returns>
+    public async Task BatchProcessVideosAsync(DirRecord dir)
+    {
+        var subDirs = Directory.GetDirectories(dir.FullName);
+        if (subDirs?.Any() ?? false)
+        {
+            foreach (var sub in subDirs)
+            {
+                this.Information($"目录 [{sub}] 开始处理。。。");
+                var subRecord = new DirRecord(sub);
+                await this.WithVideosAsync(subRecord);
+                this.Information($"目录 [{sub}] 处理完成。");
+            }
+        }
+    }
+
+    /// <summary>
+    /// 异步处理视频文件的方法。
+    /// 此方法扫描指定目录中的视频文件，根据条件筛选后将其处理并写入数据库。
+    /// </summary>
+    /// <param name="dir">
+    /// 表示目录的对象，包含目录的完整路径、名称和有效名称等信息。
+    /// </param>
+    /// <returns>
+    /// 表示异步操作的任务对象。
+    /// </returns>
+    /// <exception cref="FileNotFoundException">
+    /// 如果目录中未找到任何文件时，抛出此异常。
+    /// </exception>
     public async Task ProcessVideosAsync(DirRecord dir)
     {
         var dirInfo = new DirectoryInfo(dir.FullName);
@@ -174,6 +380,7 @@ partial class MainViewModel
 
         var videoFiles = files.Where(f => videoExts.Contains(f.Extension.ToLower())).ToList();
         var videoStoreFiles = videoFiles?.Where(m => m.Length >= videoMiniSize).ToList() ?? new List<FileInfo>();
+
         var videoData = await dataService.VideosService.QueryAsync(m => m.VideoDir == dir.ValidName);
         var videoDict = videoData.ToDictionary(m => m.VideoPath, m => m);
 
@@ -189,10 +396,10 @@ partial class MainViewModel
                 }
 
                 Message = $"视频 [{fileInfo.FullName}] 处理中。。。";
-                var video = await ProcessVideoAsync(new FileRecord(fileInfo.FullName));
-                dataService.VideosService.AddAsync(video);
-                Log.Information($"视频 [{fileInfo.FullName}] 处理完成。");
-                Message = $"视频 [{fileInfo.FullName}] 处理完成。";
+                var video = await ProcessVideoAsync(dir, new FileRecord(fileInfo.FullName));
+                await this.dataService.VideosService.AddAsync(video);
+                Log.Information($"视频数据 [{fileInfo.FullName}] 写入完成。");
+                Message = $"视频数据 [{fileInfo.FullName}] 写入完成。";
             }
             catch (Exception e)
             {
@@ -202,14 +409,14 @@ partial class MainViewModel
     }
 
     /// <summary>
-    ///     异步处理视频的方法。
-    ///     此方法从指定的文件记录中提取视频信息，生成或更新视频对象，
-    ///     并处理视频截图及相关元数据信息。
+    /// 异步处理视频文件的方法。
+    /// 该方法接收目录记录和文件记录对象，通过特定的逻辑处理视频文件，
+    /// 并返回处理完成的 <see cref="Video"/> 对象。
     /// </summary>
-    /// <param name="record">视频文件的文件记录对象，包含文件的路径及相关信息。</param>
-    /// <param name="video">可选参数，用于更新的已有视频对象；若为 null，则创建新的视频对象。</param>
-    /// <returns>处理完成的 <see cref="Video" /> 对象。</returns>
-    private async Task<Video> ProcessVideoAsync(FileRecord record)
+    /// <param name="dir">包含视频文件所属目录信息的 <see cref="DirRecord"/> 对象。</param>
+    /// <param name="record">表示待处理视频文件的 <see cref="FileRecord"/> 对象。</param>
+    /// <returns>返回处理完成的 <see cref="Video"/> 对象。</returns>
+    private async Task<Video> ProcessVideoAsync(DirRecord dir, FileRecord record)
     {
         var st = Stopwatch.StartNew();
 
@@ -222,7 +429,7 @@ partial class MainViewModel
             var video = await dataService.VideosService.FirstAsync(m => m.VideoPath == record.ValidName);
             var dataDir = Path.Combine(AppSettingsUtils.Default.Current.DataDir, record.Dir.ValidName);
             var info = await GetVideoInfo(record.FullName);
-            var md5Task = GetMd5CodeAsync(record.FullName);
+            //var md5Task = GetMd5CodeAsync(record.FullName);
             var timestamps = GetTimestamps(info.times);
             var images = await GetVideoImagesAsync(record.FullName, timestamps);
 
@@ -231,14 +438,14 @@ partial class MainViewModel
             this.DelOriginalImages(video);
             video.VideoDir = record.Dir.ValidName;
             video.VideoPath = record.ValidName;
-            video.RootDir = selectedDir.ValidName;
+            video.RootDir = dir.ValidName;
             video.Caption = record.NameWithoutExt;
             video.Times = info.times;
             video.Length = file.Length / 1024 / 1024;
             video.DataDir = record.Dir.ValidName;
             video.Snapshots = images.Select(m => dataService.SnapshotsService.Create(m.Name, video.Id))
                 .ToList();
-            video.MD5 = await md5Task;
+            //video.MD5 = await md5Task;
             video.Width = info.width;
             video.Height = info.height;
             video.WideScrenn = info.widescreen;
@@ -277,7 +484,7 @@ partial class MainViewModel
         // 遍历时间点并添加截图参数
         foreach (var timestamp in timestamps)
         {
-            var name = $"{Guid.NewGuid():N}.jpg";
+            var name = $"{Guid.NewGuid():N}.png";
             var fullName = Path.Combine(outputFolderPath, name);
             var record = new FileRecord(fullName, AppSettingsUtils.Default.Current.DataDir);
             //conversion.AddParameter($"-ss {timestamp} -i \"{videoPath}\" -frames:v 1 \"{fullName}\"");
@@ -299,12 +506,12 @@ partial class MainViewModel
     /// <returns>一个表示异步操作的 Task。</returns>
     private async Task CaptureFrameAtTime(string videoPath, string outputFolderPath, TimeSpan timestamp)
     {
-        var name = $"{Guid.NewGuid():N}.jpg";
         var conversion = FFmpeg.Conversions.New()
             .AddParameter($"-ss {timestamp}")
             .AddParameter($"-i \"{videoPath}\"")
             .AddParameter("-frames:v 1")
             .AddParameter("-q:v 1") // 设置JPEG图片质量（数字越小质量越高）
+            .AddParameter("-vf \"scale=iw:ih\"")
             .AddParameter($"\"{outputFolderPath}\"");
         await conversion.Start();
     }

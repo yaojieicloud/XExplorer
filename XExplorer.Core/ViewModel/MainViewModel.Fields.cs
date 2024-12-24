@@ -130,7 +130,7 @@ partial class MainViewModel
     /// 最近一次交互或操作的对象，用于记录状态或执行逻辑判断。
     /// </summary>
     private object last;
-
+ 
     /// <summary>
     /// 当前屏幕模式，指示视图的显示布局（如无模式、宽屏或窄屏）。
     /// </summary>

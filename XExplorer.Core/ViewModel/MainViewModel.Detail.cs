@@ -37,9 +37,9 @@ partial class MainViewModel
                 var currPath = AdjustPath(mode.VideoPath);
                 currPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, currPath);
                 if (AppSettingsUtils.Default.OS == OS.Windows)
-                    Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"--no-one-instance \"{currPath}\"");
+                    Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"--no-one-instance \"{currPath}\" --loop");
                 else
-                    Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"\"{currPath}\"");
+                    Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"\"{currPath}\" --loop");
 
                 var entry = await dataService.VideosService.FirstAsync(m => m.Id == mode.Id);
                 if (entry != null)
@@ -93,9 +93,7 @@ partial class MainViewModel
 
                 var fullDir = Path.Combine(AppSettingsUtils.Default.Current.Volume, mode.VideoDir);
                 var fullPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, mode.VideoPath);
-                var videos =
-                    await this.dataService.VideosService.QueryAsync(m =>
-                        m.VideoDir == mode.VideoDir && m.Id != mode.Id);
+                var videos = await this.dataService.VideosService.QueryAsync(m => m.VideoDir == mode.VideoDir && m.Id != mode.Id);
 
                 if (File.Exists(fullPath))
                 {
@@ -130,10 +128,40 @@ partial class MainViewModel
                     }
                 }
 
-                this.dataService.VideosService.DeleteAsync(mode.Id);
+                await this.dataService.VideosService.DeleteAsync(mode.Id);
                 this.Videos.Remove(mode);
                 Log.Information($"视频数据 [{mode.Caption}] 已删除。");
                 //this.Notification($"视频数据 [{mode.Caption}] 已删除。");
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+                this.Notification($"{e}");
+            }
+            finally
+            {
+                this.Processing = false;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 删除指定视频文件及其相关数据。
+    /// </summary>
+    /// <param name="param">表示视频文件信息的对象，该对象应为 <see cref="VideoMode"/> 类型。</param>
+    /// <returns>异步任务对象，表示该删除操作完成的状态。</returns>
+    [RelayCommand]
+    public async Task DelOnlyAsync(object param)
+    {
+        if (param is VideoMode mode)
+        {
+            this.Processing = true;
+
+            try
+            {
+                await this.dataService.VideosService.DeleteAsync(mode.Id);
+                this.Videos.Remove(mode);
+                this.Information($"视频数据 [{mode.Caption}] 已删除。");
             }
             catch (Exception e)
             {
@@ -166,7 +194,9 @@ partial class MainViewModel
             {
                 var st = Stopwatch.StartNew();
                 var fullName = Path.Combine(AppSettingsUtils.Default.Current.Volume, enty.VideoPath);
-                var video = await ProcessVideoAsync(new FileRecord(fullName));
+                var dirPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, enty.RootDir);
+                var dirRecord = new DirRecord(dirPath);
+                var video = await ProcessVideoAsync(dirRecord, new FileRecord(fullName));
                 await dataService.VideosService.UpdateAsync(video);
                 video.ToMode(enty);
                 st.Stop();
@@ -198,7 +228,7 @@ partial class MainViewModel
                 if (this.last != null && Convert.ToInt32(last) == enty.Evaluate)
                     return;
 
-                var video = enty.ToVideo(); 
+                var video = enty.ToVideo();
                 await this.dataService.VideosService.UpdateOnlyAsync(video);
                 Log.Information($"视频 [{enty.Id} {enty.VideoPath}] 更新星级完成。");
             }

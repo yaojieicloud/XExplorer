@@ -145,6 +145,23 @@ partial class DataService
         }
 
         /// <summary>
+        /// 异步更新指定视频的部分字段。
+        /// </summary>
+        /// <param name="video">待更新的单个视频对象。</param>
+        /// <returns>表示异步操作的 <see cref="Task"/>。</returns>
+        public async Task UpdateOnlyAsync(List<Video> videos)
+        {
+            foreach (var video in videos)
+            {
+                var entry = dataContext.Entry(video);
+                entry.State = EntityState.Modified;
+                entry.CurrentValues.SetValues(video);
+            }
+
+            await dataContext.SaveChangesAsync();
+        }
+
+        /// <summary>
         ///     从数据库中删除指定的视频对象。
         /// </summary>
         /// <param name="video">要从数据库中删除的视频对象。</param>
@@ -277,6 +294,17 @@ partial class DataService
         /// </summary>
         /// <param name="predicate">用于筛选视频的谓词表达式。</param>
         /// <returns>满足条件的视频列表。</returns>
+        public async Task<List<Video>> QueryOnlyAsync(Expression<Func<Video, bool>> predicate = null)
+        {
+            var query = dataContext.Videos.AsQueryable();
+            return predicate == null ? await query.ToListAsync() : await query.Where(predicate).ToListAsync();
+        }
+
+        /// <summary>
+        ///     异步查询视频的方法，根据指定的谓词条件从数据库中检索视频列表。
+        /// </summary>
+        /// <param name="predicate">用于筛选视频的谓词表达式。</param>
+        /// <returns>满足条件的视频列表。</returns>
         public async Task<Video> FirstAsync(Expression<Func<Video, bool>> predicate)
         {
             var query = dataContext.Videos
@@ -296,6 +324,56 @@ partial class DataService
                 .Include(v => v.Snapshots).AsQueryable();
 
             return query.Where(predicate).FirstOrDefault();
+        }
+        
+        /// <summary>
+        /// 异步查询重复视频的方法，根据指定的字段分组，返回重复视频列表。
+        /// </summary>
+        /// <typeparam name="TKey">用于分组的字段类型。</typeparam>
+        /// <param name="keySelector">用于指定分组依据的表达式。</param>
+        /// <returns>包含重复视频的列表。</returns>
+        public async Task<List<Video>> QueryDuplicatesAsync<TKey>(Expression<Func<Video, TKey>> keySelector)
+        {
+            // 查询所有视频数据
+            var query = dataContext.Videos.Include(v => v.Snapshots).AsQueryable();
+
+            // 查找重复的视频
+            var duplicateKeys = await query
+                .GroupBy(keySelector) // 按指定字段分组
+                .Where(g => g.Count() > 1) // 找出组内数量大于1的
+                .Select(g => g.Key) // 提取重复的Key
+                .ToListAsync();
+
+            // 获取所有满足重复条件的视频列表
+            var duplicates = await query
+                .Where(video => duplicateKeys.Contains(keySelector.Compile().Invoke(video)))
+                .ToListAsync();
+
+            return duplicates;
+        }
+        
+        /// <summary>
+        /// 根据 MD5 查询所有 MD5 相同的视频集合。
+        /// </summary>
+        /// <returns>包含所有 MD5 相同的视频集合的列表。</returns>
+        public async Task<List<Video>> QueryMD5DuplicateAsync()
+        {
+            // 查询视频数据
+            var query = dataContext.Videos.Include(v => v.Snapshots).AsQueryable();
+
+            // 查找重复的 MD5 值
+            var duplicateMD5s = await query
+                .GroupBy(video => video.MD5) // 按 MD5 分组
+                .Where(group => group.Count() > 1) // 只保留重复的
+                .Select(group => group.Key) // 提取 MD5 值
+                .ToListAsync();
+
+            // 找出所有 MD5 重复的视频
+            var duplicateVideos = await query
+                .Where(video => duplicateMD5s.Contains(video.MD5))
+                .ToListAsync();
+
+            return duplicateVideos;
         }
     }
 }

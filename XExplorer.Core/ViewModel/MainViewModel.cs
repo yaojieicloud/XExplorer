@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -49,10 +50,12 @@ public partial class MainViewModel : ObservableObject
         {
             Processing = true;
             Videos.Clear();
-            var dir = this.SelectedDir.ValidName == Screnn.All ? null : this.SelectedDir.ValidName;
-            bool? wideScrenn = this.ScrennMode == Screnn.None
+            var dir = SelectedDir.ValidName == Screnn.All ? null : SelectedDir.ValidName;
+            bool? wideScrenn = ScrennMode == Screnn.None
                 ? null
-                : ScrennMode == Screnn.Wide ? true : false;
+                : ScrennMode == Screnn.Wide
+                    ? true
+                    : false;
             var enties = await dataService.VideosService.QueryAsync(
                 dir,
                 wideScrenn: wideScrenn);
@@ -96,7 +99,48 @@ public partial class MainViewModel : ObservableObject
                     ValidName = result.Folder.Path.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty)
                 };
 
-                await ProcessVideosAsync(dir);
+                await WithVideosAsync(dir);
+                st.Stop();
+                Notification($"文件夹 [{selectedDir.FullName}] 全部处理完成，耗时[{st.Elapsed.TotalSeconds}]秒。");
+            }
+        }
+        catch (Exception e)
+        {
+            Notification($"{e}");
+            Log.Error(e, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+        }
+        finally
+        {
+            st.Stop();
+            Log.Information($"文件夹 [{selectedDir.FullName}] 全部处理完成，耗时[{st.Elapsed.TotalSeconds}]秒。");
+            Processing = false;
+        }
+    }
+
+    /// <summary>
+    ///     异步批量处理视频文件的方法，允许用户选择文件夹并对文件夹内的视频进行批处理操作。
+    ///     方法完成后会提供处理状态的通知及耗时信息。
+    /// </summary>
+    /// <returns>表示异步操作的任务。</returns>
+    [RelayCommand]
+    public async Task BatchProcessVideosAsync()
+    {
+        var st = Stopwatch.StartNew();
+        Processing = true;
+
+        try
+        {
+            var result = await FolderPicker.PickAsync(default);
+            if (result != null)
+            {
+                var dir = new DirRecord
+                {
+                    Name = result.Folder.Name,
+                    FullName = result.Folder.Path,
+                    ValidName = result.Folder.Path.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty)
+                };
+
+                await BatchProcessVideosAsync(dir);
                 st.Stop();
                 Notification($"文件夹 [{selectedDir.FullName}] 全部处理完成，耗时[{st.Elapsed.TotalSeconds}]秒。");
             }
@@ -172,6 +216,105 @@ public partial class MainViewModel : ObservableObject
 
         await Task.CompletedTask;
     }
+
+    /// <summary>
+    ///     Md5Async 方法是一个异步任务，用于计算文件的 MD5 哈希值。
+    ///     此方法通常用于文件校验操作，确保文件的完整性。
+    /// </summary>
+    /// <returns>返回表示异步计算完成的任务。</returns>
+    [RelayCommand]
+    public async Task Md5Async()
+    {
+        var st = Stopwatch.StartNew();
+
+        try
+        {
+            Information("开始MD5处理。。。");
+            await WithMd5Async();
+        }
+        catch (Exception e)
+        {
+            Notification($"{e}");
+        }
+        finally
+        {
+            st.Stop();
+            Information($"MD5处理结束，耗时 「{st.Elapsed.TotalSeconds}」 秒");
+        }
+    }
+
+    /// <summary>
+    ///     KillAsync 方法会查找并终止当前操作系统上的指定名称的进程。
+    ///     在 Windows 上，它会终止名为 "vlc" 的进程，
+    ///     在 macOS 上也会查找并终止同名进程。
+    ///     如果在终止过程中发生异常，方法将记录相关错误信息。
+    /// </summary>
+    /// <returns>返回一个已完成的 Task，表示该操作的异步结果。</returns>
+    [RelayCommand]
+    public async Task KillAsync()
+    {
+        // 检查当前操作系统
+        if (AppSettingsUtils.Default.OS == OS.Windows)
+        {
+            // Windows平台
+            foreach (var process in Process.GetProcessesByName("vlc"))
+                try
+                {
+                    process.Kill();
+                    Information($"Killed process {process.Id} on Windows.");
+                }
+                catch (Exception ex)
+                {
+                    Information($"Error killing process {process.Id}: {ex}", ex.Message);
+                }
+        }
+        else if (AppSettingsUtils.Default.OS == OS.MacCatalyst)
+        {
+            foreach (var process in Process.GetProcessesByName("vlc"))
+                try
+                {
+                    process.Kill();
+                    Information($"Killed process {process.Id} {process.ProcessName} on macOS.");
+                }
+                catch (Exception ex)
+                {
+                    Information($"Error killing process {process.Id}: {ex}", ex.Message);
+                }
+        }
+
+        await Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// 异步查询具有重复 MD5 值的视频条目，并更新 UI 中的视频列表。
+    /// </summary>
+    /// <returns>返回一个表示异步操作的 Task。</returns>
+    [RelayCommand]
+    public async Task QueryDuplicateMD5Async()
+    {
+        try
+        {
+            Processing = true;
+            Videos.Clear();
+
+            var enties = await dataService.VideosService.QueryMD5DuplicateAsync();
+            enties = enties.OrderBy(m => m.MD5).ThenByDescending(m => m.ModifyTime).ToList();
+            var modes = enties.ToModes();
+            Videos = new ObservableCollection<VideoMode>(modes);
+            Message = $"重复数据[{enties?.Count}]行加载完成。";
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+            Notification($"{ex}");
+            Message = ex.Message;
+        }
+        finally
+        {
+            Processing = false;
+        }
+    }
+
 
     /// <summary>
     ///     异步方法 DownloadRuntimeAsync 用于下载和配置 FFmpeg 的运行时文件。
