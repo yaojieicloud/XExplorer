@@ -32,6 +32,7 @@ public static class DataUtils
         result.Height = mode.Height;
         result.WideScrenn = mode.WideScrenn;
         result.Status = mode.Status;
+        result.GroupNo = mode.GroupNo;
         result.Snapshots = mode.Snapshots.ToSnapshots();
         return result;
     }
@@ -90,6 +91,7 @@ public static class DataUtils
         result.WideScrenn = video.WideScrenn;
         result.Width = video.Width;
         result.Height = video.Height;
+        result.GroupNo = video.GroupNo;
         result.Snapshots = new ObservableCollection<SnapshotMode>(video.Snapshots.ToModes());
 
         return result;

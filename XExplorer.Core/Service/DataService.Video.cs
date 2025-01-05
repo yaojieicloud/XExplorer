@@ -325,33 +325,41 @@ partial class DataService
 
             return query.Where(predicate).FirstOrDefault();
         }
-        
+
         /// <summary>
         /// 异步查询重复视频的方法，根据指定的字段分组，返回重复视频列表。
         /// </summary>
         /// <typeparam name="TKey">用于分组的字段类型。</typeparam>
         /// <param name="keySelector">用于指定分组依据的表达式。</param>
         /// <returns>包含重复视频的列表。</returns>
-        public async Task<List<Video>> QueryDuplicatesAsync<TKey>(Expression<Func<Video, TKey>> keySelector)
+        public async Task<List<Video>> QueryDuplicatesAsync<TKey>(Func<Video, TKey> keySelector)
         {
+            var duplicates = new List<Video>();
+
             // 查询所有视频数据
-            var query = dataContext.Videos.Include(v => v.Snapshots).AsQueryable();
-
-            // 查找重复的视频
-            var duplicateKeys = await query
+            var query = dataContext.Videos.Include(v => v.Snapshots).AsEnumerable();
+ 
+            var groups = query
                 .GroupBy(keySelector) // 按指定字段分组
-                .Where(g => g.Count() > 1) // 找出组内数量大于1的
-                .Select(g => g.Key) // 提取重复的Key
-                .ToListAsync();
+                .Where(g => g.Count() > 1); // 找出组内数量大于1的  
 
-            // 获取所有满足重复条件的视频列表
-            var duplicates = await query
-                .Where(video => duplicateKeys.Contains(keySelector.Compile().Invoke(video)))
-                .ToListAsync();
+            // 分配 GroupNo
+            int groupNo = 1; // 从1开始为每组分配编号
+            foreach (var group in groups)
+            {
+                var sorted = group.OrderByDescending(m => m.Evaluate).ThenByDescending(m => m.PlayCount)
+                    .ThenByDescending(m => m.ModifyTime).ToList();
+                foreach (var video in sorted)
+                {
+                    video.GroupNo = groupNo; // 为每个视频分配相同的编号 
+                }
+
+                groupNo++;
+            }
 
             return duplicates;
-        }
-        
+        } 
+
         /// <summary>
         /// 根据 MD5 查询所有 MD5 相同的视频集合。
         /// </summary>
@@ -359,21 +367,30 @@ partial class DataService
         public async Task<List<Video>> QueryMD5DuplicateAsync()
         {
             // 查询视频数据
-            var query = dataContext.Videos.Include(v => v.Snapshots).AsQueryable();
+            var duplicates = new List<Video>();
+            var query = dataContext.Videos.Include(v => v.Snapshots).AsEnumerable();
+            var groups = query
+                .GroupBy(m => m.MD5) // 按指定字段分组
+                .Where(g => g.Count() > 1)
+                .ToList(); // 找出组内数量大于1的  
 
-            // 查找重复的 MD5 值
-            var duplicateMD5s = await query
-                .GroupBy(video => video.MD5) // 按 MD5 分组
-                .Where(group => group.Count() > 1) // 只保留重复的
-                .Select(group => group.Key) // 提取 MD5 值
-                .ToListAsync();
+            // 分配 GroupNo
+            int groupNo = 1; // 从1开始为每组分配编号
+            foreach (var group in groups)
+            {
+                var sorted = group.OrderByDescending(m => m.Evaluate).ThenByDescending(m => m.PlayCount)
+                    .ThenByDescending(m => m.ModifyTime).ToList();
+                foreach (var video in sorted)
+                {
+                    video.GroupNo = groupNo; // 为每个视频分配相同的编号 
+                    duplicates.Add(video);
+                }
 
-            // 找出所有 MD5 重复的视频
-            var duplicateVideos = await query
-                .Where(video => duplicateMD5s.Contains(video.MD5))
-                .ToListAsync();
+                groupNo++;
+            }
 
-            return duplicateVideos;
+            await Task.CompletedTask;
+            return duplicates;
         }
     }
 }

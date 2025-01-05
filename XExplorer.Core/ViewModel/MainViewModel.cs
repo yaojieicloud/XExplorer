@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
@@ -5,6 +6,7 @@ using System.Runtime.InteropServices;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Controls;
 using Serilog;
 using Syncfusion.Maui.Popup;
 using Xabe.FFmpeg;
@@ -298,7 +300,6 @@ public partial class MainViewModel : ObservableObject
             Videos.Clear();
 
             var enties = await dataService.VideosService.QueryMD5DuplicateAsync();
-            enties = enties.OrderBy(m => m.MD5).ThenByDescending(m => m.ModifyTime).ToList();
             var modes = enties.ToModes();
             Videos = new ObservableCollection<VideoMode>(modes);
             Message = $"重复数据[{enties?.Count}]行加载完成。";
@@ -410,6 +411,53 @@ public partial class MainViewModel : ObservableObject
     {
         IsCancel = false;
         IsShow = false;
+    }
+
+    /// <summary>
+    /// 将指定的 CollectionView 滚动到顶部位置。
+    /// </summary>
+    /// <param name="param">需要传递的参数，应为 CollectionView 类型。</param>
+    [RelayCommand]
+    public void ScrollToTop(object param)
+    {
+        if (param is CollectionView view)
+        {
+            view.ScrollTo(0, position: ScrollToPosition.Start, animate: true);
+        }
+    }
+
+    /// <summary>
+    /// ScrollToBottom 方法用于将指定的 CollectionView 滚动到其内容的末尾。
+    /// </summary>
+    /// <param name="param">类型为 CollectionView 的对象，用于执行滚动操作。</param>
+    [RelayCommand]
+    public void ScrollToBottom(object param)
+    {
+        if (param is CollectionView view)
+        {
+            var itemsSource = view.ItemsSource as IList;
+            if (itemsSource != null && itemsSource.Count > 0)
+            {
+                view.ScrollTo(itemsSource.Count - 1, position: ScrollToPosition.End, animate: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 在 CollectionView 中滚动到数据源的中间位置。
+    /// </summary>
+    /// <param name="param">CollectionView 对象，用于执行滚动操作。</param>
+    [RelayCommand]
+    public void ScrollToMiddle(object param)
+    {
+        if (param is CollectionView view)
+        {
+            var itemsSource = view.ItemsSource as IList;
+            if (itemsSource != null && itemsSource.Count > 0)
+            {
+                view.ScrollTo(itemsSource.Count / 2 + 1, position: ScrollToPosition.End, animate: true);
+            }
+        }
     }
 
     #endregion

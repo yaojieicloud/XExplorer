@@ -230,7 +230,7 @@ partial class MainViewModel
 
                 var video = enty.ToVideo();
                 await this.dataService.VideosService.UpdateOnlyAsync(video);
-                Log.Information($"视频 [{enty.Id} {enty.VideoPath}] 更新星级完成。");
+                this.Information($"视频 [{enty.Id} {enty.VideoPath}] 更新星级完成。");
             }
         }
         catch (Exception ex)

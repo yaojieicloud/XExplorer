@@ -117,6 +117,12 @@ public partial class VideoMode : ObservableObject
     private decimal status = 1;
 
     /// <summary>
+    /// 获取或设置视频分组的编号。
+    /// </summary>
+    [ObservableProperty]
+    private int groupNo;
+
+    /// <summary>
     /// 快照列表.
     /// </summary>
     private ObservableCollection<SnapshotMode> snapshots = new();

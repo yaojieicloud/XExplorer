@@ -94,4 +94,10 @@ public class Video : ModeBase
     /// 快照列表.
     /// </summary>
     public List<Snapshot> Snapshots { get; set; } = [];
+
+    /// <summary>
+    /// 获取或设置视频所属的分组编号。
+    /// </summary>
+    [NotMapped]
+    public int GroupNo { get; set; }
 }

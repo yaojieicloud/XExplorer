@@ -88,7 +88,7 @@
                                HorizontalOptions="StartAndExpand"
                                HorizontalTextAlignment="Start"
                                Margin="10,0"
-                               MinimumWidthRequest="400" />
+                               MinimumWidthRequest="300" />
             <inputs:SfComboBox SelectedItem="{Binding ScrennMode}"
                                VerticalTextAlignment="Center"
                                VerticalOptions="EndAndExpand"
@@ -194,6 +194,48 @@
                     </LinearGradientBrush>
                 </syfButton:SfButton.Background>
             </syfButton:SfButton>
+            <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
+            <syfButton:SfButton Text="顶部" CornerRadius="20" HeightRequest="40"
+                                Padding="5,0"
+                                Command="{Binding ScrollToTopCommand}"
+                                CommandParameter="{x:Reference MainView}">
+                <syfButton:SfButton.Background>
+                    <LinearGradientBrush>
+                        <LinearGradientBrush.GradientStops>
+                            <GradientStop Color="#0D62D4" Offset="0" />
+                            <GradientStop Color="#9F3CDC" Offset="1" />
+                        </LinearGradientBrush.GradientStops>
+                    </LinearGradientBrush>
+                </syfButton:SfButton.Background>
+            </syfButton:SfButton>
+            <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
+            <syfButton:SfButton Text="中部" CornerRadius="20" HeightRequest="40"
+                                Padding="5,0"
+                                Command="{Binding ScrollToMiddleCommand}"
+                                CommandParameter="{x:Reference MainView}">
+                <syfButton:SfButton.Background>
+                    <LinearGradientBrush>
+                        <LinearGradientBrush.GradientStops>
+                            <GradientStop Color="#0D62D4" Offset="0" />
+                            <GradientStop Color="#9F3CDC" Offset="1" />
+                        </LinearGradientBrush.GradientStops>
+                    </LinearGradientBrush>
+                </syfButton:SfButton.Background>
+            </syfButton:SfButton>
+            <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
+            <syfButton:SfButton Text="底部" CornerRadius="20" HeightRequest="40"
+                                Padding="5,0"
+                                Command="{Binding ScrollToBottomCommand}"
+                                CommandParameter="{x:Reference MainView}">
+                <syfButton:SfButton.Background>
+                    <LinearGradientBrush>
+                        <LinearGradientBrush.GradientStops>
+                            <GradientStop Color="#0D62D4" Offset="0" />
+                            <GradientStop Color="#9F3CDC" Offset="1" />
+                        </LinearGradientBrush.GradientStops>
+                    </LinearGradientBrush>
+                </syfButton:SfButton.Background>
+            </syfButton:SfButton>
             <!-- <material:ButtonView ToolTipProperties.Text="浏览并选取目录" -->
             <!--                      PressedCommand="{Binding SelectFolderCommand}"> -->
             <!--     <Label Text="浏览" Padding="5,0,5,0" /> -->
@@ -218,7 +260,6 @@
             <!-- <Button Text="清垃圾" ToolTipProperties.Text="清理数据目录不再使用的图片资源" Command="{Binding ClearInvalidDataDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
             <!-- <Button Text="删数据" ToolTipProperties.Text="删除选中目录的数据目录" Command="{Binding ClearDataCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
         </HorizontalStackLayout>
-        <BoxView StyleClass="Divider" />
         <syfCore:SfBusyIndicator x:Name="busyIndicator" IsVisible="{Binding Processing}"
                                  IsRunning="{Binding Processing}"
                                  AnimationType="DoubleCircle" />
@@ -238,6 +279,21 @@
                             <!-- 信息栏 -->
                             <HorizontalStackLayout>
                                 <HorizontalStackLayout HeightRequest="30" VerticalOptions="Center">
+                                    <inputs:SfRating Precision="Standard" Value="{Binding Evaluate,Mode=TwoWay}"
+                                                     ItemSize="30" ItemCount="5" ItemSpacing="6" Margin="15,0,10,0"
+                                                     BackgroundColor="Transparent">
+                                        <inputs:SfRating.RatingSettings>
+                                            <inputs:RatingSettings RatedFill="Yellow" UnratedFill="LightGrey"
+                                                                   UnratedStroke="Blue" RatedStrokeThickness="1"
+                                                                   UnratedStrokeThickness="1" />
+                                        </inputs:SfRating.RatingSettings>
+                                        <inputs:SfRating.Behaviors>
+                                            <toolkit:EventToCommandBehavior EventName="ValueChanged"
+                                                                            Command="{Binding Source={x:Reference MainGrid}, Path=BindingContext.RatingChangedCommand}"
+                                                                            CommandParameter="{Binding .}" />
+                                        </inputs:SfRating.Behaviors>
+                                    </inputs:SfRating>
+                                    <Label Text="===" FontSize="18" />
                                     <Label Text="{Binding Caption}" FontSize="18" Padding="15,0,10,0" />
                                     <Label Text="===" FontSize="18" />
                                     <Label Text="{Binding Length}" FontSize="18" Padding="10,0" />
@@ -254,20 +310,7 @@
                                     <Label Text="x" FontSize="18" Padding="10,0" />
                                     <Label Text="{Binding Height}" FontSize="18" Padding="0,0,10,0" />
                                     <Label Text="===" FontSize="18" Padding="0,0,10,0" />
-                                    <inputs:SfRating Precision="Standard" Value="{Binding Evaluate,Mode=TwoWay}"
-                                                     ItemSize="30" ItemCount="5" ItemSpacing="6"
-                                                     BackgroundColor="Transparent">
-                                        <inputs:SfRating.RatingSettings>
-                                            <inputs:RatingSettings RatedFill="Yellow" UnratedFill="LightGrey"
-                                                                   UnratedStroke="Blue" RatedStrokeThickness="1"
-                                                                   UnratedStrokeThickness="1" />
-                                        </inputs:SfRating.RatingSettings>
-                                        <inputs:SfRating.Behaviors>
-                                            <toolkit:EventToCommandBehavior EventName="ValueChanged"
-                                                                            Command="{Binding Source={x:Reference MainGrid}, Path=BindingContext.RatingChangedCommand}"
-                                                                            CommandParameter="{Binding .}" />
-                                        </inputs:SfRating.Behaviors>
-                                    </inputs:SfRating>
+                                    <Label Text="{Binding GroupNo}" FontSize="18" Padding="0,0,10,0" />
                                 </HorizontalStackLayout>
                                 <!-- <HorizontalStackLayout HorizontalOptions="EndAndExpand" -->
                                 <!--                        VerticalOptions="CenterAndExpand" -->
