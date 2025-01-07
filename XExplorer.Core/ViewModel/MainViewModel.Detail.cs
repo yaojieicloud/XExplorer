@@ -88,8 +88,8 @@ partial class MainViewModel
 
             try
             {
-                if (await this.Ask($"确认删除视频 「{mode.VideoPath}」?"))
-                    return;
+                // if (await this.Ask($"确认删除视频 「{mode.VideoPath}」?"))
+                //     return;
 
                 var fullDir = Path.Combine(AppSettingsUtils.Default.Current.Volume, mode.VideoDir);
                 var fullPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, mode.VideoPath);
@@ -98,20 +98,20 @@ partial class MainViewModel
                 if (File.Exists(fullPath))
                 {
                     File.Delete(fullPath);
-                    Log.Information($"视频文件 [{fullPath}] 已删除。");
+                    this.Information($"视频文件 [{fullPath}] 已删除。");
                 }
                 else
                 {
-                    Log.Information($"视频文件 [{fullPath}] 不存在，无需删除。");
+                    this.Information($"视频文件 [{fullPath}] 不存在，无需删除。");
                 }
 
-                if (!(videos?.Any() ?? false))
+                if (mode.VideoDir != mode.RootDir && !(videos?.Any() ?? false))
                 {
                     var files = Directory.GetFiles(fullDir);
                     foreach (var file in files)
                     {
                         File.Delete(file);
-                        Log.Information($"视频文件 [{file}] 已删除。");
+                        this.Information($"视频文件 [{file}] 已删除。");
                     }
                 }
 
@@ -120,17 +120,17 @@ partial class MainViewModel
                     if (File.Exists(snapshot.FullPath))
                     {
                         File.Delete(snapshot.FullPath);
-                        Log.Information($"视频快照 [{snapshot.FullPath}] 已删除。");
+                        this.Information($"视频快照 [{snapshot.FullPath}] 已删除。");
                     }
                     else
                     {
-                        Log.Information($"视频快照 [{snapshot.FullPath}] 不存在，无需删除。");
+                        this.Information($"视频快照 [{snapshot.FullPath}] 不存在，无需删除。");
                     }
                 }
 
                 await this.dataService.VideosService.DeleteAsync(mode.Id);
                 this.Videos.Remove(mode);
-                Log.Information($"视频数据 [{mode.Caption}] 已删除。");
+                this.Information($"视频数据 [{mode.Caption}] 已删除。");
                 //this.Notification($"视频数据 [{mode.Caption}] 已删除。");
             }
             catch (Exception e)
