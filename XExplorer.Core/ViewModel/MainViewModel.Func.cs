@@ -240,8 +240,16 @@ partial class MainViewModel
             }
         });
 
-        this.Information($"目录：{dir.FullName} 开始写入数据...");
-        await this.dataService.VideosService.AddAsync(newVideos);
+        if (newVideos?.Any() ?? false)
+        {
+            this.Information($"目录：{dir.FullName} 开始写入数据...");
+            await this.dataService.VideosService.AddAsync(newVideos);
+        }
+        else
+        {
+            this.Information($"目录：{dir.FullName} 无需写入数据...");
+        }
+
         this.Information($"目录：{dir.FullName} 写入数据完成，目录处理结束。");
     }
 
