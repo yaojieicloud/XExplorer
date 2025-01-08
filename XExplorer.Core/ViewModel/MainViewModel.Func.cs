@@ -202,7 +202,7 @@ partial class MainViewModel
         var videoStoreFiles = videoFiles?.Where(m => m.Length >= videoMiniSize).ToList() ?? new List<FileInfo>();
 
         // 查询已有的视频数据
-        var videoData = await dataService.VideosService.QueryAsync(m => m.VideoDir == dir.ValidName);
+        var videoData = await dataService.VideosService.QueryAsync(m => m.RootDir == dir.ValidName);
         var videoDict = videoData.ToDictionary(m => m.VideoPath, m => m);
 
         // 使用 Parallel.ForEachAsync 并发处理所有视频文件
@@ -659,14 +659,13 @@ partial class MainViewModel
     /// <returns>返回文件的 MD5 哈希值，格式为小写的十六进制字符串。</returns>
     private async Task<string> GetMd5CodeAsync(string filePath)
     {
-        using (var md5 = MD5.Create())
+        return await Task.Run(() =>
         {
-            using (var stream = File.OpenRead(filePath))
-            {
-                var hash = await Task.Run(() => md5.ComputeHash(stream));
-                return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-            }
-        }
+            using var md5 = MD5.Create();
+            using var stream = File.OpenRead(filePath);
+            var hash = md5.ComputeHash(stream);
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        });
     }
 
     /// <summary>
