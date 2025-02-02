@@ -42,7 +42,7 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
-        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzYzMjY4NEAzMjM4MmUzMDJlMzBWeTYvOGVWT201ekVwOTZxZW91QnJUemQyRTkrR2FIVTZmb0c3RWxqbi9FPQ==");
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("NDAxNEAzMjM4MkUzMTJFMzlMeXJkaVJFV2Z5R3o5ZXNEVnNOQjFqUmx2MW0xZkR2TGdud2MrVGNJRlBzPQ==");
         
         return builder.Build();
     }
