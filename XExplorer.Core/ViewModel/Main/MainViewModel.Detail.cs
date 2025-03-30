@@ -88,9 +88,6 @@ partial class MainViewModel
 
             try
             {
-                // if (await this.Ask($"确认删除视频 「{mode.VideoPath}」?"))
-                //     return;
-
                 var fullDir = Path.Combine(AppSettingsUtils.Default.Current.Volume, mode.VideoDir);
                 var fullPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, mode.VideoPath);
                 var videos = await this.dataService.VideosService.QueryAsync(m => m.VideoDir == mode.VideoDir && m.Id != mode.Id);
@@ -130,8 +127,7 @@ partial class MainViewModel
 
                 await this.dataService.VideosService.DeleteAsync(mode.Id);
                 this.Videos.Remove(mode);
-                this.Information($"视频数据 [{mode.Caption}] 已删除。");
-                //this.Notification($"视频数据 [{mode.Caption}] 已删除。");
+                this.Information($"视频数据 [{mode.Caption}] 已删除。"); 
             }
             catch (Exception e)
             {

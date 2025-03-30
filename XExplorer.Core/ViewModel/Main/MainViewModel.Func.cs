@@ -8,6 +8,9 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Microsoft.Maui.ApplicationModel;
 using Serilog;
+using SharpCompress.Archives;
+using SharpCompress.Common;
+using SharpCompress.Readers;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using Xabe.FFmpeg;
@@ -720,4 +723,5 @@ partial class MainViewModel
     }
 
     #endregion
+
 }

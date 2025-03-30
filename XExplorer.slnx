@@ -1,0 +1,6 @@
+﻿<Solution>
+  <Project Path="XExplorer.Core\XExplorer.Core.csproj" Type="Classic C#" />
+  <Project Path="XExplorer.Maui\XExplorer.Maui.csproj" Type="Classic C#">
+    <Configuration Solution="Release|Any CPU" Project="Release|Any CPU|Deploy" />
+  </Project>
+</Solution>

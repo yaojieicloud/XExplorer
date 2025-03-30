@@ -94,6 +94,9 @@ public partial class MainViewModel : ObservableObject
             var result = await FolderPicker.PickAsync(default);
             if (result != null)
             {
+                if (result.Folder == null)
+                    return;
+                
                 var dir = new DirRecord
                 {
                     Name = result.Folder.Name,

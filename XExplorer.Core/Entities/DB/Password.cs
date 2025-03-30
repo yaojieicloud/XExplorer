@@ -7,5 +7,5 @@ namespace XExplorer.Core.Modes;
 public class Password : ModeBase
 {
     [Column("Password")]
-    public string? Pwd { get; set; }
+    public string Pwd { get; set; }
 }

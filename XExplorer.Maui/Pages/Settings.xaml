@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:XExplorer.Core.ViewModel.Settings;assembly=XExplorer.Core"
+             xmlns:sfPopup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
+             xmlns:sync="clr-namespace:Syncfusion.Maui.Themes;assembly=Syncfusion.Maui.Core"
+             xmlns:syfButton="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:syfCore="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:inputs="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+             xmlns:syfCarousel="clr-namespace:Syncfusion.Maui.Carousel;assembly=Syncfusion.Maui.Carousel"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:inputLayout="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:converts="clr-namespace:XExplorer.Core.Converts;assembly=XExplorer.Core"
+             SizeChanged="MainGrid_OnSizeChanged"
+             x:Class="XExplorer.Maui.Pages.Settings">
+    <ContentPage.Resources>
+        <sync:SyncfusionThemeResourceDictionary x:Key="SyncfusionTheme" />
+        <converts:MinusConverter x:Key="WidthMinusConverter" />
+    </ContentPage.Resources>
+    <ContentPage.BindingContext>
+        <vm:SettingsViewModel />
+    </ContentPage.BindingContext>
+    <ContentPage.Content>
+        <VerticalStackLayout VerticalOptions="StartAndExpand">
+            <syfCore:SfBusyIndicator IsRunning="{Binding Processing}"
+                                     Margin="10,20" HeightRequest="{Binding MainViewHeight}"
+                                     AnimationType="DoubleCircle">
+                <VerticalStackLayout VerticalOptions="StartAndExpand">
+                    <sfPopup:SfPopup AppearanceMode="{Binding AppearanceMode}"
+                                     ShowFooter="True"
+                                     OverlayMode="Blur"
+                                     AnimationMode="Fade"
+                                     StaysOpen="True"
+                                     ShowCloseButton="True"
+                                     HeaderTitle="提醒"
+                                     DeclineCommand="{Binding DeclineCommand}"
+                                     AcceptCommand="{Binding AcceptCommand}"
+                                     IsOpen="{Binding IsShow}">
+                        <sfPopup:SfPopup.PopupStyle>
+                            <sfPopup:PopupStyle FooterBackground="LightGray"
+                                                MessageTextColor="#292929"
+                                                AcceptButtonBackground="DimGray"
+                                                AcceptButtonTextColor="White"
+                                                DeclineButtonBackground="DimGray"
+                                                DeclineButtonTextColor="White"
+                                                FooterButtonCornerRadius="0,20,20,0" />
+                        </sfPopup:SfPopup.PopupStyle>
+                        <sfPopup:SfPopup.ContentTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding Message}" TextColor="#292929"
+                                       HorizontalTextAlignment="Center" Padding="10" />
+                            </DataTemplate>
+                        </sfPopup:SfPopup.ContentTemplate>
+                    </sfPopup:SfPopup>
+                    <HorizontalStackLayout VerticalOptions="Center" HeightRequest="75" Padding="0,20,0,10">
+                        <Label Text="请输入密码：" FontSize="25" Padding="20,0,0,0"></Label>
+                        <Entry Text="{Binding Password, Mode=TwoWay}" WidthRequest="200" HeightRequest="55" />
+                        <syfButton:SfButton Text="提交" CornerRadius="10"
+                                            FontSize="18"
+                                            HeightRequest="55"
+                                            Padding="0,0,0,0"
+                                            Margin="20,0,0,0"
+                                            Command="{Binding SetPasswordCommand}">
+                            <syfButton:SfButton.Background>
+                                <LinearGradientBrush>
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </syfButton:SfButton.Background>
+                        </syfButton:SfButton>
+                    </HorizontalStackLayout>
+                    <BoxView StyleClass="Divider" />
+                    <HorizontalStackLayout VerticalOptions="Center" HeightRequest="75" Padding="0,20,0,10">
+                        <syfButton:SfButton Text="解压" CornerRadius="10"
+                                            FontSize="18"
+                                            HeightRequest="55"
+                                            Padding="0,0,0,0"
+                                            Margin="20,0,0,0"
+                                            Command="{Binding UnzipCommand}">
+                            <syfButton:SfButton.Background>
+                                <LinearGradientBrush>
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </syfButton:SfButton.Background>
+                        </syfButton:SfButton>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout HorizontalOptions="EndAndExpand" MaximumHeightRequest="20">
+                        <Label Text="{Binding Message}" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </syfCore:SfBusyIndicator>
+        </VerticalStackLayout>
+    </ContentPage.Content>
+</ContentPage>
