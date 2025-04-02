@@ -1,8 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Publish XExplorer" type="DotNetFolderPublish" factoryName="Publish to folder">
-    <riderPublish configuration="Release" platform="Any CPU" runtime="maccatalyst-arm64" self_contained="true" 
-    	target_folder="$PROJECT_DIR$/XExplorer.Maui/bin/Release/net9.0-maccatalyst/maccatalyst-arm64/publish" UseAotCompilation="Flase"
-    	target_framework="net9.0-maccatalyst" uuid_high="3568132245980137829" uuid_low="-9123440157272822521">
+    <riderPublish configuration="Release" platform="Any CPU" runtime="maccatalyst-arm64" self_contained="true" target_folder="$PROJECT_DIR$/XExplorer.Maui/bin/Release/net9.0-maccatalyst/maccatalyst-arm64/publish" target_framework="net9.0-maccatalyst" uuid_high="4851889384667115510" uuid_low="6612441946436927210">
       <option name="extraSettings">
         <map>
           <entry key="CreatePackage" value="false" />

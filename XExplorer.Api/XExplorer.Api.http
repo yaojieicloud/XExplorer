@@ -1,0 +1,6 @@
+@XExplorer.Api_HostAddress = http://localhost:5152
+
+POST {{XExplorer.Api_HostAddress}}/zip/
+Accept: application/json
+
+###

@@ -1,0 +1,14 @@
+﻿version: '3.8'
+services:
+  xexplorer-api:
+    build:
+      context: .
+      dockerfile: XExplorer.Api/Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    volumes:
+      - /Volumes/MacData/XXXX/58:/app/resource_directory
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    user: "${yaojiestudio}" # 默认 UID，如果未设置环境变量，使用 UID 1000
