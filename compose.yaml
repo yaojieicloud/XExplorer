@@ -3,7 +3,7 @@ services:
   xexplorer-api:
     build:
       context: .
-      dockerfile: XExplorer.Api/Dockerfile
+      dockerfile: XExplorer.Api/Dockerfile_Release
     ports:
       - "8080:8080"
       - "8081:8081"
