@@ -92,4 +92,10 @@ public class Conf
     /// 根目录是配置文件、数据库及其他应用程序资源的基础位置，通常根据操作系统的不同而有所变化。
     /// </summary>
     public string RootDir { get; set; }
+
+    /// <summary>
+    /// 获取存储压缩文件的公共访问路径，表示应用程序与压缩资源相关联的具体 URL。
+    /// 该路径通常依赖于当前操作系统的配置。
+    /// </summary>
+    public string ZipUrl { get; set; }
 }

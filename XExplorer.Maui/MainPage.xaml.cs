@@ -11,13 +11,14 @@ public partial class MainPage : ContentPage
     public MainPage()
     {
         this.InitializeComponent();
-    } 
-    
+    }
+
     private void MainGrid_OnSizeChanged(object? sender, EventArgs e)
     {
         if (this.BindingContext is MainViewModel vm)
         {
-            vm.MainViewHeight = this.MainGrid.Height - this.MainTool.Height - 100;
+            vm.MainViewHeight = this.Height - 30;
+            vm.MainContHeight = vm.MainViewHeight - this.MainTool.Height - 60;
         }
-    } 
+    }
 }

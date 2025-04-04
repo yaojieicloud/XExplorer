@@ -74,330 +74,342 @@
                 </DataTemplate>
             </sfPopup:SfPopup.ContentTemplate>
         </sfPopup:SfPopup>
-        <HorizontalStackLayout x:Name="MainTool"
-                               HorizontalOptions="Start"
-                               VerticalOptions="CenterAndExpand">
-            <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Text="目录：" FontSize="18"
-                   Padding="10,0,0,0" />
-            <inputs:SfComboBox SelectedItem="{Binding SelectedDir}"
-                               ItemsSource="{Binding Dirs}"
-                               SelectedIndex="0"
-                               DisplayMemberPath="ValidName"
-                               VerticalTextAlignment="Center"
-                               VerticalOptions="EndAndExpand"
-                               HorizontalOptions="StartAndExpand"
-                               HorizontalTextAlignment="Start"
-                               Margin="10,0"
-                               MinimumWidthRequest="300" />
-            <inputs:SfComboBox SelectedItem="{Binding ScrennMode}"
-                               VerticalTextAlignment="Center"
-                               VerticalOptions="EndAndExpand"
-                               HorizontalOptions="StartAndExpand"
-                               HorizontalTextAlignment="Start"
-                               Margin="10,0"
-                               MinimumWidthRequest="100">
-                <inputs:SfComboBox.ItemsSource>
-                    <x:Array Type="{x:Type x:String}">
-                        <x:String>None</x:String>
-                        <x:String>Wide</x:String>
-                        <x:String>Narrow</x:String>
-                    </x:Array>
-                </inputs:SfComboBox.ItemsSource>
-            </inputs:SfComboBox>
-            <syfButton:SfButton Text="加载" CornerRadius="20" HeightRequest="40"
-                                Padding="5,0"
-                                Command="{Binding LoadDirCommand}">
-                <syfButton:SfButton.Background>
-                    <LinearGradientBrush>
-                        <LinearGradientBrush.GradientStops>
-                            <GradientStop Color="#0D62D4" Offset="0" />
-                            <GradientStop Color="#9F3CDC" Offset="1" />
-                        </LinearGradientBrush.GradientStops>
-                    </LinearGradientBrush>
-                </syfButton:SfButton.Background>
-            </syfButton:SfButton>
-            <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
-            <syfButton:SfButton Text="日志" CornerRadius="20" HeightRequest="40"
-                                Padding="5,0"
-                                Command="{Binding OpenLogDirCommand}">
-                <syfButton:SfButton.Background>
-                    <LinearGradientBrush>
-                        <LinearGradientBrush.GradientStops>
-                            <GradientStop Color="#0D62D4" Offset="0" />
-                            <GradientStop Color="#9F3CDC" Offset="1" />
-                        </LinearGradientBrush.GradientStops>
-                    </LinearGradientBrush>
-                </syfButton:SfButton.Background>
-            </syfButton:SfButton>
-            <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
-            <syfButton:SfButton Text="处理" CornerRadius="20" HeightRequest="40"
-                                Padding="5,0"
-                                Command="{Binding ProcessVideosCommand}">
-                <syfButton:SfButton.Background>
-                    <LinearGradientBrush>
-                        <LinearGradientBrush.GradientStops>
-                            <GradientStop Color="#0D62D4" Offset="0" />
-                            <GradientStop Color="#9F3CDC" Offset="1" />
-                        </LinearGradientBrush.GradientStops>
-                    </LinearGradientBrush>
-                </syfButton:SfButton.Background>
-            </syfButton:SfButton>
-            <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
-            <syfButton:SfButton Text="批处理" CornerRadius="20" HeightRequest="40"
-                                Padding="5,0"
-                                Command="{Binding BatchProcessVideosCommand}">
-                <syfButton:SfButton.Background>
-                    <LinearGradientBrush>
-                        <LinearGradientBrush.GradientStops>
-                            <GradientStop Color="#0D62D4" Offset="0" />
-                            <GradientStop Color="#9F3CDC" Offset="1" />
-                        </LinearGradientBrush.GradientStops>
-                    </LinearGradientBrush>
-                </syfButton:SfButton.Background>
-            </syfButton:SfButton>
-            <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
-            <syfButton:SfButton Text="MD5" CornerRadius="20" HeightRequest="40"
-                                Padding="5,0"
-                                Command="{Binding Md5Command}">
-                <syfButton:SfButton.Background>
-                    <LinearGradientBrush>
-                        <LinearGradientBrush.GradientStops>
-                            <GradientStop Color="#0D62D4" Offset="0" />
-                            <GradientStop Color="#9F3CDC" Offset="1" />
-                        </LinearGradientBrush.GradientStops>
-                    </LinearGradientBrush>
-                </syfButton:SfButton.Background>
-            </syfButton:SfButton>
-            <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
-            <syfButton:SfButton Text="查重" CornerRadius="20" HeightRequest="40"
-                                Padding="5,0"
-                                Command="{Binding QueryDuplicateMD5Command}">
-                <syfButton:SfButton.Background>
-                    <LinearGradientBrush>
-                        <LinearGradientBrush.GradientStops>
-                            <GradientStop Color="#0D62D4" Offset="0" />
-                            <GradientStop Color="#9F3CDC" Offset="1" />
-                        </LinearGradientBrush.GradientStops>
-                    </LinearGradientBrush>
-                </syfButton:SfButton.Background>
-            </syfButton:SfButton>
-            <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
-            <syfButton:SfButton Text="结束" CornerRadius="20" HeightRequest="40"
-                                Padding="5,0"
-                                Command="{Binding KillCommand}">
-                <syfButton:SfButton.Background>
-                    <LinearGradientBrush>
-                        <LinearGradientBrush.GradientStops>
-                            <GradientStop Color="#0D62D4" Offset="0" />
-                            <GradientStop Color="#9F3CDC" Offset="1" />
-                        </LinearGradientBrush.GradientStops>
-                    </LinearGradientBrush>
-                </syfButton:SfButton.Background>
-            </syfButton:SfButton>
-            <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
-            <syfButton:SfButton Text="顶部" CornerRadius="20" HeightRequest="40"
-                                Padding="5,0"
-                                Command="{Binding ScrollToTopCommand}"
-                                CommandParameter="{x:Reference MainView}">
-                <syfButton:SfButton.Background>
-                    <LinearGradientBrush>
-                        <LinearGradientBrush.GradientStops>
-                            <GradientStop Color="#0D62D4" Offset="0" />
-                            <GradientStop Color="#9F3CDC" Offset="1" />
-                        </LinearGradientBrush.GradientStops>
-                    </LinearGradientBrush>
-                </syfButton:SfButton.Background>
-            </syfButton:SfButton>
-            <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
-            <syfButton:SfButton Text="中部" CornerRadius="20" HeightRequest="40"
-                                Padding="5,0"
-                                Command="{Binding ScrollToMiddleCommand}"
-                                CommandParameter="{x:Reference MainView}">
-                <syfButton:SfButton.Background>
-                    <LinearGradientBrush>
-                        <LinearGradientBrush.GradientStops>
-                            <GradientStop Color="#0D62D4" Offset="0" />
-                            <GradientStop Color="#9F3CDC" Offset="1" />
-                        </LinearGradientBrush.GradientStops>
-                    </LinearGradientBrush>
-                </syfButton:SfButton.Background>
-            </syfButton:SfButton>
-            <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
-            <syfButton:SfButton Text="底部" CornerRadius="20" HeightRequest="40"
-                                Padding="5,0"
-                                Command="{Binding ScrollToBottomCommand}"
-                                CommandParameter="{x:Reference MainView}">
-                <syfButton:SfButton.Background>
-                    <LinearGradientBrush>
-                        <LinearGradientBrush.GradientStops>
-                            <GradientStop Color="#0D62D4" Offset="0" />
-                            <GradientStop Color="#9F3CDC" Offset="1" />
-                        </LinearGradientBrush.GradientStops>
-                    </LinearGradientBrush>
-                </syfButton:SfButton.Background>
-            </syfButton:SfButton>
-            <!-- <material:ButtonView ToolTipProperties.Text="浏览并选取目录" -->
-            <!--                      PressedCommand="{Binding SelectFolderCommand}"> -->
-            <!--     <Label Text="浏览" Padding="5,0,5,0" /> -->
-            <!-- </material:ButtonView> -->
-            <!-- <material:ButtonView ToolTipProperties.Text="加载选中文件目录的视频" -->
-            <!--                      PressedCommand="{Binding LoadDirCommand}"> -->
-            <!--     <Label Text="加载" Padding="5,0,5,0" /> -->
-            <!-- </material:ButtonView> -->
-            <!-- <material:ButtonView ToolTipProperties.Text="打开日志目录" -->
-            <!--                      PressedCommand="{Binding OpenLogDirCommand}"> -->
-            <!--     <Label Text="日志" Padding="5,0,5,0" /> -->
-            <!-- </material:ButtonView> -->
-            <!-- <material:ButtonView ToolTipProperties.Text="处理视频" -->
-            <!--                      PressedCommand="{Binding ProcessVideosCommand}"> -->
-            <!--     <Label Text="处理" Padding="5,0,5,0" /> -->
-            <!-- </material:ButtonView> -->
-            <!-- <Button Text="全载" ToolTipProperties.Text="全部加载" Command="{Binding LoadAllDirsCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
-            <!-- <Button Text="处理" ToolTipProperties.Text="视频处理" Command="{Binding ProcessVideosCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
-            <!-- <Button Text="清源" ToolTipProperties.Text="清理原始目录" Command="{Binding DeleteOriginalCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
-            <!-- <Button Text="日志" ToolTipProperties.Text="打开日志目录" Command="{Binding OpenLogDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
-            <!-- <Button Text="数据" ToolTipProperties.Text="打开数据目录" Command="{Binding OpenDataDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
-            <!-- <Button Text="清垃圾" ToolTipProperties.Text="清理数据目录不再使用的图片资源" Command="{Binding ClearInvalidDataDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
-            <!-- <Button Text="删数据" ToolTipProperties.Text="删除选中目录的数据目录" Command="{Binding ClearDataCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
-        </HorizontalStackLayout>
-        <syfCore:SfBusyIndicator x:Name="busyIndicator" IsVisible="{Binding Processing}"
+        <syfCore:SfBusyIndicator x:Name="busyIndicator" VerticalOptions="StartAndExpand"
                                  IsRunning="{Binding Processing}"
-                                 AnimationType="DoubleCircle" />
-        <CollectionView ItemsSource="{Binding Videos}" x:Name="MainView" VerticalOptions="FillAndExpand"
-                        HeightRequest="{Binding MainViewHeight}" Margin="10">
-            <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical" />
-            </CollectionView.ItemsLayout>
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Border HorizontalOptions="Start" VerticalOptions="Center">
-                        <VerticalStackLayout>
-                            <HorizontalStackLayout HeightRequest="30" VerticalOptions="Center">
-                                <Label Text="{Binding VideoDir}" FontSize="18" Padding="15,10,0,0" />
-                            </HorizontalStackLayout>
-                            <BoxView StyleClass="Divider" />
-                            <!-- 信息栏 -->
-                            <HorizontalStackLayout>
-                                <HorizontalStackLayout HeightRequest="30" VerticalOptions="Center">
-                                    <inputs:SfRating Precision="Standard" Value="{Binding Evaluate,Mode=TwoWay}"
-                                                     ItemSize="30" ItemCount="5" ItemSpacing="6" Margin="15,0,10,0"
-                                                     BackgroundColor="Transparent">
-                                        <inputs:SfRating.RatingSettings>
-                                            <inputs:RatingSettings RatedFill="Yellow" UnratedFill="LightGrey"
-                                                                   UnratedStroke="Blue" RatedStrokeThickness="1"
-                                                                   UnratedStrokeThickness="1" />
-                                        </inputs:SfRating.RatingSettings>
-                                        <inputs:SfRating.Behaviors>
-                                            <toolkit:EventToCommandBehavior EventName="ValueChanged"
-                                                                            Command="{Binding Source={x:Reference MainGrid}, Path=BindingContext.RatingChangedCommand}"
-                                                                            CommandParameter="{Binding .}" />
-                                        </inputs:SfRating.Behaviors>
-                                    </inputs:SfRating>
-                                    <Label Text="===" FontSize="18" />
-                                    <Label Text="{Binding Caption}" FontSize="18" Padding="15,0,10,0" />
-                                    <Label Text="===" FontSize="18" />
-                                    <Label Text="{Binding Length}" FontSize="18" Padding="10,0" />
-                                    <Label Text="MB" FontSize="18" Padding="10,0" />
-                                    <Label Text="===" FontSize="18" Padding="10,0" />
-                                    <Label Text="{Binding Minute}" FontSize="18" Padding="10,0" />
-                                    <Label Text="分钟" FontSize="18" Padding="10,0" />
-                                    <Label Text="===" FontSize="18" Padding="10,0" />
-                                    <Label Text="{Binding PlayCount}" FontSize="18" Padding="10,0" />
-                                    <Label Text="===" FontSize="18" Padding="10,0" />
-                                    <Label Text="{Binding ModifyTime}" FontSize="18" Padding="10,0" />
-                                    <Label Text="===" FontSize="18" Padding="0,0,10,0" />
-                                    <Label Text="{Binding Width}" FontSize="18" Padding="10,0,0,0" />
-                                    <Label Text="x" FontSize="18" Padding="10,0" />
-                                    <Label Text="{Binding Height}" FontSize="18" Padding="0,0,10,0" />
-                                    <Label Text="===" FontSize="18" Padding="0,0,10,0" />
-                                    <Label Text="{Binding GroupNo}" FontSize="18" Padding="0,0,10,0" />
-                                </HorizontalStackLayout>
-                                <!-- <HorizontalStackLayout HorizontalOptions="EndAndExpand" -->
-                                <!--                        VerticalOptions="CenterAndExpand" -->
-                                <!--                        Padding="10,0"> -->
-                                <!--     <syfCore:SfBadgeView HorizontalOptions="Center" -->
-                                <!--                          VerticalOptions="Center" -->
-                                <!--                          BadgeText="{Binding PlayCount}"> -->
-                                <!--         <syfCore:SfBadgeView.BadgeSettings> -->
-                                <!--             <syfCore:BadgeSettings BadgeAlignment="End" CornerRadius="20" /> -->
-                                <!--         </syfCore:SfBadgeView.BadgeSettings> -->
-                                <!--         <syfCore:SfBadgeView.Content> -->
-                                <!--             <syfButton:SfButton Text="播放" CornerRadius="20" -->
-                                <!--                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=PlayCommand}" -->
-                                <!--                                 CommandParameter="{Binding}"> -->
-                                <!--                 <syfButton:SfButton.Background> -->
-                                <!--                     <LinearGradientBrush> -->
-                                <!--                         <LinearGradientBrush.GradientStops> -->
-                                <!--                             <GradientStop Color="#0D62D4" Offset="0" /> -->
-                                <!--                             <GradientStop Color="#9F3CDC" Offset="1" /> -->
-                                <!--                         </LinearGradientBrush.GradientStops> -->
-                                <!--                     </LinearGradientBrush> -->
-                                <!--                 </syfButton:SfButton.Background> -->
-                                <!--             </syfButton:SfButton> -->
-                                <!--         </syfCore:SfBadgeView.Content> -->
-                                <!--     </syfCore:SfBadgeView> -->
-                                <!--     <syfButton:SfButton Text="目录" CornerRadius="20" HeightRequest="40" -->
-                                <!--                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=OpenFolderCommand}" -->
-                                <!--                         CommandParameter="{Binding}"> -->
-                                <!--         <syfButton:SfButton.Background> -->
-                                <!--             <LinearGradientBrush> -->
-                                <!--                 <LinearGradientBrush.GradientStops> -->
-                                <!--                     <GradientStop Color="#0D62D4" Offset="0" /> -->
-                                <!--                     <GradientStop Color="#9F3CDC" Offset="1" /> -->
-                                <!--                 </LinearGradientBrush.GradientStops> -->
-                                <!--             </LinearGradientBrush> -->
-                                <!--         </syfButton:SfButton.Background> -->
-                                <!--     </syfButton:SfButton> -->
-                                <!--     <syfButton:SfButton Text="删除" CornerRadius="20" HeightRequest="40" -->
-                                <!--                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DelFolderCommand}" -->
-                                <!--                         CommandParameter="{Binding}"> -->
-                                <!--         <syfButton:SfButton.Background> -->
-                                <!--             <LinearGradientBrush> -->
-                                <!--                 <LinearGradientBrush.GradientStops> -->
-                                <!--                     <GradientStop Color="#0D62D4" Offset="0" /> -->
-                                <!--                     <GradientStop Color="#9F3CDC" Offset="1" /> -->
-                                <!--                 </LinearGradientBrush.GradientStops> -->
-                                <!--             </LinearGradientBrush> -->
-                                <!--         </syfButton:SfButton.Background> -->
-                                <!--     </syfButton:SfButton> -->
-                                <!--     <syfButton:SfButton Text="重置" CornerRadius="20" HeightRequest="40" -->
-                                <!--                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=ResetVideoCommand}" -->
-                                <!--                         CommandParameter="{Binding}"> -->
-                                <!--         <syfButton:SfButton.Background> -->
-                                <!--             <LinearGradientBrush> -->
-                                <!--                 <LinearGradientBrush.GradientStops> -->
-                                <!--                     <GradientStop Color="#0D62D4" Offset="0" /> -->
-                                <!--                     <GradientStop Color="#9F3CDC" Offset="1" /> -->
-                                <!--                 </LinearGradientBrush.GradientStops> -->
-                                <!--             </LinearGradientBrush> -->
-                                <!--         </syfButton:SfButton.Background> -->
-                                <!--     </syfButton:SfButton> -->
-                                <!--     ~1~ <Button MinimumWidthRequest="150" Text="Del"  @1@ -->
-                                <!--     ~1~         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteCommand}" @1@ -->
-                                <!--     ~1~         CommandParameter="{Binding}" /> @1@ -->
-                                <!--     ~1~ <Button MinimumWidthRequest="150" Text="Del folder"  @1@ -->
-                                <!--     ~1~         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteFolderCommand}" @1@ -->
-                                <!--     ~1~         CommandParameter="{Binding}" /> @1@ -->
-                                <!-- </HorizontalStackLayout> -->
-                            </HorizontalStackLayout>
-                            <BoxView StyleClass="Divider" />
-                            <HorizontalStackLayout Margin="10,0" HorizontalOptions="FillAndExpand">
-                                <Frame Padding="0" HorizontalOptions="FillAndExpand"
-                                       CornerRadius="0"
-                                       BorderColor="#99E0E0E0"
-                                       HasShadow="False">
-                                    <VerticalStackLayout HorizontalOptions="StartAndExpand"
-                                                         VerticalOptions="Start" WidthRequest="100"
-                                                         Padding="10,10,10,10">
-                                        <syfCore:SfBadgeView HorizontalOptions="Center"
-                                                             VerticalOptions="Center"
-                                                             BadgeText="{Binding PlayCount}">
-                                            <syfCore:SfBadgeView.BadgeSettings>
-                                                <syfCore:BadgeSettings BadgeAlignment="End" CornerRadius="20" />
-                                            </syfCore:SfBadgeView.BadgeSettings>
-                                            <syfCore:SfBadgeView.Content>
-                                                <syfButton:SfButton Text="播放" CornerRadius="20"
-                                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=PlayCommand}"
+                                 HeightRequest="{Binding MainViewHeight}"
+                                 AnimationType="DoubleCircle">
+            <VerticalStackLayout VerticalOptions="StartAndExpand" HeightRequest="{Binding MainViewHeight}">
+                <Grid ColumnDefinitions="7*,3*">
+                    <HorizontalStackLayout x:Name="MainTool" Grid.Column="0"
+                                           HorizontalOptions="StartAndExpand"
+                                           VerticalOptions="CenterAndExpand">
+                        <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Text="目录：" FontSize="18"
+                               Padding="10,0,0,0" />
+                        <inputs:SfComboBox SelectedItem="{Binding SelectedDir}"
+                                           ItemsSource="{Binding Dirs}"
+                                           SelectedIndex="0"
+                                           DisplayMemberPath="ValidName"
+                                           VerticalTextAlignment="Center"
+                                           VerticalOptions="EndAndExpand"
+                                           HorizontalOptions="StartAndExpand"
+                                           HorizontalTextAlignment="Start"
+                                           Margin="10,0"
+                                           MinimumWidthRequest="300" />
+                        <inputs:SfComboBox SelectedItem="{Binding ScrennMode}"
+                                           VerticalTextAlignment="Center"
+                                           VerticalOptions="EndAndExpand"
+                                           HorizontalOptions="StartAndExpand"
+                                           HorizontalTextAlignment="Start"
+                                           Margin="10,0"
+                                           MinimumWidthRequest="100">
+                            <inputs:SfComboBox.ItemsSource>
+                                <x:Array Type="{x:Type x:String}">
+                                    <x:String>None</x:String>
+                                    <x:String>Wide</x:String>
+                                    <x:String>Narrow</x:String>
+                                </x:Array>
+                            </inputs:SfComboBox.ItemsSource>
+                        </inputs:SfComboBox>
+                        <syfButton:SfButton Text="加载" CornerRadius="20" HeightRequest="40"
+                                            Padding="5,0"
+                                            Command="{Binding LoadDirCommand}">
+                            <syfButton:SfButton.Background>
+                                <LinearGradientBrush>
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </syfButton:SfButton.Background>
+                        </syfButton:SfButton>
+                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
+                        <syfButton:SfButton Text="处理" CornerRadius="20" HeightRequest="40"
+                                            Padding="5,0"
+                                            Command="{Binding ProcessVideosCommand}">
+                            <syfButton:SfButton.Background>
+                                <LinearGradientBrush>
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </syfButton:SfButton.Background>
+                        </syfButton:SfButton>
+                        <!-- <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" /> -->
+                        <!-- <syfButton:SfButton Text="批处理" CornerRadius="20" HeightRequest="40" -->
+                        <!--                     Padding="5,0" -->
+                        <!--                     Command="{Binding BatchProcessVideosCommand}"> -->
+                        <!--     <syfButton:SfButton.Background> -->
+                        <!--         <LinearGradientBrush> -->
+                        <!--             <LinearGradientBrush.GradientStops> -->
+                        <!--                 <GradientStop Color="#0D62D4" Offset="0" /> -->
+                        <!--                 <GradientStop Color="#9F3CDC" Offset="1" /> -->
+                        <!--             </LinearGradientBrush.GradientStops> -->
+                        <!--         </LinearGradientBrush> -->
+                        <!--     </syfButton:SfButton.Background> -->
+                        <!-- </syfButton:SfButton> -->
+                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
+                        <syfButton:SfButton Text="MD5" CornerRadius="20" HeightRequest="40"
+                                            Padding="5,0"
+                                            Command="{Binding Md5Command}">
+                            <syfButton:SfButton.Background>
+                                <LinearGradientBrush>
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </syfButton:SfButton.Background>
+                        </syfButton:SfButton>
+                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
+                        <syfButton:SfButton Text="查重" CornerRadius="20" HeightRequest="40"
+                                            Padding="5,0"
+                                            Command="{Binding QueryDuplicateMD5Command}">
+                            <syfButton:SfButton.Background>
+                                <LinearGradientBrush>
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </syfButton:SfButton.Background>
+                        </syfButton:SfButton>
+                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
+                        <syfButton:SfButton Text="结束" CornerRadius="20" HeightRequest="40"
+                                            Padding="5,0"
+                                            Command="{Binding KillCommand}">
+                            <syfButton:SfButton.Background>
+                                <LinearGradientBrush>
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </syfButton:SfButton.Background>
+                        </syfButton:SfButton>
+                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
+
+                        <!-- <material:ButtonView ToolTipProperties.Text="浏览并选取目录" -->
+                        <!--                      PressedCommand="{Binding SelectFolderCommand}"> -->
+                        <!--     <Label Text="浏览" Padding="5,0,5,0" /> -->
+                        <!-- </material:ButtonView> -->
+                        <!-- <material:ButtonView ToolTipProperties.Text="加载选中文件目录的视频" -->
+                        <!--                      PressedCommand="{Binding LoadDirCommand}"> -->
+                        <!--     <Label Text="加载" Padding="5,0,5,0" /> -->
+                        <!-- </material:ButtonView> -->
+                        <!-- <material:ButtonView ToolTipProperties.Text="打开日志目录" -->
+                        <!--                      PressedCommand="{Binding OpenLogDirCommand}"> -->
+                        <!--     <Label Text="日志" Padding="5,0,5,0" /> -->
+                        <!-- </material:ButtonView> -->
+                        <!-- <material:ButtonView ToolTipProperties.Text="处理视频" -->
+                        <!--                      PressedCommand="{Binding ProcessVideosCommand}"> -->
+                        <!--     <Label Text="处理" Padding="5,0,5,0" /> -->
+                        <!-- </material:ButtonView> -->
+                        <!-- <Button Text="全载" ToolTipProperties.Text="全部加载" Command="{Binding LoadAllDirsCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
+                        <!-- <Button Text="处理" ToolTipProperties.Text="视频处理" Command="{Binding ProcessVideosCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
+                        <!-- <Button Text="清源" ToolTipProperties.Text="清理原始目录" Command="{Binding DeleteOriginalCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
+                        <!-- <Button Text="日志" ToolTipProperties.Text="打开日志目录" Command="{Binding OpenLogDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
+                        <!-- <Button Text="数据" ToolTipProperties.Text="打开数据目录" Command="{Binding OpenDataDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
+                        <!-- <Button Text="清垃圾" ToolTipProperties.Text="清理数据目录不再使用的图片资源" Command="{Binding ClearInvalidDataDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
+                        <!-- <Button Text="删数据" ToolTipProperties.Text="删除选中目录的数据目录" Command="{Binding ClearDataCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout HorizontalOptions="EndAndExpand" Grid.Column="1">
+                        <syfButton:SfButton Text="顶部" CornerRadius="20" HeightRequest="40"
+                                            Padding="5,0"
+                                            Command="{Binding ScrollToTopCommand}"
+                                            CommandParameter="{x:Reference MainView}">
+                            <syfButton:SfButton.Background>
+                                <LinearGradientBrush>
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </syfButton:SfButton.Background>
+                        </syfButton:SfButton>
+                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
+                        <syfButton:SfButton Text="中部" CornerRadius="20" HeightRequest="40"
+                                            Padding="5,0"
+                                            Command="{Binding ScrollToMiddleCommand}"
+                                            CommandParameter="{x:Reference MainView}">
+                            <syfButton:SfButton.Background>
+                                <LinearGradientBrush>
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </syfButton:SfButton.Background>
+                        </syfButton:SfButton>
+                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
+                        <syfButton:SfButton Text="底部" CornerRadius="20" HeightRequest="40"
+                                            Padding="5,0"
+                                            Command="{Binding ScrollToBottomCommand}"
+                                            CommandParameter="{x:Reference MainView}">
+                            <syfButton:SfButton.Background>
+                                <LinearGradientBrush>
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </syfButton:SfButton.Background>
+                        </syfButton:SfButton>
+                    </HorizontalStackLayout>
+                </Grid>
+                <CollectionView ItemsSource="{Binding Videos}" x:Name="MainView" VerticalOptions="FillAndExpand"
+                                HeightRequest="{Binding MainContHeight}" Margin="10">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border HorizontalOptions="Start" VerticalOptions="Center">
+                                <VerticalStackLayout>
+                                    <HorizontalStackLayout HeightRequest="30" VerticalOptions="Center">
+                                        <Label Text="{Binding VideoDir}" FontSize="18" Padding="15,10,0,0" />
+                                    </HorizontalStackLayout>
+                                    <BoxView StyleClass="Divider" />
+                                    <!-- 信息栏 -->
+                                    <HorizontalStackLayout>
+                                        <HorizontalStackLayout HeightRequest="30" VerticalOptions="Center">
+                                            <inputs:SfRating Precision="Standard"
+                                                             Value="{Binding Evaluate,Mode=TwoWay}"
+                                                             ItemSize="30" ItemCount="5" ItemSpacing="6"
+                                                             Margin="15,0,10,0"
+                                                             BackgroundColor="Transparent">
+                                                <inputs:SfRating.RatingSettings>
+                                                    <inputs:RatingSettings RatedFill="Yellow" UnratedFill="LightGrey"
+                                                                           UnratedStroke="Blue"
+                                                                           RatedStrokeThickness="1"
+                                                                           UnratedStrokeThickness="1" />
+                                                </inputs:SfRating.RatingSettings>
+                                                <inputs:SfRating.Behaviors>
+                                                    <toolkit:EventToCommandBehavior EventName="ValueChanged"
+                                                        Command="{Binding Source={x:Reference MainGrid}, Path=BindingContext.RatingChangedCommand}"
+                                                        CommandParameter="{Binding .}" />
+                                                </inputs:SfRating.Behaviors>
+                                            </inputs:SfRating>
+                                            <Label Text="===" FontSize="18" />
+                                            <Label Text="{Binding Caption}" FontSize="18" Padding="15,0,10,0" />
+                                            <Label Text="===" FontSize="18" />
+                                            <Label Text="{Binding Length}" FontSize="18" Padding="10,0" />
+                                            <Label Text="MB" FontSize="18" Padding="10,0" />
+                                            <Label Text="===" FontSize="18" Padding="10,0" />
+                                            <Label Text="{Binding Minute}" FontSize="18" Padding="10,0" />
+                                            <Label Text="分钟" FontSize="18" Padding="10,0" />
+                                            <Label Text="===" FontSize="18" Padding="10,0" />
+                                            <Label Text="{Binding PlayCount}" FontSize="18" Padding="10,0" />
+                                            <Label Text="===" FontSize="18" Padding="10,0" />
+                                            <Label Text="{Binding ModifyTime}" FontSize="18" Padding="10,0" />
+                                            <Label Text="===" FontSize="18" Padding="0,0,10,0" />
+                                            <Label Text="{Binding Width}" FontSize="18" Padding="10,0,0,0" />
+                                            <Label Text="x" FontSize="18" Padding="10,0" />
+                                            <Label Text="{Binding Height}" FontSize="18" Padding="0,0,10,0" />
+                                            <Label Text="===" FontSize="18" Padding="0,0,10,0" />
+                                            <Label Text="{Binding GroupNo}" FontSize="18" Padding="0,0,10,0" />
+                                        </HorizontalStackLayout>
+                                        <!-- <HorizontalStackLayout HorizontalOptions="EndAndExpand" -->
+                                        <!--                        VerticalOptions="CenterAndExpand" -->
+                                        <!--                        Padding="10,0"> -->
+                                        <!--     <syfCore:SfBadgeView HorizontalOptions="Center" -->
+                                        <!--                          VerticalOptions="Center" -->
+                                        <!--                          BadgeText="{Binding PlayCount}"> -->
+                                        <!--         <syfCore:SfBadgeView.BadgeSettings> -->
+                                        <!--             <syfCore:BadgeSettings BadgeAlignment="End" CornerRadius="20" /> -->
+                                        <!--         </syfCore:SfBadgeView.BadgeSettings> -->
+                                        <!--         <syfCore:SfBadgeView.Content> -->
+                                        <!--             <syfButton:SfButton Text="播放" CornerRadius="20" -->
+                                        <!--                                 Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=PlayCommand}" -->
+                                        <!--                                 CommandParameter="{Binding}"> -->
+                                        <!--                 <syfButton:SfButton.Background> -->
+                                        <!--                     <LinearGradientBrush> -->
+                                        <!--                         <LinearGradientBrush.GradientStops> -->
+                                        <!--                             <GradientStop Color="#0D62D4" Offset="0" /> -->
+                                        <!--                             <GradientStop Color="#9F3CDC" Offset="1" /> -->
+                                        <!--                         </LinearGradientBrush.GradientStops> -->
+                                        <!--                     </LinearGradientBrush> -->
+                                        <!--                 </syfButton:SfButton.Background> -->
+                                        <!--             </syfButton:SfButton> -->
+                                        <!--         </syfCore:SfBadgeView.Content> -->
+                                        <!--     </syfCore:SfBadgeView> -->
+                                        <!--     <syfButton:SfButton Text="目录" CornerRadius="20" HeightRequest="40" -->
+                                        <!--                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=OpenFolderCommand}" -->
+                                        <!--                         CommandParameter="{Binding}"> -->
+                                        <!--         <syfButton:SfButton.Background> -->
+                                        <!--             <LinearGradientBrush> -->
+                                        <!--                 <LinearGradientBrush.GradientStops> -->
+                                        <!--                     <GradientStop Color="#0D62D4" Offset="0" /> -->
+                                        <!--                     <GradientStop Color="#9F3CDC" Offset="1" /> -->
+                                        <!--                 </LinearGradientBrush.GradientStops> -->
+                                        <!--             </LinearGradientBrush> -->
+                                        <!--         </syfButton:SfButton.Background> -->
+                                        <!--     </syfButton:SfButton> -->
+                                        <!--     <syfButton:SfButton Text="删除" CornerRadius="20" HeightRequest="40" -->
+                                        <!--                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DelFolderCommand}" -->
+                                        <!--                         CommandParameter="{Binding}"> -->
+                                        <!--         <syfButton:SfButton.Background> -->
+                                        <!--             <LinearGradientBrush> -->
+                                        <!--                 <LinearGradientBrush.GradientStops> -->
+                                        <!--                     <GradientStop Color="#0D62D4" Offset="0" /> -->
+                                        <!--                     <GradientStop Color="#9F3CDC" Offset="1" /> -->
+                                        <!--                 </LinearGradientBrush.GradientStops> -->
+                                        <!--             </LinearGradientBrush> -->
+                                        <!--         </syfButton:SfButton.Background> -->
+                                        <!--     </syfButton:SfButton> -->
+                                        <!--     <syfButton:SfButton Text="重置" CornerRadius="20" HeightRequest="40" -->
+                                        <!--                         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=ResetVideoCommand}" -->
+                                        <!--                         CommandParameter="{Binding}"> -->
+                                        <!--         <syfButton:SfButton.Background> -->
+                                        <!--             <LinearGradientBrush> -->
+                                        <!--                 <LinearGradientBrush.GradientStops> -->
+                                        <!--                     <GradientStop Color="#0D62D4" Offset="0" /> -->
+                                        <!--                     <GradientStop Color="#9F3CDC" Offset="1" /> -->
+                                        <!--                 </LinearGradientBrush.GradientStops> -->
+                                        <!--             </LinearGradientBrush> -->
+                                        <!--         </syfButton:SfButton.Background> -->
+                                        <!--     </syfButton:SfButton> -->
+                                        <!--     ~1~ <Button MinimumWidthRequest="150" Text="Del"  @1@ -->
+                                        <!--     ~1~         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteCommand}" @1@ -->
+                                        <!--     ~1~         CommandParameter="{Binding}" /> @1@ -->
+                                        <!--     ~1~ <Button MinimumWidthRequest="150" Text="Del folder"  @1@ -->
+                                        <!--     ~1~         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteFolderCommand}" @1@ -->
+                                        <!--     ~1~         CommandParameter="{Binding}" /> @1@ -->
+                                        <!-- </HorizontalStackLayout> -->
+                                    </HorizontalStackLayout>
+                                    <BoxView StyleClass="Divider" />
+                                    <HorizontalStackLayout Margin="10,0" HorizontalOptions="FillAndExpand">
+                                        <Frame Padding="0" HorizontalOptions="FillAndExpand"
+                                               CornerRadius="0"
+                                               BorderColor="#99E0E0E0"
+                                               HasShadow="False">
+                                            <VerticalStackLayout HorizontalOptions="StartAndExpand"
+                                                                 VerticalOptions="Start" WidthRequest="100"
+                                                                 Padding="10,10,10,10">
+                                                <syfCore:SfBadgeView HorizontalOptions="Center"
+                                                                     VerticalOptions="Center"
+                                                                     BadgeText="{Binding PlayCount}">
+                                                    <syfCore:SfBadgeView.BadgeSettings>
+                                                        <syfCore:BadgeSettings BadgeAlignment="End" CornerRadius="20" />
+                                                    </syfCore:SfBadgeView.BadgeSettings>
+                                                    <syfCore:SfBadgeView.Content>
+                                                        <syfButton:SfButton Text="播放" CornerRadius="20"
+                                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=PlayCommand}"
+                                                                            CommandParameter="{Binding}">
+                                                            <syfButton:SfButton.Background>
+                                                                <LinearGradientBrush>
+                                                                    <LinearGradientBrush.GradientStops>
+                                                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                                                    </LinearGradientBrush.GradientStops>
+                                                                </LinearGradientBrush>
+                                                            </syfButton:SfButton.Background>
+                                                        </syfButton:SfButton>
+                                                    </syfCore:SfBadgeView.Content>
+                                                </syfCore:SfBadgeView>
+                                                <BoxView StyleClass="Divider" />
+                                                <syfButton:SfButton Text="目录" CornerRadius="20" HeightRequest="40"
+                                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=OpenFolderCommand}"
                                                                     CommandParameter="{Binding}">
                                                     <syfButton:SfButton.Background>
                                                         <LinearGradientBrush>
@@ -408,135 +420,122 @@
                                                         </LinearGradientBrush>
                                                     </syfButton:SfButton.Background>
                                                 </syfButton:SfButton>
-                                            </syfCore:SfBadgeView.Content>
-                                        </syfCore:SfBadgeView>
-                                        <BoxView StyleClass="Divider" />
-                                        <syfButton:SfButton Text="目录" CornerRadius="20" HeightRequest="40"
-                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=OpenFolderCommand}"
-                                                            CommandParameter="{Binding}">
-                                            <syfButton:SfButton.Background>
-                                                <LinearGradientBrush>
-                                                    <LinearGradientBrush.GradientStops>
-                                                        <GradientStop Color="#0D62D4" Offset="0" />
-                                                        <GradientStop Color="#9F3CDC" Offset="1" />
-                                                    </LinearGradientBrush.GradientStops>
-                                                </LinearGradientBrush>
-                                            </syfButton:SfButton.Background>
-                                        </syfButton:SfButton>
-                                        <BoxView StyleClass="Divider" />
-                                        <syfButton:SfButton Text="删除" CornerRadius="20" HeightRequest="40"
-                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DelFolderCommand}"
-                                                            CommandParameter="{Binding}">
-                                            <syfButton:SfButton.Background>
-                                                <LinearGradientBrush>
-                                                    <LinearGradientBrush.GradientStops>
-                                                        <GradientStop Color="#0D62D4" Offset="0" />
-                                                        <GradientStop Color="#9F3CDC" Offset="1" />
-                                                    </LinearGradientBrush.GradientStops>
-                                                </LinearGradientBrush>
-                                            </syfButton:SfButton.Background>
-                                        </syfButton:SfButton>
-                                        <BoxView StyleClass="Divider" />
-                                        <syfButton:SfButton Text="移除" CornerRadius="20" HeightRequest="40"
-                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DelOnlyCommand}"
-                                                            CommandParameter="{Binding}">
-                                            <syfButton:SfButton.Background>
-                                                <LinearGradientBrush>
-                                                    <LinearGradientBrush.GradientStops>
-                                                        <GradientStop Color="#0D62D4" Offset="0" />
-                                                        <GradientStop Color="#9F3CDC" Offset="1" />
-                                                    </LinearGradientBrush.GradientStops>
-                                                </LinearGradientBrush>
-                                            </syfButton:SfButton.Background>
-                                        </syfButton:SfButton>
-                                        <BoxView StyleClass="Divider" />
-                                        <syfButton:SfButton Text="重置" CornerRadius="20" HeightRequest="40"
-                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=ResetVideoCommand}"
-                                                            CommandParameter="{Binding}">
-                                            <syfButton:SfButton.Background>
-                                                <LinearGradientBrush>
-                                                    <LinearGradientBrush.GradientStops>
-                                                        <GradientStop Color="#0D62D4" Offset="0" />
-                                                        <GradientStop Color="#9F3CDC" Offset="1" />
-                                                    </LinearGradientBrush.GradientStops>
-                                                </LinearGradientBrush>
-                                            </syfButton:SfButton.Background>
-                                        </syfButton:SfButton>
-                                        <!-- <Button MinimumWidthRequest="150" Text="Del"  -->
-                                        <!--         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteCommand}" -->
-                                        <!--         CommandParameter="{Binding}" /> -->
-                                        <!-- <Button MinimumWidthRequest="150" Text="Del folder"  -->
-                                        <!--         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteFolderCommand}" -->
-                                        <!--         CommandParameter="{Binding}" /> -->
-                                    </VerticalStackLayout>
-                                </Frame>
-                                <Frame Padding="0" HorizontalOptions="FillAndExpand"
-                                       CornerRadius="0"
-                                       BorderColor="#99E0E0E0"
-                                       HasShadow="False">
-                                    <!-- 图片快照 -->
-                                    <syfCarousel:SfCarousel
-                                        EnableVirtualization="True"
-                                        ItemsSource="{Binding Snapshots}"
-                                        ViewMode="Linear"
-                                        WidthRequest="{Binding Source={x:Reference MainGrid}, Path=Width, Converter={StaticResource WidthMinusConverter}, ConverterParameter=150}"
-                                        SelectedIndex="6"
-                                        RotationAngle="30"
-                                        Offset="300"
-                                        ItemHeight="300"
-                                        ItemWidth="400">
-                                        <syfCarousel:SfCarousel.ItemTemplate>
-                                            <DataTemplate>
-                                                <!-- <Image Source="{Binding}" Aspect="AspectFit" /> -->
-                                                <Image Source="{Binding FullPath}" Aspect="AspectFit">
-                                                    <Image.GestureRecognizers>
-                                                        <TapGestureRecognizer
-                                                            Command="{Binding Source={x:Reference MainView}, Path=BindingContext.ImageTappedCommand}"
-                                                            CommandParameter="{Binding }" />
-                                                    </Image.GestureRecognizers>
-                                                </Image>
-                                            </DataTemplate>
-                                        </syfCarousel:SfCarousel.ItemTemplate>
-                                    </syfCarousel:SfCarousel>
-                                    <!-- 图片快照 -->
-                                    <!-- <CollectionView ItemsSource="{Binding Snapshots}" HeightRequest="310" -->
-                                    <!--                 HorizontalOptions="FillAndExpand"> -->
-                                    <!--     <CollectionView.ItemsLayout> -->
-                                    <!--         <LinearItemsLayout Orientation="Horizontal" /> -->
-                                    <!--     </CollectionView.ItemsLayout> -->
-                                    <!--     <CollectionView.ItemTemplate> -->
-                                    <!--         <DataTemplate> -->
-                                    <!--             <Frame BackgroundColor="LightGray" CornerRadius="5" -->
-                                    <!--                    Padding="3" -->
-                                    <!--                    Margin="5" -->
-                                    <!--                    BorderColor="Gray" -->
-                                    <!--                    HorizontalOptions="FillAndExpand" -->
-                                    <!--                    VerticalOptions="FillAndExpand"> -->
-                                    <!--                 <Frame.Background> -->
-                                    <!--                     <SolidColorBrush Color="Gray" /> -->
-                                    <!--                 </Frame.Background> -->
-                                    <!--                 <Image Source="{Binding FullPath}" HeightRequest="300" -->
-                                    <!--                        WidthRequest="400"> -->
-                                    <!--                     <Image.GestureRecognizers> -->
-                                    <!--                         <TapGestureRecognizer -->
-                                    <!--                             Command="{Binding Source={x:Reference MainView}, Path=BindingContext.ImageTappedCommand}" -->
-                                    <!--                             CommandParameter="{Binding .}" /> -->
-                                    <!--                     </Image.GestureRecognizers> -->
-                                    <!--                 </Image> -->
-                                    <!--             </Frame> -->
-                                    <!--         </DataTemplate> -->
-                                    <!--     </CollectionView.ItemTemplate> -->
-                                    <!-- </CollectionView> -->
-                                </Frame>
-                            </HorizontalStackLayout>
-                        </VerticalStackLayout>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
-        <BoxView StyleClass="Divider" />
-        <HorizontalStackLayout HorizontalOptions="EndAndExpand" MaximumHeightRequest="20">
-            <Label Text="{Binding Message}" />
-        </HorizontalStackLayout>
+                                                <BoxView StyleClass="Divider" />
+                                                <syfButton:SfButton Text="删除" CornerRadius="20" HeightRequest="40"
+                                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DelFolderCommand}"
+                                                                    CommandParameter="{Binding}">
+                                                    <syfButton:SfButton.Background>
+                                                        <LinearGradientBrush>
+                                                            <LinearGradientBrush.GradientStops>
+                                                                <GradientStop Color="#0D62D4" Offset="0" />
+                                                                <GradientStop Color="#9F3CDC" Offset="1" />
+                                                            </LinearGradientBrush.GradientStops>
+                                                        </LinearGradientBrush>
+                                                    </syfButton:SfButton.Background>
+                                                </syfButton:SfButton>
+                                                <BoxView StyleClass="Divider" />
+                                                <syfButton:SfButton Text="移除" CornerRadius="20" HeightRequest="40"
+                                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DelOnlyCommand}"
+                                                                    CommandParameter="{Binding}">
+                                                    <syfButton:SfButton.Background>
+                                                        <LinearGradientBrush>
+                                                            <LinearGradientBrush.GradientStops>
+                                                                <GradientStop Color="#0D62D4" Offset="0" />
+                                                                <GradientStop Color="#9F3CDC" Offset="1" />
+                                                            </LinearGradientBrush.GradientStops>
+                                                        </LinearGradientBrush>
+                                                    </syfButton:SfButton.Background>
+                                                </syfButton:SfButton>
+                                                <BoxView StyleClass="Divider" />
+                                                <syfButton:SfButton Text="重置" CornerRadius="20" HeightRequest="40"
+                                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=ResetVideoCommand}"
+                                                                    CommandParameter="{Binding}">
+                                                    <syfButton:SfButton.Background>
+                                                        <LinearGradientBrush>
+                                                            <LinearGradientBrush.GradientStops>
+                                                                <GradientStop Color="#0D62D4" Offset="0" />
+                                                                <GradientStop Color="#9F3CDC" Offset="1" />
+                                                            </LinearGradientBrush.GradientStops>
+                                                        </LinearGradientBrush>
+                                                    </syfButton:SfButton.Background>
+                                                </syfButton:SfButton>
+                                                <!-- <Button MinimumWidthRequest="150" Text="Del"  -->
+                                                <!--         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteCommand}" -->
+                                                <!--         CommandParameter="{Binding}" /> -->
+                                                <!-- <Button MinimumWidthRequest="150" Text="Del folder"  -->
+                                                <!--         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteFolderCommand}" -->
+                                                <!--         CommandParameter="{Binding}" /> -->
+                                            </VerticalStackLayout>
+                                        </Frame>
+                                        <Frame Padding="0" HorizontalOptions="FillAndExpand"
+                                               CornerRadius="0"
+                                               BorderColor="#99E0E0E0"
+                                               HasShadow="False">
+                                            <!-- 图片快照 -->
+                                            <syfCarousel:SfCarousel
+                                                EnableVirtualization="True"
+                                                ItemsSource="{Binding Snapshots}"
+                                                ViewMode="Linear"
+                                                WidthRequest="{Binding Source={x:Reference MainGrid}, Path=Width, Converter={StaticResource WidthMinusConverter}, ConverterParameter=150}"
+                                                SelectedIndex="6"
+                                                RotationAngle="30"
+                                                Offset="300"
+                                                ItemHeight="300"
+                                                ItemWidth="400">
+                                                <syfCarousel:SfCarousel.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <!-- <Image Source="{Binding}" Aspect="AspectFit" /> -->
+                                                        <Image Source="{Binding FullPath}" Aspect="AspectFit">
+                                                            <Image.GestureRecognizers>
+                                                                <TapGestureRecognizer
+                                                                    Command="{Binding Source={x:Reference MainView}, Path=BindingContext.ImageTappedCommand}"
+                                                                    CommandParameter="{Binding }" />
+                                                            </Image.GestureRecognizers>
+                                                        </Image>
+                                                    </DataTemplate>
+                                                </syfCarousel:SfCarousel.ItemTemplate>
+                                            </syfCarousel:SfCarousel>
+                                            <!-- 图片快照 -->
+                                            <!-- <CollectionView ItemsSource="{Binding Snapshots}" HeightRequest="310" -->
+                                            <!--                 HorizontalOptions="FillAndExpand"> -->
+                                            <!--     <CollectionView.ItemsLayout> -->
+                                            <!--         <LinearItemsLayout Orientation="Horizontal" /> -->
+                                            <!--     </CollectionView.ItemsLayout> -->
+                                            <!--     <CollectionView.ItemTemplate> -->
+                                            <!--         <DataTemplate> -->
+                                            <!--             <Frame BackgroundColor="LightGray" CornerRadius="5" -->
+                                            <!--                    Padding="3" -->
+                                            <!--                    Margin="5" -->
+                                            <!--                    BorderColor="Gray" -->
+                                            <!--                    HorizontalOptions="FillAndExpand" -->
+                                            <!--                    VerticalOptions="FillAndExpand"> -->
+                                            <!--                 <Frame.Background> -->
+                                            <!--                     <SolidColorBrush Color="Gray" /> -->
+                                            <!--                 </Frame.Background> -->
+                                            <!--                 <Image Source="{Binding FullPath}" HeightRequest="300" -->
+                                            <!--                        WidthRequest="400"> -->
+                                            <!--                     <Image.GestureRecognizers> -->
+                                            <!--                         <TapGestureRecognizer -->
+                                            <!--                             Command="{Binding Source={x:Reference MainView}, Path=BindingContext.ImageTappedCommand}" -->
+                                            <!--                             CommandParameter="{Binding .}" /> -->
+                                            <!--                     </Image.GestureRecognizers> -->
+                                            <!--                 </Image> -->
+                                            <!--             </Frame> -->
+                                            <!--         </DataTemplate> -->
+                                            <!--     </CollectionView.ItemTemplate> -->
+                                            <!-- </CollectionView> -->
+                                        </Frame>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                <BoxView StyleClass="Divider" />
+                <HorizontalStackLayout HorizontalOptions="EndAndExpand" MaximumHeightRequest="20">
+                    <Label Text="{Binding Message}" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </syfCore:SfBusyIndicator>
     </VerticalStackLayout>
 </ContentPage>

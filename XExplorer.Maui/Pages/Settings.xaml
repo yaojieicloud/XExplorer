@@ -71,9 +71,7 @@
                                 </LinearGradientBrush>
                             </syfButton:SfButton.Background>
                         </syfButton:SfButton>
-                    </HorizontalStackLayout>
-                    <BoxView StyleClass="Divider" />
-                    <HorizontalStackLayout VerticalOptions="Center" HeightRequest="75" Padding="0,20,0,10">
+                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
                         <syfButton:SfButton Text="解压" CornerRadius="10"
                                             FontSize="18"
                                             HeightRequest="55"
@@ -89,7 +87,24 @@
                                 </LinearGradientBrush>
                             </syfButton:SfButton.Background>
                         </syfButton:SfButton>
+                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
+                        <syfButton:SfButton Text="日志"
+                                            CornerRadius="10"
+                                            HeightRequest="55"
+                                            Padding="0,0,0,0"
+                                            Margin="20,0,0,0"
+                                            Command="{Binding OpenLogDirCommand}">
+                            <syfButton:SfButton.Background>
+                                <LinearGradientBrush>
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </syfButton:SfButton.Background>
+                        </syfButton:SfButton>
                     </HorizontalStackLayout>
+                    <BoxView StyleClass="Divider" />
                     <HorizontalStackLayout HorizontalOptions="EndAndExpand" MaximumHeightRequest="20">
                         <Label Text="{Binding Message}" />
                     </HorizontalStackLayout>

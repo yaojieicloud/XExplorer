@@ -109,6 +109,12 @@ partial class MainViewModel
     private double mainViewHeight;
 
     /// <summary>
+    /// 主视图的高度
+    /// </summary>
+    [ObservableProperty]
+    private double mainContHeight;
+    
+    /// <summary>
     /// 是否显示图片的布尔值
     /// </summary>
     [ObservableProperty]

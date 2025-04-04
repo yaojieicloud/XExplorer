@@ -14,7 +14,7 @@ namespace XExplorer.Api.Controllers;
 [Route("[controller]")]
 public class ZipController : ControllerBase
 {
-    private const string ROOT_DIR = "/volume1/99_资源收藏";
+    private const string ROOT_DIR = "/volume1";
     private readonly ILogger<ZipController> _logger;
 
     public ZipController(ILogger<ZipController> logger)
