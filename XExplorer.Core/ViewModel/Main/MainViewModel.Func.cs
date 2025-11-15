@@ -16,6 +16,7 @@ using SixLabors.ImageSharp.Formats.Jpeg;
 using Xabe.FFmpeg;
 using XExplorer.Core.Dictionaries;
 using XExplorer.Core.Modes;
+using XExplorer.Core.Utils;
 
 namespace XExplorer.Core.ViewModel;
 
@@ -35,27 +36,33 @@ partial class MainViewModel
     /// </summary>
     /// <remarks>
     ///     本方法使用应用程序设定的根目录路径（RootDir）读取所有子目录，
-    ///     并生成用于绑定显示的 ObservableCollection
-    ///     <DirRecord>
-    ///         对象，
-    ///         以便供界面或后续逻辑使用。
+    ///     并生成用于绑定显示的 ObservableCollection「DirRecord」对象，
+    ///     以便供界面或后续逻辑使用。
     /// </remarks>
     private void InitDirs()
     {
-        var videoDirs = new List<DirRecord>();
-        ;
-        var allDirs = Directory.GetDirectories(AppSettingsUtils.Default.Current.RootDir);
-        for (var i = 0; i < allDirs.Length; i++)
+        Processing = true;
+        try
         {
-            var dir = allDirs[i];
-            var dirInfo = new DirectoryInfo(dir);
-            var valid = dir.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty);
-            videoDirs.Add(new DirRecord { Name = dirInfo.Name, FullName = dir, ValidName = valid });
-        }
+            var videoDirs = new List<DirRecord>();
+            var allDirs = Directory.GetDirectories(AppSettingsUtils.Default.Current.RootDir);
+            var list = SortUtils.Sort(allDirs.ToList(), true);
 
-        videoDirs = videoDirs.OrderByDescending(m => m.ValidName).ToList();
-        videoDirs.Insert(0, new DirRecord() { Name = Screnn.All, FullName = Screnn.All, ValidName = Screnn.All });
-        Dirs = new ObservableCollection<DirRecord>(videoDirs);
+            for (var i = 0; i < list.Count; i++)
+            {
+                var dir = list[i];
+                var dirInfo = new DirectoryInfo(dir);
+                var valid = dir.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty);
+                videoDirs.Add(new DirRecord { Name = dirInfo.Name, FullName = dir, ValidName = valid, Sort = i + 1 });
+            }
+
+            videoDirs.Insert(0, new DirRecord() { Name = Screnn.All, FullName = Screnn.All, ValidName = Screnn.All });
+            Dirs = new ObservableCollection<DirRecord>(videoDirs);
+        }
+        finally
+        {
+            Processing = false;
+        }
     }
 
     /// <summary>
@@ -723,5 +730,4 @@ partial class MainViewModel
     }
 
     #endregion
-
 }

@@ -50,18 +50,17 @@ public partial class MainViewModel : ObservableObject
     {
         try
         {
-            Processing = true;
+            Processing = true; 
             Videos.Clear();
-            var dir = SelectedDir.ValidName == Screnn.All ? null : SelectedDir.ValidName;
-            bool? wideScrenn = ScrennMode == Screnn.None
-                ? null
-                : ScrennMode == Screnn.Wide
-                    ? true
-                    : false;
-            var enties = await dataService.VideosService.QueryAsync(
-                dir,
-                wideScrenn: wideScrenn);
-            var modes = enties.ToModes();
+            var modes = new List<VideoMode>();
+            await Task.Delay(1000);
+            await Task.Run(async () =>
+            {
+                var dir = SelectedDir.ValidName == Screnn.All ? null : SelectedDir.ValidName;
+                bool? wideScrenn = ScrennMode == Screnn.None ? null : ScrennMode == Screnn.Wide ? true : false;
+                var enties = await dataService.VideosService.QueryAsync(dir, wideScrenn: wideScrenn);
+                modes = enties.ToModes();
+            });
             Videos = new ObservableCollection<VideoMode>(modes);
             Message = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] 目录 {SelectedDir.FullName} 加载完成。";
         }

@@ -47,6 +47,12 @@ public partial class DirRecord : ObservableObject
     private string fullName;
 
     /// <summary>
+    /// 排序
+    /// </summary>
+    [ObservableProperty]
+    private decimal sort;
+
+    /// <summary>
     /// 调整路径格式，根据运行平台将路径在 Windows 和 Mac 之间进行转换。
     /// </summary>
     /// <param name="path">需要调整的路径字符串。</param>

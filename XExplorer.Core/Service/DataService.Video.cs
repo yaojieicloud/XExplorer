@@ -153,7 +153,7 @@ partial class DataService
         {
             foreach (var video in videos)
             {
-                var entry = dataContext.Entry(video);
+                var entry =  dataContext.Entry(video);
                 entry.State = EntityState.Modified;
                 entry.CurrentValues.SetValues(video);
             }
@@ -186,7 +186,7 @@ partial class DataService
         /// </remarks>
         public async Task DeleteAsync(long id)
         {
-            var video = dataContext.Videos.FirstOrDefault(v => v.Id == id);
+            var video = dataContext.Videos.AsNoTracking().FirstOrDefault(v => v.Id == id);
             var delSnapshots = dataContext.Snapshots.Where(s => s.VideoId == video.Id).ToList();
             if (video != null)
                 dataContext.Videos.Remove(video);
@@ -223,7 +223,7 @@ partial class DataService
         /// </remarks>
         public async Task DeleteDirAsync(string dir)
         {
-            var delVideos = dataContext.Videos.Where(v => v.VideoDir == dir).ToList();
+            var delVideos = dataContext.Videos.AsNoTracking().Where(v => v.VideoDir == dir).ToList();
             var delSnapshots = dataContext.Snapshots.Where(s => delVideos.Any(v => v.Id == s.VideoId)).ToList();
 
             if (delVideos?.Any() ?? false)
@@ -251,7 +251,7 @@ partial class DataService
             string? caption = null, int? evaluate = null,
             bool isDesc = true, int skip = 0, int take = int.MaxValue, decimal status = 1, bool? wideScrenn = null)
         {
-            var query = dataContext.Videos
+            var query = dataContext.Videos.AsNoTracking()
                 .Include(v => v.Snapshots).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(dir))
@@ -283,7 +283,7 @@ partial class DataService
         /// <returns>满足条件的视频列表。</returns>
         public async Task<List<Video>> QueryAsync(Expression<Func<Video, bool>> predicate)
         {
-            var query = dataContext.Videos
+            var query = dataContext.Videos.AsNoTracking()
                 .Include(v => v.Snapshots).AsQueryable();
 
             return await query.Where(predicate).ToListAsync();
@@ -296,7 +296,7 @@ partial class DataService
         /// <returns>满足条件的视频列表。</returns>
         public async Task<List<Video>> QueryOnlyAsync(Expression<Func<Video, bool>> predicate = null)
         {
-            var query = dataContext.Videos.AsQueryable();
+            var query = dataContext.Videos.AsNoTracking().AsQueryable();
             return predicate == null ? await query.ToListAsync() : await query.Where(predicate).ToListAsync();
         }
 
@@ -307,7 +307,7 @@ partial class DataService
         /// <returns>满足条件的视频列表。</returns>
         public async Task<Video> FirstAsync(Expression<Func<Video, bool>> predicate)
         {
-            var query = dataContext.Videos
+            var query = dataContext.Videos.AsNoTracking()
                 .Include(v => v.Snapshots).AsQueryable();
 
             return await query.Where(predicate).FirstOrDefaultAsync();
@@ -320,7 +320,7 @@ partial class DataService
         /// <returns>满足条件的视频列表。</returns>
         public Video First(Expression<Func<Video, bool>> predicate)
         {
-            var query = dataContext.Videos
+            var query = dataContext.Videos.AsNoTracking()
                 .Include(v => v.Snapshots).AsQueryable();
 
             return query.Where(predicate).FirstOrDefault();
@@ -337,7 +337,7 @@ partial class DataService
             var duplicates = new List<Video>();
 
             // 查询所有视频数据
-            var query = dataContext.Videos.Include(v => v.Snapshots).AsEnumerable();
+            var query = dataContext.Videos.AsNoTracking().Include(v => v.Snapshots).AsEnumerable();
  
             var groups = query
                 .GroupBy(keySelector) // 按指定字段分组
@@ -368,7 +368,7 @@ partial class DataService
         {
             // 查询视频数据
             var duplicates = new List<Video>();
-            var query = dataContext.Videos.Include(v => v.Snapshots).AsEnumerable();
+            var query = dataContext.Videos.AsNoTracking().Include(v => v.Snapshots).AsEnumerable();
             var groups = query
                 .GroupBy(m => m.MD5) // 按指定字段分组
                 .Where(g => g.Count() > 1)
