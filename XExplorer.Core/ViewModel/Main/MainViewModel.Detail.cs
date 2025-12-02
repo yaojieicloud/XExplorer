@@ -36,8 +36,10 @@ partial class MainViewModel
                 mode.PlayCount++;
                 var currPath = AdjustPath(mode.VideoPath);
                 currPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, currPath);
+                var volume = AdjustPath(AppSettingsUtils.Default.Current.Volume);
+                currPath = Path.Combine(volume, currPath);
                 if (AppSettingsUtils.Default.OS == OS.Windows)
-                    Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"--no-one-instance \"{currPath}\" --loop");
+                    Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"--no-one-instance \"{currPath}\" --loop --rate=1.7");
                 else
                     Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"\"{currPath}\" --loop");
 

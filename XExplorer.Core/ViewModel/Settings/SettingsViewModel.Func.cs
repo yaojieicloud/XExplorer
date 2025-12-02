@@ -142,6 +142,25 @@ public partial class SettingsViewModel
         return path;
     }
 
+    private string AdjustPath(string path, string os = null)
+    {
+        os ??= AppSettingsUtils.Default.OS;
+        if (os == OS.MacCatalyst)
+        {
+            // 将 Windows 路径转换成 Mac 的路径
+            path = path.Replace(AppSettingsUtils.Default.Windows.Volume, AppSettingsUtils.Default.Mac.Volume);
+            path = path.Replace('\\', '/');
+        }
+        else
+        {
+            // 将 Mac 路径转换成 Windows 的路径
+            path = path.Replace(AppSettingsUtils.Default.Mac.Volume, AppSettingsUtils.Default.Windows.Volume);
+            path = path.Replace('/', '\\');
+        }
+
+        return path;
+    }
+
     /// <summary>
     ///     获取相对目录路径的方法。
     ///     此方法根据 AppSettings 的定义，移除 Windows 或 Mac 平台特定的卷标信息后，

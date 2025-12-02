@@ -31,8 +31,11 @@ public class ZipController : ControllerBase
             {
                 var path = string.IsNullOrWhiteSpace(request.Dir) ? ROOT_DIR : Path.Combine(ROOT_DIR, request.Dir);
                 var zipFiles = this.GetPaths(path);
-                foreach (var file in zipFiles)
+
+                Parallel.ForEach(zipFiles, new ParallelOptions { MaxDegreeOfParallelism = 2 }, file =>
+                {
                     this.ExtractArchive(file, request.Passwords, path);
+                });
 
                 return this.Ok();
             });

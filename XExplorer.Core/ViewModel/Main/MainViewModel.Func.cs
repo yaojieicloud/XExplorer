@@ -52,7 +52,7 @@ partial class MainViewModel
             {
                 var dir = list[i];
                 var dirInfo = new DirectoryInfo(dir);
-                var valid = dir.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty);
+                var valid = this.GetValid(dir);
                 videoDirs.Add(new DirRecord { Name = dirInfo.Name, FullName = dir, ValidName = valid, Sort = i + 1 });
             }
 
@@ -188,6 +188,16 @@ partial class MainViewModel
             this.Message = title ?? message;
         else
             MainThread.BeginInvokeOnMainThread(() => this.Message = title ?? message);
+    }
+
+    private string GetValid(string path)
+    {
+        var valid = path.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty);
+
+        foreach (var invalid in AppSettingsUtils.Default.Current.Volumes)
+            valid = valid.Replace(invalid, string.Empty);
+
+        return valid;
     }
 
     #region 批处理视频

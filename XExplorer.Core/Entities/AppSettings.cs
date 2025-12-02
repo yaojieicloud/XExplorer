@@ -1,4 +1,6 @@
-﻿namespace XExplorer.Core.Modes;
+﻿using Microsoft.Maui.Devices;
+
+namespace XExplorer.Core.Modes;
 
 /// <summary>
 ///     应用程序设置类，包括 Windows 和 Mac 平台的路径信息。
@@ -29,7 +31,7 @@ public class AppSettings
     /// Gets or sets the operating system identifier for the application settings,
     /// used to determine the current configuration.
     /// </summary>
-    public string OS { get; set; }
+    public string OS => this.GetOsId();
 
     /// <summary>
     /// Gets or sets the configuration settings specific to the Mac platform.
@@ -45,6 +47,34 @@ public class AppSettings
     /// TaskLimit
     /// </summary>
     public int TaskLimit { get; set; } = 1;
+
+    /// <summary>
+    /// Gets the operating system identifier for the current platform.
+    /// </summary>
+    /// <remarks>This method determines the operating system by first checking .NET's OperatingSystem API, and
+    /// then falls back to platform detection via MAUI's DeviceInfo if necessary. If the platform cannot be determined,
+    /// the method defaults to returning the Windows identifier.</remarks>
+    /// <returns>A string representing the operating system identifier. Returns a value corresponding to Mac Catalyst or Windows,
+    /// depending on the detected platform.</returns>
+    public string GetOsId()
+    {
+        // 优先使用 .NET 的 OperatingSystem API（推荐用于业务/非 UI 代码）
+        if (OperatingSystem.IsMacCatalyst())
+            return Dictionaries.OS.MacCatalyst;
+
+        if (OperatingSystem.IsWindows())
+            return Dictionaries.OS.Windows;
+
+        // 回退到 MAUI 的 DeviceInfo（当运行在 MAUI 环境时更可靠）
+        if (DeviceInfo.Platform == DevicePlatform.MacCatalyst)
+            return Dictionaries.OS.MacCatalyst;
+
+        if (DeviceInfo.Platform == DevicePlatform.WinUI)
+            return Dictionaries.OS.Windows;
+
+        // 最后默认回退到 Windows 配置
+        return Dictionaries.OS.Windows;
+    }
 }
 
 public class Conf
@@ -60,7 +90,12 @@ public class Conf
     /// 它通常与相应的操作系统配置文件关联，例如 Windows 或 Mac 的存储卷路径。
     /// </summary>
     public string Volume { get; set; }
-    
+
+    /// <summary>
+    /// Gets or sets the collection of volume identifiers associated with the entity.
+    /// </summary>
+    public string[] Volumes { get; set; }
+
     /// <summary>
     /// 获取或设置数据存储目录路径，以便应用程序存放其相关的文件或数据。
     /// 根据当前操作系统的配置（Windows 或 MacCatalyst）可以有不同的路径设定。

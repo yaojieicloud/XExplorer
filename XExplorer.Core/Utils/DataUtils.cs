@@ -109,6 +109,11 @@ public static class DataUtils
         result.Id = snapshot.Id;
         result.Path = snapshot.Path;
         result.FullPath = snapshot.FullPath;
+
+#if DEBUG
+        result.FullPath = "D:\\Downloads\\001.png";
+#endif
+
         return result;
     }
 

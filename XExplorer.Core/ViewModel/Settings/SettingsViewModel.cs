@@ -56,11 +56,22 @@ public partial class SettingsViewModel : ViewModelBase
                 if (result.Folder == null)
                     return;
 
+                var valid = result.Folder.Path.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty);
+                var fullName = result.Folder.Path;
+
+                foreach (var ext in AppSettingsUtils.Default.Current.Volumes)
+                {
+                    valid = result.Folder.Path.Replace(valid, string.Empty);
+                    fullName = fullName.Replace(valid, string.Empty);
+                }
+
+                valid = this.AdjustPath(valid, OS.MacCatalyst);
+
                 var dir = new DirRecord
                 {
                     Name = result.Folder.Name,
                     FullName = result.Folder.Path,
-                    ValidName = result.Folder.Path.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty)
+                    ValidName = valid
                 };
 
                 var pwds = await this.dataService.PwdService.GetAsync();
@@ -68,7 +79,7 @@ public partial class SettingsViewModel : ViewModelBase
                 pwdStrings.Add(string.Empty);
                 var reuqest = new UnzipRequest { Dir = dir.ValidName, Passwords = pwdStrings };
 
-                start:
+            start:
                 try
                 {
                     using var client = new HttpClient();
@@ -86,7 +97,7 @@ public partial class SettingsViewModel : ViewModelBase
                     Log.Error(hrex, hrex.Message);
                     goto start;
                 }
- 
+
                 Notification($"文件夹 [{dir.FullName}] 全部解压完成，耗时[{st.Elapsed.TotalSeconds}]秒。");
             }
         }

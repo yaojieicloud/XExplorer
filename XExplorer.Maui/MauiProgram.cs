@@ -4,6 +4,7 @@ using Serilog;
 using Syncfusion.Maui.Core.Hosting;
 using UraniumUI;
 using Xabe.FFmpeg;
+using Xabe.FFmpeg.Downloader;
 using XExplorer.Core.Modes;
 
 namespace XExplorer.Maui;
@@ -35,7 +36,11 @@ public static class MauiProgram
             .CreateLogger(); 
         Log.Information("The application has started.");
 
+#if MACCATALYST
         SetFFmpegPath();
+#elif WINDOWS
+        DownloadRuntimeAsync();
+#endif
 
         #endregion
 
@@ -68,5 +73,17 @@ public static class MauiProgram
         ffmpegDir = Path.Combine(basePath, "ffmpeg", AppSettingsUtils.Default.OS);
 #endif
         FFmpeg.SetExecutablesPath(ffmpegDir);
+    }
+
+    public static async Task DownloadRuntimeAsync()
+    {
+        var ffmpegDir = Path.Combine(AppContext.BaseDirectory, "ffmpeg", AppSettingsUtils.Default.OS);
+
+        if (!Directory.Exists(ffmpegDir))
+            Directory.CreateDirectory(ffmpegDir);
+
+        await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Shared, ffmpegDir);
+        FFmpeg.SetExecutablesPath(ffmpegDir);
+        Log.Information($"已经将 FFmpeg 运行时下载到 [{ffmpegDir}]");
     }
 }

@@ -19,8 +19,6 @@
     <ContentPage.BindingContext>
         <vm:MainViewModel />
     </ContentPage.BindingContext>
-    <ContentPage.Style>
-    </ContentPage.Style>
     <VerticalStackLayout Margin="10" x:Name="MainGrid" SizeChanged="MainGrid_OnSizeChanged">
         <sfPopup:SfPopup AppearanceMode="{Binding AppearanceMode}"
                          ShowFooter="True"
@@ -379,7 +377,7 @@
                                     </HorizontalStackLayout>
                                     <BoxView StyleClass="Divider" />
                                     <HorizontalStackLayout Margin="10,0" HorizontalOptions="FillAndExpand">
-                                        <Frame Padding="0" HorizontalOptions="FillAndExpand"
+                                        <Frame Padding="-10,0,10,0" HorizontalOptions="StartAndExpand"
                                                CornerRadius="0"
                                                BorderColor="#99E0E0E0"
                                                HasShadow="False">
@@ -472,7 +470,7 @@
                                                BorderColor="#99E0E0E0"
                                                HasShadow="False">
                                             <!-- 图片快照 -->
-                                            <syfCarousel:SfCarousel
+                                            <!--<syfCarousel:SfCarousel
                                                 EnableVirtualization="True"
                                                 ItemsSource="{Binding Snapshots}"
                                                 ViewMode="Linear"
@@ -484,7 +482,9 @@
                                                 ItemWidth="400">
                                                 <syfCarousel:SfCarousel.ItemTemplate>
                                                     <DataTemplate>
-                                                        <!-- <Image Source="{Binding}" Aspect="AspectFit" /> -->
+                                                        -->
+                                            <!-- <Image Source="{Binding}" Aspect="AspectFit" /> -->
+                                            <!--
                                                         <Image Source="{Binding FullPath}" Aspect="AspectFit">
                                                             <Image.GestureRecognizers>
                                                                 <TapGestureRecognizer
@@ -494,36 +494,57 @@
                                                         </Image>
                                                     </DataTemplate>
                                                 </syfCarousel:SfCarousel.ItemTemplate>
-                                            </syfCarousel:SfCarousel>
+                                            </syfCarousel:SfCarousel>-->
                                             <!-- 图片快照 -->
-                                            <!-- <CollectionView ItemsSource="{Binding Snapshots}" HeightRequest="310" -->
-                                            <!--                 HorizontalOptions="FillAndExpand"> -->
-                                            <!--     <CollectionView.ItemsLayout> -->
-                                            <!--         <LinearItemsLayout Orientation="Horizontal" /> -->
-                                            <!--     </CollectionView.ItemsLayout> -->
-                                            <!--     <CollectionView.ItemTemplate> -->
-                                            <!--         <DataTemplate> -->
-                                            <!--             <Frame BackgroundColor="LightGray" CornerRadius="5" -->
-                                            <!--                    Padding="3" -->
-                                            <!--                    Margin="5" -->
-                                            <!--                    BorderColor="Gray" -->
-                                            <!--                    HorizontalOptions="FillAndExpand" -->
-                                            <!--                    VerticalOptions="FillAndExpand"> -->
-                                            <!--                 <Frame.Background> -->
-                                            <!--                     <SolidColorBrush Color="Gray" /> -->
-                                            <!--                 </Frame.Background> -->
-                                            <!--                 <Image Source="{Binding FullPath}" HeightRequest="300" -->
-                                            <!--                        WidthRequest="400"> -->
-                                            <!--                     <Image.GestureRecognizers> -->
-                                            <!--                         <TapGestureRecognizer -->
-                                            <!--                             Command="{Binding Source={x:Reference MainView}, Path=BindingContext.ImageTappedCommand}" -->
-                                            <!--                             CommandParameter="{Binding .}" /> -->
-                                            <!--                     </Image.GestureRecognizers> -->
-                                            <!--                 </Image> -->
-                                            <!--             </Frame> -->
-                                            <!--         </DataTemplate> -->
-                                            <!--     </CollectionView.ItemTemplate> -->
-                                            <!-- </CollectionView> -->
+                                            <CollectionView ItemsSource="{Binding Snapshots}" HeightRequest="290" WidthRequest="{Binding Source={x:Reference MainGrid}, Path=Width, Converter={StaticResource WidthMinusConverter}, ConverterParameter=150}"
+                                                             ItemSizingStrategy="MeasureFirstItem"
+                                               HorizontalScrollBarVisibility="Always"> 
+                                                 <CollectionView.ItemsLayout> 
+                                                     <LinearItemsLayout Orientation="Horizontal" /> 
+                                                 </CollectionView.ItemsLayout> 
+                                                 <CollectionView.ItemTemplate> 
+                                                     <DataTemplate> 
+                                                         <Frame BackgroundColor="LightGray" CornerRadius="5" 
+                                                                Padding="3" 
+                                                                BorderColor="Gray" 
+                                                                HorizontalOptions="FillAndExpand" 
+                                                                VerticalOptions="FillAndExpand"> 
+                                                             <Frame.Background>
+                                                                <SolidColorBrush Color="Transparent" /> 
+                                                             </Frame.Background>
+                                                            <Image Source="{Binding FullPath}" Aspect="AspectFit" HeightRequest="280" 
+                                                                    WidthRequest="400"> 
+                                                                 <Image.GestureRecognizers> 
+                                                                     <TapGestureRecognizer 
+                                                                         Command="{Binding Source={x:Reference MainView}, Path=BindingContext.ImageTappedCommand}" 
+                                                                         CommandParameter="{Binding .}" /> 
+                                                                 </Image.GestureRecognizers> 
+                                                             </Image> 
+                                                         </Frame> 
+                                                     </DataTemplate> 
+                                                 </CollectionView.ItemTemplate> 
+                                             </CollectionView>
+                                            <!--图片快照-->
+                                            <!--<ScrollView Orientation="Horizontal" HeightRequest="290" WidthRequest="{Binding Source={x:Reference MainGrid}, Path=Width, Converter={StaticResource WidthMinusConverter}, ConverterParameter=150}">
+                                                <HorizontalStackLayout        BindableLayout.ItemsSource="{Binding Snapshots}"
+        Spacing="5">
+                                                    <BindableLayout.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Image Source="{Binding FullPath}"
+                       Aspect="AspectFit"
+                       HeightRequest="280"
+                       WidthRequest="350">
+                                                                <Image.GestureRecognizers>
+                                                                    <TapGestureRecognizer
+                            Command="{Binding Source={x:Reference MainView}, Path=BindingContext.ImageTappedCommand}"
+                            CommandParameter="{Binding .}" />
+                                                                </Image.GestureRecognizers>
+                                                            </Image>
+                                                        </DataTemplate>
+                                                    </BindableLayout.ItemTemplate>
+                                                </HorizontalStackLayout>
+                                            </ScrollView>-->
+
                                         </Frame>
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
