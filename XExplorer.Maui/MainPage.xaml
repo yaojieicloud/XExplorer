@@ -72,15 +72,13 @@
                 </DataTemplate>
             </sfPopup:SfPopup.ContentTemplate>
         </sfPopup:SfPopup>
-        <syfCore:SfBusyIndicator x:Name="busyIndicator" VerticalOptions="StartAndExpand"
+        <syfCore:SfBusyIndicator x:Name="busyIndicator"
                                  IsRunning="{Binding Processing}"
                                  HeightRequest="{Binding MainViewHeight}"
                                  AnimationType="DoubleCircle">
-            <VerticalStackLayout VerticalOptions="StartAndExpand" HeightRequest="{Binding MainViewHeight}">
+            <VerticalStackLayout HeightRequest="{Binding MainViewHeight}">
                 <Grid ColumnDefinitions="7*,3*">
-                    <HorizontalStackLayout x:Name="MainTool" Grid.Column="0"
-                                           HorizontalOptions="StartAndExpand"
-                                           VerticalOptions="CenterAndExpand">
+                    <HorizontalStackLayout x:Name="MainTool" Grid.Column="0">
                         <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Text="目录：" FontSize="18"
                                Padding="10,0,0,0" />
                         <inputs:SfComboBox SelectedItem="{Binding SelectedDir}"
@@ -88,15 +86,11 @@
                                            SelectedIndex="0"
                                            DisplayMemberPath="ValidName"
                                            VerticalTextAlignment="Center"
-                                           VerticalOptions="EndAndExpand"
-                                           HorizontalOptions="StartAndExpand"
                                            HorizontalTextAlignment="Start"
                                            Margin="10,0"
                                            MinimumWidthRequest="300" />
                         <inputs:SfComboBox SelectedItem="{Binding ScrennMode}"
                                            VerticalTextAlignment="Center"
-                                           VerticalOptions="EndAndExpand"
-                                           HorizontalOptions="StartAndExpand"
                                            HorizontalTextAlignment="Start"
                                            Margin="10,0"
                                            MinimumWidthRequest="100">
@@ -211,7 +205,7 @@
                         <!-- <Button Text="清垃圾" ToolTipProperties.Text="清理数据目录不再使用的图片资源" Command="{Binding ClearInvalidDataDirCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
                         <!-- <Button Text="删数据" ToolTipProperties.Text="删除选中目录的数据目录" Command="{Binding ClearDataCommand}" MinimumWidthRequest="50" Margin="10,0"></Button> -->
                     </HorizontalStackLayout>
-                    <HorizontalStackLayout HorizontalOptions="EndAndExpand" Grid.Column="1">
+                    <HorizontalStackLayout Grid.Column="1">
                         <syfButton:SfButton Text="顶部" CornerRadius="20" HeightRequest="40"
                                             Padding="5,0"
                                             Command="{Binding ScrollToTopCommand}"
@@ -255,7 +249,7 @@
                         </syfButton:SfButton>
                     </HorizontalStackLayout>
                 </Grid>
-                <CollectionView ItemsSource="{Binding Videos}" x:Name="MainView" VerticalOptions="FillAndExpand"
+                <CollectionView ItemsSource="{Binding Videos}" x:Name="MainView"
                                 HeightRequest="{Binding MainContHeight}" Margin="10">
                     <CollectionView.ItemsLayout>
                         <LinearItemsLayout Orientation="Vertical" />
@@ -376,11 +370,8 @@
                                         <!-- </HorizontalStackLayout> -->
                                     </HorizontalStackLayout>
                                     <BoxView StyleClass="Divider" />
-                                    <HorizontalStackLayout Margin="10,0" HorizontalOptions="FillAndExpand">
-                                        <Frame Padding="-10,0,10,0" HorizontalOptions="StartAndExpand"
-                                               CornerRadius="0"
-                                               BorderColor="#99E0E0E0"
-                                               HasShadow="False">
+                                    <HorizontalStackLayout Margin="10,0">
+                                        <Border Padding="-10,0,10,0">
                                             <VerticalStackLayout HorizontalOptions="StartAndExpand"
                                                                  VerticalOptions="Start" WidthRequest="100"
                                                                  Padding="10,10,10,10">
@@ -464,11 +455,8 @@
                                                 <!--         Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DeleteFolderCommand}" -->
                                                 <!--         CommandParameter="{Binding}" /> -->
                                             </VerticalStackLayout>
-                                        </Frame>
-                                        <Frame Padding="0" HorizontalOptions="FillAndExpand"
-                                               CornerRadius="0"
-                                               BorderColor="#99E0E0E0"
-                                               HasShadow="False">
+                                        </Border>
+                                        <Border Padding="0">
                                             <!-- 图片快照 -->
                                             <!--<syfCarousel:SfCarousel
                                                 EnableVirtualization="True"
@@ -498,54 +486,27 @@
                                             <!-- 图片快照 -->
                                             <CollectionView ItemsSource="{Binding Snapshots}" HeightRequest="290" WidthRequest="{Binding Source={x:Reference MainGrid}, Path=Width, Converter={StaticResource WidthMinusConverter}, ConverterParameter=150}"
                                                              ItemSizingStrategy="MeasureFirstItem"
-                                               HorizontalScrollBarVisibility="Always"> 
-                                                 <CollectionView.ItemsLayout> 
-                                                     <LinearItemsLayout Orientation="Horizontal" /> 
-                                                 </CollectionView.ItemsLayout> 
-                                                 <CollectionView.ItemTemplate> 
-                                                     <DataTemplate> 
-                                                         <Frame BackgroundColor="LightGray" CornerRadius="5" 
-                                                                Padding="3" 
-                                                                BorderColor="Gray" 
-                                                                HorizontalOptions="FillAndExpand" 
-                                                                VerticalOptions="FillAndExpand"> 
-                                                             <Frame.Background>
-                                                                <SolidColorBrush Color="Transparent" /> 
-                                                             </Frame.Background>
+                                               HorizontalScrollBarVisibility="Always">
+                                                <CollectionView.ItemsLayout>
+                                                    <LinearItemsLayout Orientation="Horizontal" />
+                                                </CollectionView.ItemsLayout>
+                                                <CollectionView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border BackgroundColor="Transparent"
+                                                                Padding="3">
                                                             <Image Source="{Binding FullPath}" Aspect="AspectFit" HeightRequest="280" 
-                                                                    WidthRequest="400"> 
-                                                                 <Image.GestureRecognizers> 
-                                                                     <TapGestureRecognizer 
-                                                                         Command="{Binding Source={x:Reference MainView}, Path=BindingContext.ImageTappedCommand}" 
-                                                                         CommandParameter="{Binding .}" /> 
-                                                                 </Image.GestureRecognizers> 
-                                                             </Image> 
-                                                         </Frame> 
-                                                     </DataTemplate> 
-                                                 </CollectionView.ItemTemplate> 
-                                             </CollectionView>
-                                            <!--图片快照-->
-                                            <!--<ScrollView Orientation="Horizontal" HeightRequest="290" WidthRequest="{Binding Source={x:Reference MainGrid}, Path=Width, Converter={StaticResource WidthMinusConverter}, ConverterParameter=150}">
-                                                <HorizontalStackLayout        BindableLayout.ItemsSource="{Binding Snapshots}"
-        Spacing="5">
-                                                    <BindableLayout.ItemTemplate>
-                                                        <DataTemplate>
-                                                            <Image Source="{Binding FullPath}"
-                       Aspect="AspectFit"
-                       HeightRequest="280"
-                       WidthRequest="350">
+                                                                    WidthRequest="400">
                                                                 <Image.GestureRecognizers>
-                                                                    <TapGestureRecognizer
-                            Command="{Binding Source={x:Reference MainView}, Path=BindingContext.ImageTappedCommand}"
-                            CommandParameter="{Binding .}" />
+                                                                    <TapGestureRecognizer 
+                                                                         Command="{Binding Source={x:Reference MainView}, Path=BindingContext.ImageTappedCommand}" 
+                                                                         CommandParameter="{Binding .}" />
                                                                 </Image.GestureRecognizers>
                                                             </Image>
-                                                        </DataTemplate>
-                                                    </BindableLayout.ItemTemplate>
-                                                </HorizontalStackLayout>
-                                            </ScrollView>-->
-
-                                        </Frame>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </CollectionView.ItemTemplate>
+                                            </CollectionView>
+                                        </Border>
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Border>
@@ -553,7 +514,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
                 <BoxView StyleClass="Divider" />
-                <HorizontalStackLayout HorizontalOptions="EndAndExpand" MaximumHeightRequest="20">
+                <HorizontalStackLayout MaximumHeightRequest="20">
                     <Label Text="{Binding Message}" />
                 </HorizontalStackLayout>
             </VerticalStackLayout>

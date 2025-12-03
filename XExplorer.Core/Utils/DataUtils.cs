@@ -110,9 +110,9 @@ public static class DataUtils
         result.Path = snapshot.Path;
         result.FullPath = snapshot.FullPath;
 
-#if DEBUG
-        result.FullPath = "D:\\Downloads\\001.png";
-#endif
+//#if DEBUG
+//        result.FullPath = "D:\\Downloads\\001.png";
+//#endif
 
         return result;
     }
@@ -122,8 +122,25 @@ public static class DataUtils
     /// </summary>
     /// <param name="snapshots">要转换的快照列表。</param>
     /// <returns>转换后的快照模式列表。</returns>
-    public static List<SnapshotMode> ToModes(this IList<Snapshot> snapshots) =>
-        snapshots.Select(m => m.ToMode()).ToList();
+    public static List<SnapshotMode> ToModes(this IList<Snapshot> snapshots)
+    {
+        var modes  = snapshots.Select(m => m.ToMode()).ToList();
+
+        for (int i = modes.Count - 1; i >= 0; i--)
+        {
+            if (!System.IO.File.Exists(modes[i].FullPath))
+            {
+                modes.RemoveAt(i);
+            }
+
+            if (i > 2)
+            {
+                modes.RemoveAt(i);
+            }
+        }
+
+        return modes;
+    }
 
     /// <summary>
     /// 将 Video 实例列表转换为 VideoMode 实例列表。
