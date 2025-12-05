@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net;
 using System.Reflection;
 using CommunityToolkit.Mvvm.Input;
 using Serilog;
@@ -34,14 +35,69 @@ partial class MainViewModel
             if (param is VideoMode mode)
             {
                 mode.PlayCount++;
+                var port = GetPortCmd();
                 var currPath = AdjustPath(mode.VideoPath);
                 currPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, currPath);
                 var volume = AdjustPath(AppSettingsUtils.Default.Current.Volume);
                 currPath = Path.Combine(volume, currPath);
                 if (AppSettingsUtils.Default.OS == OS.Windows)
-                    Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"--no-one-instance \"{currPath}\" --loop --rate=1.7");
+                    Process.Start(AppSettingsUtils.Default.Current.VLCPath,
+                        $"--no-one-instance \"{currPath}\" --loop --rate=2.0{port}");
                 else
-                    Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"\"{currPath}\" --loop");
+                    Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"\"{currPath}\" --loop --rate=2.0{port}");
+
+                var entry = await dataService.VideosService.FirstAsync(m => m.Id == mode.Id);
+                if (entry != null)
+                {
+                    entry.PlayCount++;
+                    await dataService.VideosService.UpdateOnlyAsync(entry);
+                    Log.Information($"视频 [{mode.Id} {mode.VideoPath}] 播放次数已更新。");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+        }
+    }
+
+    /// <summary>
+    /// 将指定的视频文件添加到播放列表中。
+    /// </summary>
+    /// <param name="param">表示视频信息的对象，通常为 <c>VideoMode</c> 类型。</param>
+    /// <remarks>
+    /// 此方法会检查传入的视频信息对象是否为有效的 <c>VideoMode</c> 实例。如果是，则会增加该视频的播放次数，并通过 VLC 媒体播放器将视频文件添加到当前播放列表。同时，更新数据存储以反映变化。
+    /// 如果发生异常，该方法会记录错误信息。
+    /// </remarks>
+    [RelayCommand]
+    public async Task AddPlayListAsync(object param)
+    {
+        try
+        {
+            if (param is VideoMode mode)
+            {
+                mode.PlayCount++;
+                var port = this.SelectedPort.Port;
+                var currPath = AdjustPath(mode.VideoPath);
+                currPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, currPath);
+                var volume = AdjustPath(AppSettingsUtils.Default.Current.Volume);
+                currPath = Path.Combine(volume, currPath);
+
+                var password = "123456"; // VLC HTTP 接口密码
+                var vlcUrl = $"http://localhost:{port}/requests/status.xml";
+                var uriPath = ConvertToFileUri(currPath);
+                var requestUrl = $"{vlcUrl}?command=in_enqueue&input={Uri.EscapeDataString(uriPath)}";
+                using (var handler = new HttpClientHandler { Credentials = new NetworkCredential("", password) })
+                using (var client = new HttpClient(handler))
+                {
+                    var response = await client.GetAsync(requestUrl);
+                    var mesg = response.EnsureSuccessStatusCode();
+                    var result = await response.Content.ReadAsStringAsync();
+                    if(mesg.StatusCode == HttpStatusCode.OK)
+                        Log.Information($"视频 [{mode.Id} {mode.VideoPath}] 已加入播放列表。");
+                    else
+                        Log.Error($"视频 [{mode.Id} {mode.VideoPath}] 加入播放列表失败。");
+                }
 
                 var entry = await dataService.VideosService.FirstAsync(m => m.Id == mode.Id);
                 if (entry != null)
@@ -92,7 +148,9 @@ partial class MainViewModel
             {
                 var fullDir = Path.Combine(AppSettingsUtils.Default.Current.Volume, mode.VideoDir);
                 var fullPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, mode.VideoPath);
-                var videos = await this.dataService.VideosService.QueryAsync(m => m.VideoDir == mode.VideoDir && m.Id != mode.Id);
+                var videos =
+                    await this.dataService.VideosService.QueryAsync(m =>
+                        m.VideoDir == mode.VideoDir && m.Id != mode.Id);
 
                 if (File.Exists(fullPath))
                 {
@@ -129,7 +187,7 @@ partial class MainViewModel
 
                 await this.dataService.VideosService.DeleteAsync(mode.Id);
                 this.Videos.Remove(mode);
-                this.Information($"视频数据 [{mode.Caption}] 已删除。"); 
+                this.Information($"视频数据 [{mode.Caption}] 已删除。");
             }
             catch (Exception e)
             {

@@ -37,6 +37,12 @@ public partial class MainViewModel : ObservableObject
     {
         dataService = new DataService();
         InitDirs();
+        this.Ports.Add(new PlayPort{Name = nameof(ONE_LEFT_PORT), Port = ONE_LEFT_PORT});
+        this.Ports.Add(new PlayPort{Name = nameof(ONE_RIGHT_PORT), Port = ONE_RIGHT_PORT});
+        this.Ports.Add(new PlayPort{Name = nameof(TWO_LEFT1_PORT), Port = TWO_LEFT1_PORT});
+        this.Ports.Add(new PlayPort{Name = nameof(TWO_LEFT2_PORT), Port = TWO_LEFT2_PORT});
+        this.Ports.Add(new PlayPort{Name = nameof(TWO_RIGHT1_PORT), Port = TWO_RIGHT1_PORT});
+        this.Ports.Add(new PlayPort{Name = nameof(TWO_RIGHT2_PORT), Port = TWO_RIGHT2_PORT});
     }
 
     #region Command

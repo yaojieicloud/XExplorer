@@ -20,7 +20,43 @@ namespace XExplorer.Core.ViewModel;
 /// </summary>
 partial class MainViewModel
 {
+    /// <summary>
+    /// 表示应用程序中左侧通信端口的数值，用于特定功能模块的网络通信和数据传输。
+    /// </summary>
+    private const int ONE_LEFT_PORT = 34212;
+
+    /// <summary>
+    /// 表示应用程序中右侧通信端口的数值，用于特定功能模块的网络通信和数据传输。
+    /// </summary>
+    private const int ONE_RIGHT_PORT = 34213;
+
+    /// <summary>
+    /// 表示应用程序中第二个左侧通信端口的数值，用于特定功能模块的网络通信和数据传输。
+    /// </summary>
+    private const int TWO_LEFT1_PORT = 34312;
+
+    /// <summary>
+    /// 表示应用程序中第二个左侧通信端口的数值，用于特定功能模块的网络通信和数据传输。
+    /// </summary>
+    private const int TWO_LEFT2_PORT = 34313;
+
+    /// <summary>
+    /// 表示应用程序中右侧通信端口的数值，用于特定功能模块的网络通信和数据传输。
+    /// </summary>
+    private const int TWO_RIGHT1_PORT = 34412;
+
+    /// <summary>
+    /// 表示应用程序中右侧通信端口的数值，用于特定功能模块的网络通信和数据传输。
+    /// </summary>
+    private const int TWO_RIGHT2_PORT = 34412;
+
     #region Static
+
+    /// <summary>
+    /// 表示应用程序中玩家通信端口的数组，包含多个用于特定功能模块的网络通信和数据传输的端口号。
+    /// </summary>
+    private static int[] PLAYER_PORTS =
+        { ONE_LEFT_PORT, ONE_RIGHT_PORT, TWO_LEFT1_PORT, TWO_LEFT2_PORT, TWO_RIGHT1_PORT, TWO_RIGHT2_PORT };
 
     /// <summary>
     /// 支持的图片扩展名列表
@@ -37,9 +73,9 @@ partial class MainViewModel
     /// 视频最小大小（单位：MB）
     /// </summary>
     private readonly decimal videoMiniSize = 110 * 1024 * 1024;
-    
+
     #endregion
-    
+
     #region Fields
 
     /// <summary>
@@ -56,16 +92,20 @@ partial class MainViewModel
     ///     常用于用户界面的交互逻辑中，以在执行长时间操作时
     ///     向用户提供反馈，如显示加载动画或阻止重复操作。
     /// </summary>
-    [ObservableProperty]
-    private bool processing;
+    [ObservableProperty] private bool processing;
 
     /// <summary>
     ///     一个私有的可观察集合，包含 <see cref="VideoMode" /> 对象。
     ///     此集合用于在应用程序的主视图模型中管理和表示多个视频实体，
     ///     方便进行数据绑定和界面更新。
     /// </summary>
-    [ObservableProperty]
-    private ObservableCollection<VideoMode> videos = new();
+    [ObservableProperty] private ObservableCollection<VideoMode> videos = new();
+
+    /// <summary>
+    /// 表示一个可观察集合，用于存储和管理播放端口 (PlayPort) 的信息。
+    /// 该集合在视图模型中用作数据绑定的来源，帮助维护与用户界面相关的端口状态。
+    /// </summary>
+    [ObservableProperty] private ObservableCollection<PlayPort> ports = new();
 
     /// <summary>
     ///     一个私有变量，代表用户当前选择的目录路径。用于
@@ -73,25 +113,27 @@ partial class MainViewModel
     ///     相关操作的实现。当目录加载时，
     ///     此变量会更新以反映用户的新选择。
     /// </summary>
-    [ObservableProperty]
-    private DirRecord selectedDir;
+    [ObservableProperty] private DirRecord selectedDir;
 
+    /// <summary>
+    /// 表示当前选中的播放端口信息，用于确定应用程序中的数据传输或播放功能的目标端口。
+    /// </summary>
+    [ObservableProperty] private PlayPort selectedPort;
+    
     /// <summary>
     ///     一个私有变量，用于存储目录路径的集合。该集合是
     ///     <see cref="ObservableCollection{T}" /> 类型，支持在 UI 中动态更新和绑定。
     ///     <see cref="dirs" /> 变量由 <see cref="MainViewModel" /> 管理，负责跟踪应用程序
     ///     中需要显示的所有目录路径。
     /// </summary>
-    [ObservableProperty]
-    private ObservableCollection<DirRecord> dirs = new();
+    [ObservableProperty] private ObservableCollection<DirRecord> dirs = new();
 
     /// <summary>
     /// 一个私有字段，用于存储与应用程序状态或用户界面相关的消息内容。
     /// 该字段通过实现数据绑定的机制，被 UI 动态显示或更新，以实现对
     /// 消息通知、信息提示或用户交互内容的支持。
     /// </summary>
-    [ObservableProperty]
-    private string message;
+    [ObservableProperty] private string message;
 
     /// <summary>
     /// 一个私有布尔变量，表示当前界面元素的显示状态。通常与
@@ -99,55 +141,47 @@ partial class MainViewModel
     /// 此变量对 UI 状态的变化响应至关重要，绑定到对应的视图属性以确保
     /// 状态同步。
     /// </summary>
-    [ObservableProperty]
-    private bool isShow;
+    [ObservableProperty] private bool isShow;
 
     /// <summary>
     /// 主视图的高度
     /// </summary>
-    [ObservableProperty]
-    private double mainViewHeight;
+    [ObservableProperty] private double mainViewHeight;
 
     /// <summary>
     /// 主视图的高度
     /// </summary>
-    [ObservableProperty]
-    private double mainContHeight;
-    
+    [ObservableProperty] private double mainContHeight;
+
     /// <summary>
     /// 是否显示图片的布尔值
     /// </summary>
-    [ObservableProperty]
-    private bool showImg;
-    
+    [ObservableProperty] private bool showImg;
+
     /// <summary>
     /// 当前选中的图片路径
     /// </summary>
-    [ObservableProperty]
-    private string selectedImg;
+    [ObservableProperty] private string selectedImg;
 
     /// <summary>
     /// 表示取消操作的状态
     /// </summary>
-    [ObservableProperty]
-    private bool isCancel = true;
+    [ObservableProperty] private bool isCancel = true;
 
     /// <summary>
     /// 最近一次交互或操作的对象，用于记录状态或执行逻辑判断。
     /// </summary>
     private object last;
- 
+
     /// <summary>
     /// 当前屏幕模式，指示视图的显示布局（如无模式、宽屏或窄屏）。
     /// </summary>
-    [ObservableProperty]
-    private string scrennMode = Screnn.None;
+    [ObservableProperty] private string scrennMode = Screnn.None;
 
     /// <summary>
     /// 控制弹出按钮的外观模式
     /// </summary>
-    [ObservableProperty]
-    private PopupButtonAppearanceMode appearanceMode = PopupButtonAppearanceMode.OneButton;
+    [ObservableProperty] private PopupButtonAppearanceMode appearanceMode = PopupButtonAppearanceMode.OneButton;
 
     #endregion
 }

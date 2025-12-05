@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Mime;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Security.Cryptography;
 using Emgu.CV;
@@ -190,6 +192,17 @@ partial class MainViewModel
             MainThread.BeginInvokeOnMainThread(() => this.Message = title ?? message);
     }
 
+    /// <summary>
+    /// 根据提供的路径生成有效标识符的方法。
+    /// 此方法通过移除路径中与应用程序配置相关的不必要部分，
+    /// 返回一个适合用于显示或处理的有效路径名称。
+    /// </summary>
+    /// <param name="path">
+    /// 原始路径字符串，需要转换为有效名称的目标路径。
+    /// </param>
+    /// <returns>
+    /// 返回一个处理后的字符串，此字符串是原始路径中去除了特定卷名信息后的有效名称。
+    /// </returns>
     private string GetValid(string path)
     {
         var valid = path.Replace(AppSettingsUtils.Default.Current.Volume, string.Empty);
@@ -199,6 +212,68 @@ partial class MainViewModel
 
         return valid;
     }
+
+    /// <summary>
+    /// 生成可用端口的命令字符串。
+    /// 此方法从预定义的端口列表中查找第一个未被占用的端口，
+    /// 并生成对应的 HTTP 服务命令字符串，供播放器功能模块使用。
+    /// </summary>
+    /// <remarks>
+    /// 方法会遍历 PLAYER_PORTS 数组中的端口号，
+    /// 检测是否已被占用。如果找到未占用的端口，将返回一个包含该端口号的命令字符串，
+    /// 例如 "--extraintf http --http-port=34212"。
+    /// 如果所有端口均被占用，则返回空字符串。
+    /// </remarks>
+    /// <returns>
+    /// 包含可用端口的 HTTP 服务命令字符串；
+    /// 如果没有找到可用端口，则返回空字符串。
+    /// </returns>
+    private string GetPortCmd()
+    {
+        var cmd = "--extraintf http --http-port=";
+        var port = this.selectedPort?.Port ?? 0;
+            if (!IsPortInUse(port))
+                return $" --extraintf http --http-port={port}"; // 找到未占用的端口  
+
+        return string.Empty; // 没有可用端口
+    }
+
+    /// <summary>
+    /// 检查指定的端口是否正在使用中。
+    /// 此方法通过获取系统当前活动的 TCP 端点列表，判断目标端口是否被占用，
+    /// 可以用于网络服务配置或端口冲突的检测场景。
+    /// </summary>
+    /// <param name="port">要检查的目标端口号。</param>
+    /// <returns>如果指定端口正在使用，返回 true；否则返回 false。</returns>
+    private bool IsPortInUse(int port)
+    {
+        var ipProperties = IPGlobalProperties.GetIPGlobalProperties();
+        var tcpEndPoints = ipProperties.GetActiveTcpListeners();
+        return tcpEndPoints.Any(endPoint => endPoint.Port == port);
+    }
+
+    /// <summary>
+    /// 将指定的文件系统路径转换为文件 URI 的方法。
+    /// 此方法支持普通磁盘路径与 UNC 路径，确保返回符合 URI 格式的字符串。
+    /// </summary>
+    /// <param name="path">待转换的文件系统路径，可以是普通磁盘路径或 UNC 路径。</param>
+    /// <returns>返回一个符合文件 URI 格式的字符串。</returns>
+    private string ConvertToFileUri(string path)
+    {
+        // 如果是 UNC 路径 \\NAS\share\video.mp4
+        if (path.StartsWith(@"\\"))
+        {
+            // 去掉前导的两个反斜杠，替换为 file://
+            string withoutSlashes = path.TrimStart('\\');
+            return "file://" + withoutSlashes.Replace("\\", "/");
+        }
+        else
+        {
+            // 普通磁盘路径
+            return new Uri(path).AbsoluteUri;
+        }
+    }
+
 
     #region 批处理视频
 

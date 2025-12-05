@@ -58,7 +58,7 @@ public static class DataUtils
     /// <returns>转换后的 Snapshot 实例列表。</returns>
     public static List<Snapshot> ToSnapshots(this IList<SnapshotMode> modes) =>
         modes.Select(m => m.ToSnapshot()).ToList();
- 
+
     /// <summary>
     /// 将 VideoMode 列表转换为 Video 实体的列表。
     /// </summary>
@@ -110,9 +110,9 @@ public static class DataUtils
         result.Path = snapshot.Path;
         result.FullPath = snapshot.FullPath;
 
-//#if DEBUG
-//        result.FullPath = "D:\\Downloads\\001.png";
-//#endif
+        //#if DEBUG
+        //        result.FullPath = "D:\\Downloads\\001.png";
+        //#endif
 
         return result;
     }
@@ -124,7 +124,7 @@ public static class DataUtils
     /// <returns>转换后的快照模式列表。</returns>
     public static List<SnapshotMode> ToModes(this IList<Snapshot> snapshots)
     {
-        var modes  = snapshots.Select(m => m.ToMode()).ToList();
+        var modes = snapshots.Select(m => m.ToMode()).ToList();
 
         for (int i = modes.Count - 1; i >= 0; i--)
         {
@@ -133,10 +133,10 @@ public static class DataUtils
                 modes.RemoveAt(i);
             }
 
-            if (i > 2)
-            {
+            if (i == 1 || i == 3 || i == 5)
+                continue;
+            else
                 modes.RemoveAt(i);
-            }
         }
 
         return modes;
