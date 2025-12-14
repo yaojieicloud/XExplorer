@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Newtonsoft.Json;
 using Serilog;
 using SharpCompress.Archives;
 using SharpCompress.Common;
@@ -81,7 +82,7 @@ public partial class SettingsViewModel
     }
 
     #endregion
-    
+
     /// <summary>
     ///     打开指定目录的方法。
     ///     根据输入目录路径尝试进行路径调整，并在不同平台上调用对应的文件管理器（例如 Windows 的资源管理器）
@@ -108,8 +109,8 @@ public partial class SettingsViewModel
             Notification($"{ex}");
         }
     }
-    
-        /// <summary>
+
+    /// <summary>
     ///     调整指定路径以适应当前操作系统环境的方法。
     ///     此方法根据配置的系统平台，将路径在 Windows 格式和 Mac 格式之间进行转换，
     ///     确保路径在不同平台上能够正确解析。
@@ -216,4 +217,26 @@ public class UnzipRequest
 {
     public string Dir { get; set; }
     public List<string> Passwords { get; set; }
+}
+
+
+public class UnzipDirRequest
+{
+    [JsonProperty("dir")]
+    public string Dir { get; set; }
+
+    [JsonProperty("passwords")]
+    public List<string> Passwords { get; set; }
+
+    [JsonProperty("root")]
+    public string Root { get; set; }
+
+    [JsonProperty("extensions")]
+    public List<string> Extensions { get; set; }
+
+    [JsonProperty("is_del_zip")]
+    public bool IsDelZip { get; set; }
+
+    [JsonProperty("pool_max")]
+    public int PoolMax { get; set; } = 3;
 }

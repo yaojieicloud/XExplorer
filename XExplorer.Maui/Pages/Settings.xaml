@@ -77,7 +77,7 @@
                                             HeightRequest="55"
                                             Padding="0,0,0,0"
                                             Margin="20,0,0,0"
-                                            Command="{Binding UnzipCommand}">
+                                            Command="{Binding UnzipDirCommand}">
                             <syfButton:SfButton.Background>
                                 <LinearGradientBrush>
                                     <LinearGradientBrush.GradientStops>
