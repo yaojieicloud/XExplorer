@@ -164,7 +164,7 @@ public partial class SettingsViewModel : ViewModelBase
                 var pwds = await this.dataService.PwdService.GetAsync();
                 var pwdStrings = pwds.Select(m => m.Pwd).ToList();
                 pwdStrings.Add(string.Empty);
-                var reuqest = new UnzipDirRequest { Dir = dir.ValidName, Passwords = pwdStrings, IsDelZip = true, Extensions = new List<string> { ".zip", ".rar", ".tar", ".tar.gz", ".7z" }, PoolMax = 3, Root = "/data" };
+                var reuqest = new UnzipDirRequest { Dir = dir.ValidName, Passwords = pwdStrings, IsDelZip = true, Extensions = new List<string> { ".zip", ".rar", ".tar", ".tar.gz", ".7z" }, PoolMax = 3, Root = "/videos" };
 
             start:
                 try
