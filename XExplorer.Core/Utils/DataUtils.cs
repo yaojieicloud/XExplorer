@@ -135,7 +135,7 @@ public static class DataUtils
 
             if (i == 1 || i == 3 || i == 5)
                 continue;
-            else
+            else if (modes.Count > i)
                 modes.RemoveAt(i);
         }
 
