@@ -59,11 +59,11 @@ public partial class MainViewModel : ObservableObject
             Processing = true; 
             Videos.Clear();
             var modes = new List<VideoMode>();
-            await Task.Delay(1000);
+            await Task.Delay(500);
             await Task.Run(async () =>
-            {
-                var dir = SelectedDir.ValidName == Screnn.All ? null : SelectedDir.ValidName;
+            {                
                 bool? wideScrenn = ScrennMode == Screnn.None ? null : ScrennMode == Screnn.Wide ? true : false;
+                var dir = SelectedDir.ValidName == Screnn.All ? null : SelectedDir.ValidName;
                 var enties = await dataService.VideosService.QueryAsync(dir, wideScrenn: wideScrenn);
                 modes = enties.ToModes();
             });

@@ -19,6 +19,17 @@
     <ContentPage.BindingContext>
         <vm:MainViewModel />
     </ContentPage.BindingContext>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="顶部▲" Order="Primary" Priority="0"
+                     Command="{Binding ScrollToTopCommand}"
+                     CommandParameter="{x:Reference MainView}" />
+        <ToolbarItem Text="中部★" Order="Primary" Priority="0"
+             Command="{Binding ScrollToMiddleCommand}"
+             CommandParameter="{x:Reference MainView}" />
+        <ToolbarItem Text="底部▼" Order="Primary" Priority="0"
+             Command="{Binding ScrollToBottomCommand}"
+             CommandParameter="{x:Reference MainView}" />
+    </ContentPage.ToolbarItems>
     <VerticalStackLayout Margin="10" x:Name="MainGrid" SizeChanged="MainGrid_OnSizeChanged">
         <sfPopup:SfPopup AppearanceMode="{Binding AppearanceMode}"
                          ShowFooter="True"
@@ -77,7 +88,7 @@
                                  HeightRequest="{Binding MainViewHeight}"
                                  AnimationType="DoubleCircle">
             <VerticalStackLayout HeightRequest="{Binding MainViewHeight}">
-                <Grid ColumnDefinitions="7*,3*">
+                <Grid ColumnDefinitions="7*">
                     <HorizontalStackLayout x:Name="MainTool" Grid.Column="0">
                         <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Text="目录：" FontSize="18"
                                Padding="10,0,0,0" />
@@ -93,7 +104,7 @@
                                            VerticalTextAlignment="Center"
                                            HorizontalTextAlignment="Start"
                                            Margin="10,0"
-                                           MinimumWidthRequest="100">
+                                           MinimumWidthRequest="60">
                             <inputs:SfComboBox.ItemsSource>
                                 <x:Array Type="{x:Type x:String}">
                                     <x:String>None</x:String>
@@ -109,7 +120,7 @@
                                            VerticalTextAlignment="Center"
                                            HorizontalTextAlignment="Start"
                                            Margin="10,0"
-                                           MinimumWidthRequest="150" />
+                                           MinimumWidthRequest="100" />
                         <syfButton:SfButton Text="加载" CornerRadius="20" HeightRequest="40"
                                             Padding="5,0"
                                             Command="{Binding LoadDirCommand}">
@@ -175,11 +186,12 @@
                             </syfButton:SfButton.Background>
                         </syfButton:SfButton>
                         <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
-                        
+
                     </HorizontalStackLayout>
-                    <HorizontalStackLayout Grid.Column="1" HorizontalOptions="End">
+                    <HorizontalStackLayout Grid.Column="1" HorizontalOptions="End" IsVisible="Collapse">
                         <syfButton:SfButton Text="顶部" CornerRadius="20" HeightRequest="40"
                                             Padding="5,0"
+                                            IsVisible="Collapse"
                                             Command="{Binding ScrollToTopCommand}"
                                             CommandParameter="{x:Reference MainView}">
                             <syfButton:SfButton.Background>
@@ -207,7 +219,7 @@
                         </syfButton:SfButton>
                         <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
                         <syfButton:SfButton Text="底部" CornerRadius="20" HeightRequest="40"
-                                            Padding="5,0"
+                                            Padding="5,0" 
                                             Command="{Binding ScrollToBottomCommand}"
                                             CommandParameter="{x:Reference MainView}">
                             <syfButton:SfButton.Background>

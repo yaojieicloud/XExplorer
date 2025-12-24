@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
+using Emgu.CV.Dnn;
 using XExplorer.Core.Modes;
 
 namespace XExplorer.Core.Utils;
@@ -128,15 +129,19 @@ public static class DataUtils
 
         for (int i = modes.Count - 1; i >= 0; i--)
         {
-            if (!System.IO.File.Exists(modes[i].FullPath))
-            {
-                modes.RemoveAt(i);
-            }
+            if (!File.Exists(modes[i].FullPath))
+                modes.RemoveAt(i); 
+        }
 
-            if (i == 1 || i == 3 || i == 5)
-                continue;
-            else if (modes.Count > i)
-                modes.RemoveAt(i);
+        if (modes.Count > 3)
+        {
+            for (int i = modes.Count - 1; i >= 0; i--)
+            {
+                if (i == 1 || i == 3 || i == 5 | i == 7)
+                    continue;
+                else if (modes.Count > i)
+                    modes.RemoveAt(i);
+            }
         }
 
         return modes;

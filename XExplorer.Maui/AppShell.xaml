@@ -11,7 +11,8 @@
     <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Route="MainPage">
+    </ShellContent>
     <ShellContent
         Title="Settings"
         ContentTemplate="{DataTemplate pages:Settings}" 
