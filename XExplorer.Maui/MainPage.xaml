@@ -131,6 +131,21 @@ CommandParameter="{x:Reference MainView}" />
                                            HorizontalTextAlignment="Start"
                                            Margin="10,0"
                                            MinimumWidthRequest="100" />
+                        <inputs:SfComboBox SelectedItems="{Binding SelectedKeywords}"
+                                            ItemsSource="{Binding Keywords}"
+                                            Text="{Binding SelectedKeyword, Mode=TwoWay}"
+                                            SelectedIndex="0"
+                                            VerticalTextAlignment="Center"
+                                            HorizontalTextAlignment="Start"
+                                            Margin="10,0"
+                                            SelectionMode="Multiple"
+                                            MultiSelectionDisplayMode="Token" 
+                                            IsEditable="True"
+                                            HighlightedTextColor="Red"
+                                            TextHighlightMode="FirstOccurrence"
+                                            TextSearchMode="Contains"
+                                            MinimumWidthRequest="100" 
+                                           />
                         <syfButton:SfButton Text="加载" CornerRadius="5" HeightRequest="40"
                                             Padding="5,0"
                                             Command="{Binding LoadDirCommand}">

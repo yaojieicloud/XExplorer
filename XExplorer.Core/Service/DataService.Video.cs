@@ -153,7 +153,7 @@ partial class DataService
         {
             foreach (var video in videos)
             {
-                var entry =  dataContext.Entry(video);
+                var entry = dataContext.Entry(video);
                 entry.State = EntityState.Modified;
                 entry.CurrentValues.SetValues(video);
             }
@@ -239,7 +239,7 @@ partial class DataService
         ///     执行视频数据查询的异步方法。
         /// </summary>
         /// <param name="dir">目标目录，可选。</param>
-        /// <param name="caption">视频标题或描述的部分文本，可选。</param>
+        /// <param name="keywords">视频标题或描述的部分文本，可选。</param>
         /// <param name="evaluate">最小评价分数，可选。</param>
         /// <param name="isDesc">排序方式，true 表示按降序，false 表示按升序。</param>
         /// <param name="skip">跳过的记录数，默认为 0。</param>
@@ -248,7 +248,7 @@ partial class DataService
         /// <param name="wideScrenn">是否为宽屏视频，布尔值，可选。</param>
         /// <returns>符合条件的视频列表。</returns>
         public async Task<List<Video>> QueryAsync(string? dir = null,
-            string? caption = null, int? evaluate = null,
+            List<string> keywords = null, int? evaluate = null,
             bool isDesc = true, int skip = 0, int take = int.MaxValue, decimal status = 1, bool? wideScrenn = null)
         {
             var query = dataContext.Videos.AsNoTracking()
@@ -257,8 +257,8 @@ partial class DataService
             if (!string.IsNullOrWhiteSpace(dir))
                 query = query.Where(m => m.RootDir.Replace(@"\", "/").EndsWith(dir.Replace(@"\", "/")));
 
-            if (!string.IsNullOrWhiteSpace(caption))
-                query = query.Where(m => m.Caption.Contains(caption));
+            if (keywords?.Any() ?? false)
+                query = query.Where(m => keywords.Any(k => m.VideoPath.Contains(k)));
 
             if (evaluate.HasValue)
                 query = query.Where(m => m.Evaluate >= evaluate.Value);
@@ -338,7 +338,7 @@ partial class DataService
 
             // 查询所有视频数据
             var query = dataContext.Videos.AsNoTracking().Include(v => v.Snapshots).AsEnumerable();
- 
+
             var groups = query
                 .GroupBy(keySelector) // 按指定字段分组
                 .Where(g => g.Count() > 1); // 找出组内数量大于1的  
@@ -358,7 +358,7 @@ partial class DataService
             }
 
             return duplicates;
-        } 
+        }
 
         /// <summary>
         /// 根据 MD5 查询所有 MD5 相同的视频集合。

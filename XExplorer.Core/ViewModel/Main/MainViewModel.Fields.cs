@@ -119,7 +119,7 @@ partial class MainViewModel
     /// 表示当前选中的播放端口信息，用于确定应用程序中的数据传输或播放功能的目标端口。
     /// </summary>
     [ObservableProperty] private PlayPort selectedPort;
-    
+
     /// <summary>
     ///     一个私有变量，用于存储目录路径的集合。该集合是
     ///     <see cref="ObservableCollection{T}" /> 类型，支持在 UI 中动态更新和绑定。
@@ -128,6 +128,10 @@ partial class MainViewModel
     /// </summary>
     [ObservableProperty] private ObservableCollection<DirRecord> dirs = new();
 
+    /// <summary>
+    /// 关键字列表
+    /// </summary>
+    [ObservableProperty] private ObservableCollection<string> keywords = new();
     /// <summary>
     /// 一个私有字段，用于存储与应用程序状态或用户界面相关的消息内容。
     /// 该字段通过实现数据绑定的机制，被 UI 动态显示或更新，以实现对
@@ -177,6 +181,16 @@ partial class MainViewModel
     /// 当前屏幕模式，指示视图的显示布局（如无模式、宽屏或窄屏）。
     /// </summary>
     [ObservableProperty] private string scrennMode = Screnn.None;
+
+    /// <summary>
+    /// 搜索关键字
+    /// </summary>
+    [ObservableProperty] private List<string> selectedKeywords;
+
+    /// <summary>
+    /// 输入关键字
+    /// </summary>
+    [ObservableProperty] private string selectedKeyword;
 
     /// <summary>
     /// 控制弹出按钮的外观模式

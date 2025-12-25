@@ -37,12 +37,13 @@ public partial class MainViewModel : ObservableObject
     {
         dataService = new DataService();
         InitDirs();
-        this.Ports.Add(new PlayPort{Name = nameof(ONE_LEFT_PORT), Port = ONE_LEFT_PORT});
-        this.Ports.Add(new PlayPort{Name = nameof(ONE_RIGHT_PORT), Port = ONE_RIGHT_PORT});
-        this.Ports.Add(new PlayPort{Name = nameof(TWO_LEFT1_PORT), Port = TWO_LEFT1_PORT});
-        this.Ports.Add(new PlayPort{Name = nameof(TWO_LEFT2_PORT), Port = TWO_LEFT2_PORT});
-        this.Ports.Add(new PlayPort{Name = nameof(TWO_RIGHT1_PORT), Port = TWO_RIGHT1_PORT});
-        this.Ports.Add(new PlayPort{Name = nameof(TWO_RIGHT2_PORT), Port = TWO_RIGHT2_PORT});
+        InitKeywords();
+        this.Ports.Add(new PlayPort { Name = nameof(ONE_LEFT_PORT), Port = ONE_LEFT_PORT });
+        this.Ports.Add(new PlayPort { Name = nameof(ONE_RIGHT_PORT), Port = ONE_RIGHT_PORT });
+        this.Ports.Add(new PlayPort { Name = nameof(TWO_LEFT1_PORT), Port = TWO_LEFT1_PORT });
+        this.Ports.Add(new PlayPort { Name = nameof(TWO_LEFT2_PORT), Port = TWO_LEFT2_PORT });
+        this.Ports.Add(new PlayPort { Name = nameof(TWO_RIGHT1_PORT), Port = TWO_RIGHT1_PORT });
+        this.Ports.Add(new PlayPort { Name = nameof(TWO_RIGHT2_PORT), Port = TWO_RIGHT2_PORT });
     }
 
     #region Command
@@ -56,15 +57,20 @@ public partial class MainViewModel : ObservableObject
     {
         try
         {
-            Processing = true; 
+            Processing = true;
             Videos.Clear();
             var modes = new List<VideoMode>();
             await Task.Delay(500);
             await Task.Run(async () =>
-            {                
+            {
+                var kws = this.SelectedKeywords?.ToList();
+                if (!(kws?.Any(k => k == this.SelectedKeyword) ?? false))
+                    kws?.Add(this.SelectedKeyword);
+                kws?.Remove(Screnn.None);
+                kws?.Remove(null);
                 bool? wideScrenn = ScrennMode == Screnn.None ? null : ScrennMode == Screnn.Wide ? true : false;
                 var dir = SelectedDir.ValidName == Screnn.All ? null : SelectedDir.ValidName;
-                var enties = await dataService.VideosService.QueryAsync(dir, wideScrenn: wideScrenn);
+                var enties = await dataService.VideosService.QueryAsync(dir, kws, wideScrenn: wideScrenn);
                 modes = enties.ToModes();
             });
             Videos = new ObservableCollection<VideoMode>(modes);
@@ -101,7 +107,7 @@ public partial class MainViewModel : ObservableObject
             {
                 if (result.Folder == null)
                     return;
-                
+
                 var dir = new DirRecord
                 {
                     Name = result.Folder.Name,

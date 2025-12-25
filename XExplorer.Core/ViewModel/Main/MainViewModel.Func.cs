@@ -68,6 +68,24 @@ partial class MainViewModel
     }
 
     /// <summary>
+    /// 初始化关键字
+    /// </summary>
+    private void InitKeywords()
+    {
+        this.keywords.Clear();
+        this.keywords.Add("None");
+        this.keywords.Add("妈");
+        this.keywords.Add("母");
+        this.keywords.Add("姐");
+        this.keywords.Add("爸");
+        this.keywords.Add("父");
+        this.keywords.Add("哥");
+        this.keywords.Add("嫂"); 
+        this.keywords.Add("妹");
+        this.SelectedKeywords = new();
+        this.SelectedKeyword = string.Empty;
+    }
+    /// <summary>
     ///     调整指定路径以适应当前操作系统环境的方法。
     ///     此方法根据配置的系统平台，将路径在 Windows 格式和 Mac 格式之间进行转换，
     ///     确保路径在不同平台上能够正确解析。
@@ -232,8 +250,8 @@ partial class MainViewModel
     {
         var cmd = "--extraintf http --http-port=";
         var port = this.selectedPort?.Port ?? 0;
-            if (!IsPortInUse(port))
-                return $" --extraintf http --http-port={port}"; // 找到未占用的端口  
+        if (!IsPortInUse(port))
+            return $" --extraintf http --http-port={port}"; // 找到未占用的端口  
 
         return string.Empty; // 没有可用端口
     }
@@ -745,11 +763,11 @@ partial class MainViewModel
         // 遍历每一个像素点
         var img = grayImage.ToImage<Gray, byte>();
         for (var y = 0; y < height; y++)
-        for (var x = 0; x < width; x++)
-        {
-            var pixel = img[y, x];
-            if (pixel.Intensity > 0) return false;
-        }
+            for (var x = 0; x < width; x++)
+            {
+                var pixel = img[y, x];
+                if (pixel.Intensity > 0) return false;
+            }
 
         return true;
     }
