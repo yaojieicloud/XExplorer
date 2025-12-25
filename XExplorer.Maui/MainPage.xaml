@@ -20,6 +20,16 @@
         <vm:MainViewModel />
     </ContentPage.BindingContext>
     <ContentPage.ToolbarItems>
+        <ToolbarItem Text="解析☣" Order="Primary" Priority="0"
+Command="{Binding ProcessVideosCommand}"
+CommandParameter="{x:Reference MainView}" />
+        <ToolbarItem Text="MD5☒" Order="Primary" Priority="0"
+     Command="{Binding Md5Command}"
+     CommandParameter="{x:Reference MainView}" />
+        <ToolbarItem Text="结束✘" Order="Primary" Priority="0"
+             Command="{Binding KillCommand}"
+             CommandParameter="{x:Reference MainView}" />
+        <ToolbarItem Text="|" Order="Primary" Priority="0" />
         <ToolbarItem Text="顶部▲" Order="Primary" Priority="0"
                      Command="{Binding ScrollToTopCommand}"
                      CommandParameter="{x:Reference MainView}" />
@@ -90,7 +100,7 @@
             <VerticalStackLayout HeightRequest="{Binding MainViewHeight}">
                 <Grid ColumnDefinitions="7*">
                     <HorizontalStackLayout x:Name="MainTool" Grid.Column="0">
-                        <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Text="目录：" FontSize="18"
+                        <Label HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Text="目录：" FontSize="18" IsVisible="Collapse"
                                Padding="10,0,0,0" />
                         <inputs:SfComboBox SelectedItem="{Binding SelectedDir}"
                                            ItemsSource="{Binding Dirs}"
@@ -121,7 +131,7 @@
                                            HorizontalTextAlignment="Start"
                                            Margin="10,0"
                                            MinimumWidthRequest="100" />
-                        <syfButton:SfButton Text="加载" CornerRadius="20" HeightRequest="40"
+                        <syfButton:SfButton Text="加载" CornerRadius="5" HeightRequest="40"
                                             Padding="5,0"
                                             Command="{Binding LoadDirCommand}">
                             <syfButton:SfButton.Background>
@@ -134,8 +144,8 @@
                             </syfButton:SfButton.Background>
                         </syfButton:SfButton>
                         <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
-                        <syfButton:SfButton Text="处理" CornerRadius="20" HeightRequest="40"
-                                            Padding="5,0"
+                        <syfButton:SfButton Text="处理" CornerRadius="5" HeightRequest="40"
+                                            Padding="5,0" IsVisible="Collapse"
                                             Command="{Binding ProcessVideosCommand}">
                             <syfButton:SfButton.Background>
                                 <LinearGradientBrush>
@@ -146,9 +156,9 @@
                                 </LinearGradientBrush>
                             </syfButton:SfButton.Background>
                         </syfButton:SfButton>
-                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
+                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" IsVisible="Collapse" />
                         <syfButton:SfButton Text="MD5" CornerRadius="20" HeightRequest="40"
-                                            Padding="5,0"
+                                            Padding="5,0" IsVisible="Collapse"
                                             Command="{Binding Md5Command}">
                             <syfButton:SfButton.Background>
                                 <LinearGradientBrush>
@@ -159,8 +169,8 @@
                                 </LinearGradientBrush>
                             </syfButton:SfButton.Background>
                         </syfButton:SfButton>
-                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
-                        <syfButton:SfButton Text="查重" CornerRadius="20" HeightRequest="40"
+                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" IsVisible="Collapse" />
+                        <syfButton:SfButton Text="查重" CornerRadius="5" HeightRequest="40"
                                             Padding="5,0"
                                             Command="{Binding QueryDuplicateMD5Command}">
                             <syfButton:SfButton.Background>
@@ -174,7 +184,7 @@
                         </syfButton:SfButton>
                         <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
                         <syfButton:SfButton Text="结束" CornerRadius="20" HeightRequest="40"
-                                            Padding="5,0"
+                                            Padding="5,0" IsVisible="Collapse"
                                             Command="{Binding KillCommand}">
                             <syfButton:SfButton.Background>
                                 <LinearGradientBrush>
@@ -185,7 +195,7 @@
                                 </LinearGradientBrush>
                             </syfButton:SfButton.Background>
                         </syfButton:SfButton>
-                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" />
+                        <BoxView MaximumWidthRequest="5" BackgroundColor="Transparent" WidthRequest="5" IsVisible="Collapse" />
 
                     </HorizontalStackLayout>
                     <HorizontalStackLayout Grid.Column="1" HorizontalOptions="End" IsVisible="Collapse">
@@ -291,15 +301,18 @@
                                         <Border Padding="-10,0,10,0">
                                             <VerticalStackLayout HorizontalOptions="StartAndExpand"
                                                                  VerticalOptions="Start" WidthRequest="100"
-                                                                 Padding="10,10,10,10">
+                                                                 Padding="10,5,10,5">
                                                 <syfCore:SfBadgeView HorizontalOptions="Center"
-                                                                     VerticalOptions="Center"
+                                                                     VerticalOptions="Center" 
                                                                      BadgeText="{Binding PlayCount}">
                                                     <syfCore:SfBadgeView.BadgeSettings>
-                                                        <syfCore:BadgeSettings BadgeAlignment="End" CornerRadius="20" />
+                                                        <syfCore:BadgeSettings
+                                                            Type="Error"
+                                                            BadgeAlignment="End" 
+                                                            CornerRadius="30" />
                                                     </syfCore:SfBadgeView.BadgeSettings>
                                                     <syfCore:SfBadgeView.Content>
-                                                        <syfButton:SfButton Text="播放" CornerRadius="20"
+                                                        <syfButton:SfButton Text="播放" CornerRadius="0"
                                                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=PlayCommand}"
                                                                             CommandParameter="{Binding}">
                                                             <syfButton:SfButton.Background>
@@ -314,7 +327,7 @@
                                                     </syfCore:SfBadgeView.Content>
                                                 </syfCore:SfBadgeView>
                                                 <BoxView StyleClass="Divider" />
-                                                <syfButton:SfButton Text="加入" CornerRadius="20" HeightRequest="40"
+                                                <syfButton:SfButton Text="加入" CornerRadius="0" HeightRequest="35"
                                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=AddPlayListCommand}"
                                                                     CommandParameter="{Binding}">
                                                     <syfButton:SfButton.Background>
@@ -327,7 +340,7 @@
                                                     </syfButton:SfButton.Background>
                                                 </syfButton:SfButton>
                                                 <BoxView StyleClass="Divider" />
-                                                <syfButton:SfButton Text="目录" CornerRadius="20" HeightRequest="40"
+                                                <syfButton:SfButton Text="目录" CornerRadius="0" HeightRequest="35"
                                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=OpenFolderCommand}"
                                                                     CommandParameter="{Binding}">
                                                     <syfButton:SfButton.Background>
@@ -340,7 +353,7 @@
                                                     </syfButton:SfButton.Background>
                                                 </syfButton:SfButton>
                                                 <BoxView StyleClass="Divider" />
-                                                <syfButton:SfButton Text="删除" CornerRadius="20" HeightRequest="40"
+                                                <syfButton:SfButton Text="删除" CornerRadius="0" HeightRequest="35"
                                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=DelFolderCommand}"
                                                                     CommandParameter="{Binding}">
                                                     <syfButton:SfButton.Background>
@@ -366,7 +379,7 @@
                                                 <!--     </syfButton:SfButton.Background> -->
                                                 <!-- </syfButton:SfButton> -->
                                                 <!-- <BoxView StyleClass="Divider" /> -->
-                                                <syfButton:SfButton Text="重置" CornerRadius="20" HeightRequest="40"
+                                                <syfButton:SfButton Text="重置" CornerRadius="0" HeightRequest="35"
                                                                     Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MainViewModel}}, Path=ResetVideoCommand}"
                                                                     CommandParameter="{Binding}">
                                                     <syfButton:SfButton.Background>
@@ -425,7 +438,7 @@
                                                         <Border BackgroundColor="Transparent"
                                                                 Padding="3">
                                                             <Image Source="{Binding FullPath}" Aspect="AspectFit" HeightRequest="280" 
-                                                                    WidthRequest="400">
+                                                                    WidthRequest="350">
                                                                 <Image.GestureRecognizers>
                                                                     <TapGestureRecognizer 
                                                                          Command="{Binding Source={x:Reference MainView}, Path=BindingContext.ImageTappedCommand}" 
