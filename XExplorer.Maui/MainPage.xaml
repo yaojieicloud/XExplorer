@@ -20,9 +20,12 @@
         <vm:MainViewModel />
     </ContentPage.BindingContext>
     <ContentPage.ToolbarItems>
+        <ToolbarItem Text="播放▶" Order="Primary" Priority="0"
+                     Command="{Binding BatchPlayCommand}"
+                     CommandParameter="{x:Reference MainView}" />
         <ToolbarItem Text="解析☣" Order="Primary" Priority="0"
-Command="{Binding ProcessVideosCommand}"
-CommandParameter="{x:Reference MainView}" />
+                     Command="{Binding ProcessVideosCommand}"
+                     CommandParameter="{x:Reference MainView}" />
         <ToolbarItem Text="MD5☒" Order="Primary" Priority="0"
      Command="{Binding Md5Command}"
      CommandParameter="{x:Reference MainView}" />

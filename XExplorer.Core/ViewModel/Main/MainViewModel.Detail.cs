@@ -62,6 +62,77 @@ partial class MainViewModel
     }
 
     /// <summary>
+    ///     播放指定路径的视频文件。
+    /// </summary>
+    /// <param name="param">表示文件路径的对象。</param>
+    /// <remarks>
+    ///     此方法首先将传入的参数转换为字符串路径，然后检查路径是否为空。如果路径不为空，那么它会使用PotPlayer播放器打开并播放该路径的视频文件，然后增加该视频的播放次数。
+    /// </remarks>
+    [RelayCommand]
+    public async Task BatchPlayAsync()
+    {
+        try
+        {
+            var port = this.SelectedPort.Port;
+            var portStr = GetPortCmd();
+            if (AppSettingsUtils.Default.OS == OS.Windows)
+                Process.Start(AppSettingsUtils.Default.Current.VLCPath,
+                    $"--no-one-instance --loop --rate=2.0{portStr}");
+            else
+                Process.Start(AppSettingsUtils.Default.Current.VLCPath, $"--loop --rate=2.0{portStr}");
+
+            await Task.Delay(500);
+            foreach (var videoMode in this.Videos)
+                await this.AddPlayListOnlyAsync(videoMode,port);
+            
+            await Task.Delay(500);
+            await this.StartPlayAsync(port);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+        }
+    }
+
+    private async Task AddPlayListOnlyAsync(VideoMode mode,int port)
+    { 
+        var currPath = AdjustPath(mode.VideoPath);
+        currPath = Path.Combine(AppSettingsUtils.Default.Current.Volume, currPath);
+        var volume = AdjustPath(AppSettingsUtils.Default.Current.Volume);
+        currPath = Path.Combine(volume, currPath);
+
+        var password = "123456"; // VLC HTTP 接口密码
+        var vlcUrl = $"http://localhost:{port}/requests/status.xml";
+        var uriPath = ConvertToFileUri(currPath);
+        var requestUrl = $"{vlcUrl}?command=in_enqueue&input={Uri.EscapeDataString(uriPath)}";
+        using (var handler = new HttpClientHandler { Credentials = new NetworkCredential("", password) })
+        using (var client = new HttpClient(handler))
+        {
+            var response = await client.GetAsync(requestUrl);
+            var mesg = response.EnsureSuccessStatusCode();
+            var result = await response.Content.ReadAsStringAsync();
+            if (mesg.StatusCode == HttpStatusCode.OK)
+                Log.Information($"视频 [{mode.Id} {mode.VideoPath}] 已加入播放列表。");
+            else
+                Log.Error($"视频 [{mode.Id} {mode.VideoPath}] 加入播放列表失败。");
+        }
+    }
+    
+    private async Task StartPlayAsync(int port)
+    { 
+        var password = "123456"; // VLC HTTP 接口密码
+        var vlcUrl = $"http://localhost:{port}/requests/status.xml";
+        var requestUrl = $"{vlcUrl}?command=pl_play";
+        using (var handler = new HttpClientHandler { Credentials = new NetworkCredential("", password) })
+        using (var client = new HttpClient(handler))
+        {
+            var response = await client.GetAsync(requestUrl);
+            var mesg = response.EnsureSuccessStatusCode();
+            var result = await response.Content.ReadAsStringAsync();
+        }
+    }
+
+    /// <summary>
     /// 将指定的视频文件添加到播放列表中。
     /// </summary>
     /// <param name="param">表示视频信息的对象，通常为 <c>VideoMode</c> 类型。</param>
@@ -93,7 +164,7 @@ partial class MainViewModel
                     var response = await client.GetAsync(requestUrl);
                     var mesg = response.EnsureSuccessStatusCode();
                     var result = await response.Content.ReadAsStringAsync();
-                    if(mesg.StatusCode == HttpStatusCode.OK)
+                    if (mesg.StatusCode == HttpStatusCode.OK)
                         Log.Information($"视频 [{mode.Id} {mode.VideoPath}] 已加入播放列表。");
                     else
                         Log.Error($"视频 [{mode.Id} {mode.VideoPath}] 加入播放列表失败。");
