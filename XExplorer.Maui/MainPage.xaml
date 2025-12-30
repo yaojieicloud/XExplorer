@@ -26,6 +26,9 @@
         <ToolbarItem Text="解析☣" Order="Primary" Priority="0"
                      Command="{Binding ProcessVideosCommand}"
                      CommandParameter="{x:Reference MainView}" />
+        <ToolbarItem Text="文件夹☦" Order="Primary" Priority="0"
+             Command="{Binding CreateDirCommand}"
+             CommandParameter="{x:Reference MainView}" />
         <ToolbarItem Text="MD5☒" Order="Primary" Priority="0"
      Command="{Binding Md5Command}"
      CommandParameter="{x:Reference MainView}" />

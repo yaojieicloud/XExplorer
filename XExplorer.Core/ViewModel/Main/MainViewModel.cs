@@ -89,9 +89,57 @@ public partial class MainViewModel : ObservableObject
     }
 
     /// <summary>
-    ///     异步处理选定文件夹中的视频文件。
-    ///     此方法通过命令模式触发，会记录处理耗时并显示通知。
-    ///     若在处理过程中出现异常，将捕获并记录错误信息。
+    ///     异步加载选定目录中的视频数据。
+    /// </summary>
+    /// <returns>返回一个执行加载操作的任务。</returns>
+    [RelayCommand]
+    public async Task CreateDirAsync()
+    {
+        try
+        {
+            Processing = true;
+            var tmpDirs = this.Dirs.ToList();
+            var allDir = tmpDirs.First(m => m.Name == Screnn.All);
+            tmpDirs.Remove(allDir);
+            var item = tmpDirs.OrderByDescending(m => Convert.ToInt32(m.Name.Split('_')[0])).FirstOrDefault();
+            if (item != null)
+            {
+                try
+                {
+                    var name = item.Name.Split('_')[0];
+                    var num = Convert.ToInt32(name);
+                    var newDirName = $"{num + 1}_1024";
+                    var dirInfo = new DirectoryInfo(item.FullName);
+                    var parentDir = dirInfo.Parent;
+                    var newDirFullName = Path.Combine(parentDir?.FullName ?? string.Empty, newDirName);
+                    if (!Directory.Exists(newDirFullName))
+                    {
+                        Directory.CreateDirectory(newDirFullName);
+                        this.InitDirs();
+                        Information($"创建目录 [{newDirFullName}] 成功。");
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+            Notification($"{ex}");
+            Message = ex.Message;
+        }
+        finally
+        {
+            Processing = false;
+        }
+    }
+
+    /// <summary>
+    /// 异步处理选定文件夹中的视频文件。
+    /// 此方法通过命令模式触发，会记录处理耗时并显示通知。
+    /// 若在处理过程中出现异常，将捕获并记录错误信息。
     /// </summary>
     /// <returns>表示异步操作完成的任务。</returns>
     [RelayCommand]

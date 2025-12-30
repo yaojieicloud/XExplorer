@@ -23,6 +23,9 @@ public partial class BrowserViewModel : ViewModelBase
     [ObservableProperty]
     private ObservableCollection<string> historyUrls = new();
 
+    private Stack<string> backStack = new();
+    private Stack<string> forwardStack = new();
+
     /// <summary>
     /// Gets or sets the address of the target resource.
     /// </summary>
@@ -38,8 +41,10 @@ public partial class BrowserViewModel : ViewModelBase
     /// <summary>
     /// 是否显示下载界面
     /// </summary>
-    [ObservableProperty] 
+    [ObservableProperty]
     private bool showDownload;
+
+    private bool isGoBack = false;
 
     public BrowserViewModel()
     {
@@ -58,6 +63,7 @@ public partial class BrowserViewModel : ViewModelBase
     public async void Goto()
     {
         this.WebUrl = this.Address;
+        this.isGoBack = false;
 
         if (!string.IsNullOrWhiteSpace(this.webUrl) && !this.HistoryUrls.Contains(this.webUrl))
             this.HistoryUrls.Add(this.webUrl);
@@ -65,21 +71,60 @@ public partial class BrowserViewModel : ViewModelBase
 
     [RelayCommand]
     private void UpdateUrl(object args)
-    {
-        // 如果使用了 Converter，args 直接就是 WebNavigatedEventArgs
-        if (args is WebNavigatedEventArgs e)
-        {
-            if (e.Result == WebNavigationResult.Success)
+    { 
+        if (args is string url)
+        { 
+            if (!string.IsNullOrWhiteSpace(this.webUrl) && !this.HistoryUrls.Contains(this.webUrl))
+                this.HistoryUrls.Insert(0, this.webUrl);
+
+            if (isGoBack)
             {
-                // 更新属性，同步 UI
-                this.Address = e.Url;
-                this.webUrl = e.Url;
+                if (!this.forwardStack.Any())
+                    this.forwardStack.Push(this.Address);
+                else if (this.forwardStack.TryPeek(out var tmpUrl))
+                    if (url != tmpUrl)
+                        this.forwardStack.Push(this.Address);
+                this.isGoBack = false;
             }
-        }
-        else if (args is string url)
-        {
+            else
+            {
+                var currUrl = new Uri(url);
+                var addressUri = new Uri(this.Address);
+                if (currUrl == addressUri)
+                    return;
+
+                if (!this.backStack.Any())
+                    this.backStack.Push(this.Address);
+                else if (this.backStack.TryPeek(out var tmpUrl))
+                    if (url != tmpUrl)
+                        this.backStack.Push(this.Address);
+
+                this.forwardStack.Clear();
+            }
+
             this.Address = url;
             this.webUrl = url;
+        }
+    }
+
+    [RelayCommand]
+    private void GoBack()
+    {
+        if (this.backStack.TryPop(out string url))
+        {
+            this.isGoBack = true;
+            this.WebUrl = url;            
+        }
+    }
+
+    [RelayCommand]
+    private void GoForward()
+    {
+        if (this.forwardStack.TryPop(out string url))
+        {
+            this.isGoBack = false;
+            this.WebUrl = url;
+            
         }
     }
 

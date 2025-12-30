@@ -96,6 +96,37 @@
                            HorizontalTextAlignment="Start"
                            Margin="10,0"
                            MinimumWidthRequest="300" />
+                        <syfButton:SfButton Text="回退" CornerRadius="10"
+                                FontSize="18"
+                                HeightRequest="40"
+                                Padding="0,0,0,0"
+                                Margin="10,0,0,0"
+                                Command="{Binding GoBackCommand}">
+                            <syfButton:SfButton.Background>
+                                <LinearGradientBrush>
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </syfButton:SfButton.Background>
+                        </syfButton:SfButton>
+                        <syfButton:SfButton Text="前进" CornerRadius="10"
+                                 FontSize="18"
+                                 HeightRequest="40"
+                                 Padding="0,0,0,0"
+                                 Margin="10,0,0,0"
+                                 Command="{Binding GoForwardCommand}">             
+                            <syfButton:SfButton.Background>
+                                <LinearGradientBrush>
+                                    <LinearGradientBrush.GradientStops>
+                                        <GradientStop Color="#0D62D4" Offset="0" />
+                                        <GradientStop Color="#9F3CDC" Offset="1" />
+                                    </LinearGradientBrush.GradientStops>
+                                </LinearGradientBrush>
+                            </syfButton:SfButton.Background>
+                        </syfButton:SfButton>
+
                         <syfButton:SfButton Text="跳转" CornerRadius="10"
                                             FontSize="18"
                                             HeightRequest="40"
@@ -111,6 +142,7 @@
                                 </LinearGradientBrush>
                             </syfButton:SfButton.Background>
                         </syfButton:SfButton>
+                                               
                         <syfButton:SfButton Text="下载" CornerRadius="10"
                                         FontSize="18"
                                         HeightRequest="40"
@@ -126,6 +158,7 @@
                                 </LinearGradientBrush>
                             </syfButton:SfButton.Background>
                         </syfButton:SfButton>
+                        
                     </HorizontalStackLayout>
                     <BoxView StyleClass="Divider" />
                     <Grid VerticalOptions="Center">
