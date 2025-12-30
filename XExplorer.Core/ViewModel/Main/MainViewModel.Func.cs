@@ -278,6 +278,21 @@ partial class MainViewModel
     /// <returns>返回一个符合文件 URI 格式的字符串。</returns>
     private string ConvertToFileUri(string path)
     {
+        // 无论是 UNC 路径还是本地路径，new Uri(path).AbsoluteUri 都会自动处理：
+        // 1. 自动补全 file:/// 协议头
+        // 2. 将反斜杠 \ 转换为正斜杠 /
+        // 3. 对路径中的 # (变为 %23) 和空格 (变为 %20) 等字符进行标准 URI 编码
+
+        if (string.IsNullOrEmpty(path)) 
+            return string.Empty;
+
+        // GetFullPath 确保路径是规范的绝对路径
+        string fullPath = Path.GetFullPath(path);
+        return new Uri(fullPath).AbsoluteUri;
+    }
+
+    private string ConvertToFileUri2(string path)
+    {
         // 如果是 UNC 路径 \\NAS\share\video.mp4
         if (path.StartsWith(@"\\"))
         {
