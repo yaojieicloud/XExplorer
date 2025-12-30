@@ -16,7 +16,7 @@ namespace XExplorer.Core.ViewModel.Settings;
 public partial class SettingsViewModel : ViewModelBase
 {
     public SettingsViewModel()
-    {
+    { 
     }
 
     [RelayCommand]

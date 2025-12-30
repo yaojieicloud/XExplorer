@@ -170,6 +170,12 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Update="Pages\Browser.xaml.cs">
+        <DependentUpon>Browser.xaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
       <None Update="appsettings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>

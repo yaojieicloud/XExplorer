@@ -6,6 +6,7 @@ using UraniumUI;
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Downloader;
 using XExplorer.Core.Modes;
+using XExplorer.Core.Utils;
 
 namespace XExplorer.Maui;
 
@@ -40,6 +41,7 @@ public static class MauiProgram
         SetFFmpegPath();
 #elif WINDOWS
         DownloadRuntimeAsync();
+        VideoUtils.InitYtDlpAsync();
 #endif
 
         #endregion

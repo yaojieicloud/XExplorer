@@ -17,4 +17,8 @@
         Title="Settings"
         ContentTemplate="{DataTemplate pages:Settings}" 
         Route="PicturePage" />
+    <ShellContent
+        Title="Browser"
+        ContentTemplate="{DataTemplate pages:Browser}" 
+        Route="BrowserPage" />
 </Shell>
