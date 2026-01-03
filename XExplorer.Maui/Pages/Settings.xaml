@@ -105,33 +105,7 @@
                         </syfButton:SfButton>
                     </HorizontalStackLayout>
                     <BoxView StyleClass="Divider" />
-                    <HorizontalStackLayout VerticalOptions="Center" HeightRequest="75" Padding="0,20,0,10">
-                        <inputs:SfComboBox SelectedItem="{Binding SelectedDir}"
-                           ItemsSource="{Binding Dirs}"
-                           SelectedIndex="0"
-                           DisplayMemberPath="ValidName"
-                           VerticalTextAlignment="Center"
-                           HorizontalTextAlignment="Start"
-                           Margin="10,0"
-                           MinimumWidthRequest="300" />
-                        <syfButton:SfButton Text="下载" CornerRadius="10"
-                                            FontSize="18"
-                                            HeightRequest="55"
-                                            Padding="0,0,0,0"
-                                            Margin="20,0,0,0"
-                                            Command="{Binding DownloadVideoCommand}">
-                                            <syfButton:SfButton.Background>
-                                                <LinearGradientBrush>
-                                                    <LinearGradientBrush.GradientStops>
-                                                        <GradientStop Color="#0D62D4" Offset="0" />
-                                                        <GradientStop Color="#9F3CDC" Offset="1" />
-                                                    </LinearGradientBrush.GradientStops>
-                                                </LinearGradientBrush>
-                                            </syfButton:SfButton.Background>
-                                        </syfButton:SfButton>     
-                        
-                    </HorizontalStackLayout>
-                    <BoxView StyleClass="Divider" />
+   
                     <HorizontalStackLayout HorizontalOptions="EndAndExpand" MaximumHeightRequest="20">
                         <Label Text="{Binding Message}" />
                     </HorizontalStackLayout>
