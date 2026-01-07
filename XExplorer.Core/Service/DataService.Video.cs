@@ -378,7 +378,7 @@ partial class DataService
             int groupNo = 1; // 从1开始为每组分配编号
             foreach (var group in groups)
             {
-                var sorted = group.OrderByDescending(m => m.Evaluate).ThenByDescending(m => m.PlayCount)
+                var sorted = group.OrderByDescending(m => m.VideoDir)
                     .ThenByDescending(m => m.ModifyTime).ToList();
                 foreach (var video in sorted)
                 {

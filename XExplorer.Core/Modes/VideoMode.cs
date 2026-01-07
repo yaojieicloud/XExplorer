@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Graphics;
 using Serilog;
 using XExplorer.Core.Service;
 using XExplorer.Core.Utils;
@@ -121,6 +122,12 @@ public partial class VideoMode : ObservableObject
     /// </summary>
     [ObservableProperty]
     private int groupNo;
+
+    /// <summary>
+    /// 标题颜色
+    /// </summary>
+    [ObservableProperty]
+    private Color captionColor = Colors.White;
 
     /// <summary>
     /// 快照列表.

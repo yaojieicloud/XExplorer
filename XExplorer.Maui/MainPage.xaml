@@ -298,7 +298,7 @@
                                                 </inputs:SfRating.Behaviors>
                                             </inputs:SfRating>
                                             <Label Text="===" FontSize="18" />
-                                            <Label Text="{Binding Caption}" FontSize="18" Padding="15,0,10,0" />
+                                            <Label Text="{Binding Caption}" FontSize="18" TextColor="{Binding CaptionColor}" Padding="15,0,10,0" />
                                             <Label Text="===" FontSize="18" />
                                             <Label Text="{Binding Length}" FontSize="18" Padding="10,0" />
                                             <Label Text="MB" FontSize="18" Padding="10,0" />

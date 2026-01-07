@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using Emgu.CV.Dnn;
+using XExplorer.Core.Dictionaries;
 using XExplorer.Core.Modes;
 
 namespace XExplorer.Core.Utils;
@@ -95,6 +96,8 @@ public static class DataUtils
         result.GroupNo = video.GroupNo;
         result.Snapshots = new ObservableCollection<SnapshotMode>(video.Snapshots.ToModes());
 
+        if (DicColors.Instance.TryGetValue(video?.GroupNo ?? 0, out var color))
+            result.CaptionColor = color;
         return result;
     }
 
@@ -130,7 +133,7 @@ public static class DataUtils
         for (int i = modes.Count - 1; i >= 0; i--)
         {
             if (!File.Exists(modes[i].FullPath))
-                modes.RemoveAt(i); 
+                modes.RemoveAt(i);
         }
 
         if (modes.Count > 3)
