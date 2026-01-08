@@ -186,8 +186,9 @@ partial class DataService
         /// </remarks>
         public async Task DeleteAsync(long id)
         {
-            var video = dataContext.Videos.AsNoTracking().FirstOrDefault(v => v.Id == id);
-            var delSnapshots = dataContext.Snapshots.AsNoTracking().Where(s => s.VideoId == video.Id).ToList();
+            dataContext.Database.CloseConnection();
+            var video = dataContext.Videos.FirstOrDefault(v => v.Id == id);
+            var delSnapshots = dataContext.Snapshots.Where(s => s.VideoId == video.Id).ToList();
             if (video != null)
                 dataContext.Videos.Remove(video);
 
