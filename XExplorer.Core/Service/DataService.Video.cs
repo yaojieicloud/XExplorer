@@ -187,9 +187,10 @@ partial class DataService
         public async Task DeleteAsync(long id)
         {
             var video = dataContext.Videos.AsNoTracking().FirstOrDefault(v => v.Id == id);
-            var delSnapshots = dataContext.Snapshots.Where(s => s.VideoId == video.Id).ToList();
+            var delSnapshots = dataContext.Snapshots.AsNoTracking().Where(s => s.VideoId == video.Id).ToList();
             if (video != null)
                 dataContext.Videos.Remove(video);
+
 
             if (delSnapshots?.Any() ?? false)
                 dataContext.Snapshots.RemoveRange(delSnapshots);

@@ -29,9 +29,12 @@
         <ToolbarItem Text="文件夹☦" Order="Primary" Priority="0"
              Command="{Binding CreateDirCommand}"
              CommandParameter="{x:Reference MainView}" />
-        <ToolbarItem Text="MD5☒" Order="Primary" Priority="0"
-     Command="{Binding Md5Command}"
+        <ToolbarItem Text="去重☒" Order="Primary" Priority="0"
+     Command="{Binding DelDuplicateCommand}"
      CommandParameter="{x:Reference MainView}" />
+        <ToolbarItem Text="MD5☒" Order="Primary" Priority="0"
+Command="{Binding Md5Command}"
+CommandParameter="{x:Reference MainView}" />
         <ToolbarItem Text="结束✘" Order="Primary" Priority="0"
              Command="{Binding KillCommand}"
              CommandParameter="{x:Reference MainView}" />

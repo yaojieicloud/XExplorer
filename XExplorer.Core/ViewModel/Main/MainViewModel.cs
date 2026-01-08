@@ -378,6 +378,47 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// 剔除重复。
+    /// </summary>
+    /// <returns>返回一个表示异步操作的 Task。</returns>
+    [RelayCommand]
+    public async Task DelDuplicateAsync()
+    {
+        try
+        {
+            Processing = true;
+            Videos.Clear();
+
+            var enties = await dataService.VideosService.QueryMD5DuplicateAsync();
+            var modes = enties.ToModes();
+            Videos = new ObservableCollection<VideoMode>(modes);
+
+            var gruops = modes.GroupBy(m => m.GroupNo).Where(g => g.Count() > 1);
+            foreach (var group in gruops)
+            {
+                var toKeep = group.OrderByDescending(m => m.Evaluate).ThenByDescending(m => m.PlayCount).FirstOrDefault();
+                var toDelete = group.Where(m => m.Id != toKeep?.Id).ToList();
+                for (int i = toDelete.Count - 1; i >= 0; i--)
+                {
+                    var todel = toDelete[i];
+                    await this.DelFolderAsync(todel);
+                }
+            }
+
+            Message = $"重复数据[{enties?.Count}]行加载完成。";
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"{MethodBase.GetCurrentMethod().Name} Is Error");
+            Notification($"{ex}");
+            Message = ex.Message;
+        }
+        finally
+        {
+            Processing = false;
+        }
+    }
 
     /// <summary>
     ///     异步方法 DownloadRuntimeAsync 用于下载和配置 FFmpeg 的运行时文件。
